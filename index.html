@@ -70,20 +70,56 @@
   </div>
 </main>
 
-<section id="unterseite-bilder" class="unterseite hidden">
+<section id="unterseite-bilder" class="unterseite">
   <button onclick="zeigeStartseite()">← Zurück</button>
   <h2>Meine Bilder</h2>
   <p>Hier gibt es einiges zu sehen.</p>
+
+  <div class="galerie-grid" id="galerie-grid"></div>
 </section>
 
-<section id="unterseite-geschichten" class="unterseite hidden">
-  <button onclick="zeigeStartseite()">← Zurück</button>
-  <h2>Meine Geschichten</h2>
-  <p>Hier gibt es viel zu lesen.</p>
-</section>
+<div id="modal-beschreibung" class="modal hidden">
+  <div class="modal-inhalt">
+    <h3>Bild beschreiben</h3>
+    <p>Was siehst du in dem Bild oder wie findest du es?</p>
+    
+    <textarea id="beschreibung-text" placeholder="Deine Beschreibung..."></textarea>
+    <input type="text" id="beschreibung-name" placeholder="Dein Name (Pflichtfeld)*" required>
+    
+    <p id="modal-fehler" class="fehler-text hidden">Bitte gib deinen Namen ein!</p>
 
-<section id="unterseite-games" class="unterseite hidden">
-  <button onclick="zeigeStartseite()">← Zurück</button>
-  <h2>Meine Games</h2>
-  <p>Hier musst du selber gucken.</p>
-</section>
+    <div class="modal-buttons">
+      <button onclick="speichereBeschreibung()">Speichern</button>
+      <button onclick="schliesseBeschreibungModal()" class="btn-abbrechen">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-paint" class="modal hidden">
+  <div class="modal-inhalt paint-inhalt">
+    <h3>Bild bearbeiten & bemalen</h3>
+    
+    <div class="paint-tools">
+      <label>Farbe:</label>
+      <input type="color" id="paint-farbe" value="#00f3ff">
+      
+      <label>Stift:</label>
+      <button class="btn-tool active" onclick="setzeWerkzeug('bleistift')">Bleistift</button>
+      <button class="btn-tool" onclick="setzeWerkzeug('kugelschreiber')">Kugelschreiber</button>
+      <button class="btn-tool" onclick="setzeWerkzeug('spray')">Spraydose</button>
+    </div>
+
+    <div class="canvas-container">
+      <img id="paint-hintergrund-bild" src="" alt="Hintergrund">
+      <canvas id="paint-canvas"></canvas>
+    </div>
+
+    <input type="text" id="paint-name" placeholder="Dein Name (Pflichtfeld)*" required>
+    <p id="paint-fehler" class="fehler-text hidden">Bitte gib deinen Namen ein!</p>
+
+    <div class="modal-buttons">
+      <button onclick="speicherePaint()">Speichern</button>
+      <button onclick="schliessePaintModal()" class="btn-abbrechen">Abbrechen</button>
+    </div>
+  </div>
+</div>
