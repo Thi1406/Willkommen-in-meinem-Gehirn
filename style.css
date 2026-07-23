@@ -1,0 +1,371 @@
+/* Grunddesign */
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #000000;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+header { text-align: center; margin-bottom: 50px; }
+header h1 { font-size: 2.5rem; letter-spacing: 2px; }
+
+.navigation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  width: 100%;
+  max-width: 1000px;
+}
+
+.card {
+  background-color: #111111;
+  border: 3px solid #333;
+  border-radius: 12px;
+  height: 250px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover { transform: translateY(-5px); }
+
+.card-title {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.8rem;
+  font-weight: bold;
+  z-index: 10;
+  pointer-events: none;
+  background-color: rgba(17, 17, 17, 0.8);
+  padding: 5px 15px;
+  border-radius: 5px;
+}
+
+.card-bilder { border-color: #00ff00; }
+.card-bilder:hover { box-shadow: 0 0 20px rgba(0, 255, 0, 0.4); }
+.card-geschichten { border-color: #0088ff; }
+.card-geschichten:hover { box-shadow: 0 0 20px rgba(0, 136, 255, 0.4); }
+.card-games { border-color: #aa00ff; }
+.card-games:hover { box-shadow: 0 0 20px rgba(170, 0, 255, 0.4); }
+
+/* =======================================================
+   ANIMATION 1: CHOREOGRAFIE DER LÄUFER (BILDER)
+   ======================================================= */
+.runner {
+  position: absolute;
+  width: 20px;
+  height: 45px;
+  bottom: 20px;
+}
+
+.runner .head { 
+  width: 12px; 
+  height: 12px; 
+  border: 2px solid #fff; 
+  border-radius: 50%; 
+  position: absolute; 
+  left: 4px; 
+  top: 0; 
+  background: #111;
+  box-sizing: border-box;
+}
+
+.runner .eye { position: absolute; width: 1.5px; height: 3px; background: #fff; top: 2px; }
+.runner .eye.l { left: 2px; }
+.runner .eye.r { left: 6px; }
+
+.runner .torso { width: 2px; height: 16px; position: absolute; top: 12px; left: 9px; }
+
+/* NATÜRLICHE GLIEDMASSEN: Hängen runter und schwingen locker vor/zurück */
+.runner .arm-l, .runner .arm-r { 
+  width: 11px; 
+  height: 2px; 
+  position: absolute; 
+  top: 13px; 
+  left: 10px; 
+  transform-origin: left center;
+}
+.runner .arm-l { animation: armLaufTakt 0.6s infinite alternate ease-in-out; }
+.runner .arm-r { animation: armLaufTakt 0.6s infinite alternate-reverse ease-in-out; }
+
+.runner .leg-l, .runner .leg-r { 
+  width: 2px; 
+  height: 15px; 
+  position: absolute; 
+  top: 28px; 
+  left: 9px;
+  transform-origin: top center; 
+}
+.runner .leg-l { animation: beinLaufTakt 0.6s infinite alternate ease-in-out; }
+.runner .leg-r { animation: beinLaufTakt 0.6s infinite alternate-reverse ease-in-out; }
+
+/* Standard-Lauftakt (Pendeln nach unten gerichtet) */
+@keyframes armLaufTakt { from { transform: rotate(65deg); } to { transform: rotate(115deg); } }
+@keyframes beinLaufTakt { from { transform: rotate(25deg); } to { transform: rotate(-25deg); } }
+
+
+/* EINZELNE TIMINGS FÜR DAS VERSATZTE REINLAUFEN & NEBENEINANDER STEHENBLEIBEN */
+/* Gesamtlänge der Choreografie: 16 Sekunden */
+
+/* Läufer 1 (Rot): Läuft zuerst los, wartet ganz rechts in der Mitte (X: 160px) */
+.r1 { animation: wegLinksNachRechts1 16s infinite linear; animation-delay: 0s; }
+/* Läufer 2 (Hellblau): Wartet kurz, läuft los, stellt sich links neben Rot (X: 145px) */
+.r2 { animation: wegLinksNachRechts2 16s infinite linear; animation-delay: 0.4s; }
+/* Läufer 3 (Grün): Findet seinen Platz bei X: 130px */
+.r3 { animation: wegLinksNachRechts3 16s infinite linear; animation-delay: 0.8s; }
+/* Läufer 4 (Türkis): Findet seinen Platz bei X: 115px */
+.r4 { animation: wegLinksNachRechts4 16s infinite linear; animation-delay: 1.2s; }
+/* Läufer 5 (Orange): Kommt als Letzter an bei X: 100px. Sobald er steht, JUBELN ALLE! */
+.r5 { animation: wegLinksNachRechts5 16s infinite linear; animation-delay: 1.6s; }
+
+
+/* --- TIMELINES: CO-ORDINIERTER GRUPPENJUBEL (HINWEG) & RÜCKWEG --- */
+
+/* Läufer 1 (Rot) - Steht ganz rechts in der Gruppe */
+@keyframes wegLinksNachRechts1 {
+  0% { left: -40px; transform: scaleX(1); }
+  10% { left: 160px; transform: scaleX(1); }  /* Kommt früh an und wartet */
+  28% { left: 160px; transform: scaleX(1); }  
+  29% { transform: scaleX(1) translateY(-2px); } /* JUBEL-START: Macht sich bereit */
+  30%, 33% { transform: scaleX(1) translateY(-5px); } /* REISST ARME HOCH (Simuliert durch Hüpfen/Strecken) */
+  35% { transform: scaleX(1) translateY(0); }   /* JUBEL ENDE */
+  38% { left: 160px; transform: scaleX(1); }  /* Wartet bis alle losgehen */
+  48% { left: 340px; transform: scaleX(1); }  /* Läuft als Erster nach rechts raus */
+  53% { left: 340px; transform: scaleX(-1); } /* Dreht sich um für den Rückweg */
+  
+  /* RÜCKWEG (Von rechts nach links) */
+  58% { left: 100px; transform: scaleX(-1); } /* Läuft weit nach hinten durch */
+  78% { left: 100px; transform: scaleX(-1); } 
+  79% { transform: scaleX(-1) translateY(-2px); } /* ZWEITER GEMEINSAMER JUBEL */
+  80%, 83% { transform: scaleX(-1) translateY(-5px); }
+  85% { transform: scaleX(-1) translateY(0); }
+  92% { left: 100px; transform: scaleX(-1); } 
+  100% { left: -40px; transform: scaleX(-1); } /* Läuft als Letzter nach links raus */
+}
+
+/* Läufer 2 (Hellblau) */
+@keyframes wegLinksNachRechts2 {
+  0% { left: -40px; transform: scaleX(1); }
+  12% { left: 145px; transform: scaleX(1); }
+  28% { left: 145px; transform: scaleX(1); }
+  29% { transform: scaleX(1) translateY(-2px); }
+  30%, 33% { transform: scaleX(1) translateY(-5px); } /* GEMEINSAMER JUBEL */
+  35% { transform: scaleX(1) translateY(0); }
+  40% { left: 145px; transform: scaleX(1); }
+  50% { left: 340px; transform: scaleX(1); }
+  53% { left: 340px; transform: scaleX(-1); }
+  
+  /* RÜCKWEG */
+  60% { left: 115px; transform: scaleX(-1); }
+  78% { left: 115px; transform: scaleX(-1); }
+  79% { transform: scaleX(-1) translateY(-2px); } /* GEMEINSAMER JUBEL */
+  80%, 83% { transform: scaleX(-1) translateY(-5px); }
+  85% { transform: scaleX(-1) translateY(0); }
+  90% { left: 115px; transform: scaleX(-1); }
+  98% { left: -40px; transform: scaleX(-1); }
+}
+
+/* Läufer 3 (Grün) - Genau in der Mitte */
+@keyframes wegLinksNachRechts3 {
+  0% { left: -40px; transform: scaleX(1); }
+  14% { left: 130px; transform: scaleX(1); }
+  28% { left: 130px; transform: scaleX(1); }
+  29% { transform: scaleX(1) translateY(-2px); }
+  30%, 33% { transform: scaleX(1) translateY(-5px); } /* GEMEINSAMER JUBEL */
+  35% { transform: scaleX(1) translateY(0); }
+  42% { left: 130px; transform: scaleX(1); }
+  52% { left: 340px; transform: scaleX(1); }
+  53% { left: 340px; transform: scaleX(-1); }
+  
+  /* RÜCKWEG */
+  62% { left: 130px; transform: scaleX(-1); }
+  78% { left: 130px; transform: scaleX(-1); }
+  79% { transform: scaleX(-1) translateY(-2px); } /* GEMEINSAMER JUBEL */
+  80%, 83% { transform: scaleX(-1) translateY(-5px); }
+  85% { transform: scaleX(-1) translateY(0); }
+  88% { left: 130px; transform: scaleX(-1); }
+  96% { left: -40px; transform: scaleX(-1); }
+}
+
+/* Läufer 4 (Türkis) */
+@keyframes wegLinksNachRechts4 {
+  0% { left: -40px; transform: scaleX(1); }
+  16% { left: 115px; transform: scaleX(1); }
+  28% { left: 115px; transform: scaleX(1); }
+  29% { transform: scaleX(1) translateY(-2px); }
+  30%, 33% { transform: scaleX(1) translateY(-5px); } /* GEMEINSAMER JUBEL */
+  35% { transform: scaleX(1) translateY(0); }
+  44% { left: 115px; transform: scaleX(1); }
+  54% { left: 340px; transform: scaleX(1); }
+  55% { left: 340px; transform: scaleX(-1); }
+  
+  /* RÜCKWEG */
+  64% { left: 145px; transform: scaleX(-1); }
+  78% { left: 145px; transform: scaleX(-1); }
+  79% { transform: scaleX(-1) translateY(-2px); } /* GEMEINSAMER JUBEL */
+  80%, 83% { transform: scaleX(-1) translateY(-5px); }
+  85% { transform: scaleX(-1) translateY(0); }
+  86% { left: 145px; transform: scaleX(-1); }
+  94% { left: -40px; transform: scaleX(-1); }
+}
+
+/* Läufer 5 (Orange) - Kommt als Letzter an, geht als Letzter weg */
+@keyframes wegLinksNachRechts5 {
+  0% { left: -40px; transform: scaleX(1); }
+  18% { left: 100px; transform: scaleX(1); } /* Kommt an */
+  28% { left: 100px; transform: scaleX(1); }
+  29% { transform: scaleX(1) translateY(-2px); }
+  30%, 33% { transform: scaleX(1) translateY(-5px); } /* GEMEINSAMER JUBEL JETZT STARTEN! */
+  35% { transform: scaleX(1) translateY(0); }
+  46% { left: 100px; transform: scaleX(1); }
+  56% { left: 340px; transform: scaleX(1); }
+  57% { left: 340px; transform: scaleX(-1); }
+  
+  /* RÜCKWEG */
+  66% { left: 160px; transform: scaleX(-1); } /* Kommt als Letzter an */
+  78% { left: 160px; transform: scaleX(-1); }
+  79% { transform: scaleX(-1) translateY(-2px); } /* GEMEINSAMER JUBEL */
+  80%, 83% { transform: scaleX(-1) translateY(-5px); }
+  85% { transform: scaleX(-1) translateY(0); }
+  85.5% { left: 160px; transform: scaleX(-1); }
+  92% { left: -40px; transform: scaleX(-1); } /* Flitzt als Erster nach links weg */
+}
+
+
+/* DYNAMISCHE ARMAUSRICHTUNG WÄHREND DES JUBEL-MOMENTS (Prozentual abgestimmt auf 30%-33% und 80%-83%) */
+.runner .arm-l { animation: armLaufTakt 0.6s infinite alternate ease-in-out, armJubelChoreoL 16s infinite linear; }
+.runner .arm-r { animation: armLaufTakt 0.6s infinite alternate-reverse ease-in-out, armJubelChoreoR 16s infinite linear; }
+
+@keyframes armJubelChoreoL {
+  0%, 28% {     --override: none; }
+  /* Arme schnellen steil nach oben zum Feiern */
+  29%, 34% {   transform: rotate(-75deg) !important; }
+  35%, 78% {   --override: none; }
+  79%, 84% {   transform: rotate(-75deg) !important; }
+  85%, 100% {  --override: none; }
+}
+@keyframes armJubelChoreoR {
+  0%, 28% {     --override: none; }
+  29%, 34% {   transform: rotate(-95deg) !important; }
+  35%, 78% {   --override: none; }
+  79%, 84% {   transform: rotate(-95deg) !important; }
+  85%, 100% {  --override: none; }
+}
+
+
+/* FARBEN */
+.rot .head { border-color: #ff3333; } 
+.rot .torso, .rot .leg-l, .rot .leg-r, .rot .eye, .rot .arm-l, .rot .arm-r { background-color: #ff3333 !important; }
+.hellblau .head { border-color: #33ccff; } 
+.hellblau .torso, .hellblau .leg-l, .hellblau .leg-r, .hellblau .eye, .hellblau .arm-l, .hellblau .arm-r { background-color: #33ccff !important; }
+.gruen .head { border-color: #00ff00; } 
+.gruen .torso, .gruen .leg-l, .gruen .leg-r, .gruen .eye, .gruen .arm-l, .gruen .arm-r { background-color: #00ff00 !important; }
+.tuerkis .head { border-color: #00f5d4; } 
+.tuerkis .torso, .tuerkis .leg-l, .tuerkis .leg-r, .tuerkis .eye, .tuerkis .arm-l, .tuerkis .arm-r { background-color: #00f5d4 !important; }
+.orange .head { border-color: #ff9f1c; } 
+.orange .torso, .orange .leg-l, .orange .leg-r, .orange .eye, .orange .arm-l, .orange .arm-r { background-color: #ff9f1c !important; }
+
+/* =======================================================
+   ANIMATION 2: GESCHICHTEN
+   ======================================================= */
+.letter { position: absolute; color: #0088ff; font-family: 'Georgia', serif; font-size: 1.6rem; font-weight: bold; opacity: 0; animation: buchstabeFading 5s infinite ease-in-out; }
+.b1 { left: 15%; top: 20%; animation-delay: 0s; }
+.b2 { left: 75%; top: 30%; animation-delay: 0.8s; color: #3399ff; }
+.b3 { left: 30%; top: 70%; animation-delay: 1.5s; }
+.b4 { left: 80%; top: 75%; animation-delay: 2.2s; }
+.b5 { left: 50%; top: 15%; animation-delay: 2.8s; }
+.b6 { left: 20%; top: 45%; animation-delay: 3.5s; color: #3399ff; }
+.b7 { left: 65%; top: 60%; animation-delay: 4.1s; }
+.b8 { left: 45%; top: 80%; animation-delay: 4.7s; }
+
+@keyframes buchstabeFading {
+  0% { opacity: 0; transform: translateY(10px) scale(0.7); }
+  30% { opacity: 0.7; transform: translateY(-10px) scale(1); }
+  70% { opacity: 0.7; transform: translateY(-20px) scale(1); }
+  100% { opacity: 0; transform: translateY(-35px) scale(0.7); }
+}
+
+/* =======================================================
+   ANIMATION 3: GAMES (FLIEGER & LASER)
+   ======================================================= */
+.paperplane { position: absolute; font-size: 2.2rem; font-weight: bold; }
+.bullet { position: absolute; width: 5px; height: 5px; background-color: #ffffff; border-radius: 50%; top: 14px; opacity: 0; }
+
+.plane-rot { color: #ff3333; animation: geschwungenRot 14s infinite linear; }
+.plane-blau { color: #3333ff; animation: geschwungenBlau 14s infinite linear; }
+
+@keyframes geschwungenRot {
+  0% { left: -40px; top: 180px; transform: rotate(-30deg); }
+  15% { left: 100px; top: 40px; transform: rotate(10deg); }
+  30% { left: 200px; top: 150px; transform: rotate(-20deg); }
+  45% { left: 350px; top: 20px; transform: rotate(-10deg); }
+  48% { left: 350px; top: 20px; transform: scaleX(-1) rotate(0deg); }
+  55% { left: 280px; top: 190px; transform: scaleX(-1) rotate(-35deg); }
+  70% { left: 180px; top: 80px; transform: scaleX(-1) rotate(10deg); }
+  85% { left: 50px; top: 160px; transform: scaleX(-1) rotate(-15deg); }
+  95% { left: -50px; top: 120px; transform: scaleX(-1) rotate(0deg); }
+  100% { left: -40px; top: 180px; transform: scaleX(1) rotate(-30deg); }
+}
+
+@keyframes geschwungenBlau {
+  0% { left: -120px; top: 210px; transform: rotate(-15deg); }
+  18% { left: 60px; top: 120px; transform: rotate(-40deg); }
+  32% { left: 160px; top: 50px; transform: rotate(20deg); }
+  45% { left: 270px; top: 180px; transform: rotate(-30deg); }
+  49% { left: 350px; top: 150px; transform: rotate(0deg); }
+  52% { left: 350px; top: 150px; transform: scaleX(-1) rotate(0deg); }
+  60% { left: 240px; top: 90px; transform: scaleX(-1) rotate(30deg); }
+  75% { left: 130px; top: 200px; transform: scaleX(-1) rotate(-20deg); }
+  90% { left: -50px; top: 80px; transform: scaleX(-1) rotate(10deg); }
+  100% { left: -120px; top: 210px; transform: scaleX(1) rotate(-15deg); }
+}
+
+.b-rot-1 { animation: laserVorwaertsRot1 14s infinite linear; }
+.b-rot-2 { animation: laserVorwaertsRot2 14s infinite linear; }
+
+@keyframes laserVorwaertsRot1 {
+  0%, 55% { opacity: 0; left: 0; }
+  56% { opacity: 1; left: 0; }
+  60% { opacity: 1; left: 150px; }
+  61% { opacity: 0; left: 150px; }
+  100% { opacity: 0; }
+}
+@keyframes laserVorwaertsRot2 {
+  0%, 70% { opacity: 0; left: 0; }
+  71% { opacity: 1; left: 0; }
+  75% { opacity: 1; left: 150px; }
+  76% { opacity: 0; left: 150px; }
+  100% { opacity: 0; }
+}
+
+.b-blau-1 { animation: laserVorwaertsBlau1 14s infinite linear; }
+.b-blau-2 { animation: laserVorwaertsBlau2 14s infinite linear; }
+
+@keyframes laserVorwaertsBlau1 {
+  5% { opacity: 0; left: 0; }
+  6% { opacity: 1; left: 0; }
+  11% { opacity: 1; left: 150px; }
+  12% { opacity: 0; left: 150px; }
+  100% { opacity: 0; }
+}
+@keyframes laserVorwaertsBlau2 {
+  20% { opacity: 0; left: 0; }
+  21% { opacity: 1; left: 0; }
+  26% { opacity: 1; left: 150px; }
+  27% { opacity: 0; left: 150px; }
+  100% { opacity: 0; }
+}
+
+/* Unterseiten-Logik */
+.unterseite { background-color: #111111; border: 2px solid #555; border-radius: 12px; padding: 30px; width: 100%; max-width: 800px; margin-top: 20px; }
+.unterseite button { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
+.unterseite button:hover { background: #555; }
+.hidden { display: none !important; }
