@@ -1,0 +1,89 @@
+<header>
+  <h1>Willkommen in meinem Hirn</h1>
+  <p>Wähle einen Bereich aus, um mehr zu sehen:</p>
+</header>
+
+<main class="navigation-grid">
+  <div class="card card-bilder" onclick="zeigeBereich('bilder')">
+    <div class="card-title">Bilder</div>
+    
+    <div class="runner r1 rot">
+      <div class="head"><div class="eye l"></div><div class="eye r"></div></div>
+      <div class="torso"></div>
+      <div class="arm-l"></div>
+      <div class="arm-r"></div>
+      <div class="leg-l"></div>
+      <div class="leg-r"></div>
+    </div>
+    <div class="runner r2 hellblau">
+      <div class="head"><div class="eye l"></div><div class="eye r"></div></div>
+      <div class="torso"></div>
+      <div class="arm-l"></div>
+      <div class="arm-r"></div>
+      <div class="leg-l"></div>
+      <div class="leg-r"></div>
+    </div>
+    <div class="runner r3 gruen">
+      <div class="head"><div class="eye l"></div><div class="eye r"></div></div>
+      <div class="torso"></div>
+      <div class="arm-l"></div>
+      <div class="arm-r"></div>
+      <div class="leg-l"></div>
+      <div class="leg-r"></div>
+    </div>
+    <div class="runner r4 tuerkis">
+      <div class="head"><div class="eye l"></div><div class="eye r"></div></div>
+      <div class="torso"></div>
+      <div class="arm-l"></div>
+      <div class="arm-r"></div>
+      <div class="leg-l"></div>
+      <div class="leg-r"></div>
+    </div>
+    <div class="runner r5 orange">
+      <div class="head"><div class="eye l"></div><div class="eye r"></div></div>
+      <div class="torso"></div>
+      <div class="arm-l"></div>
+      <div class="arm-r"></div>
+      <div class="leg-l"></div>
+      <div class="leg-r"></div>
+    </div>
+  </div>
+
+  <div class="card card-geschichten" onclick="zeigeBereich('geschichten')">
+    <div class="card-title">Geschichten</div>
+    <span class="letter b1">A</span><span class="letter b2">g</span>
+    <span class="letter b3">h</span><span class="letter b4">X</span>
+    <span class="letter b5">w</span><span class="letter b6">?</span>
+    <span class="letter b7">O</span><span class="letter b8">m</span>
+  </div>
+
+  <div class="card card-games" onclick="zeigeBereich('games')">
+    <div class="card-title">Games</div>
+    <div class="paperplane plane-rot">➔
+      <div class="bullet b-rot-1"></div>
+      <div class="bullet b-rot-2"></div>
+    </div>
+    <div class="paperplane plane-blau">➔
+      <div class="bullet b-blau-1"></div>
+      <div class="bullet b-blau-2"></div>
+    </div>
+  </div>
+</main>
+
+<section id="unterseite-bilder" class="unterseite hidden">
+  <button onclick="zeigeStartseite()">← Zurück</button>
+  <h2>Meine Bilder</h2>
+  <p>Hier gibt es einiges zu sehen.</p>
+</section>
+
+<section id="unterseite-geschichten" class="unterseite hidden">
+  <button onclick="zeigeStartseite()">← Zurück</button>
+  <h2>Meine Geschichten</h2>
+  <p>Hier gibt es viel zu lesen.</p>
+</section>
+
+<section id="unterseite-games" class="unterseite hidden">
+  <button onclick="zeigeStartseite()">← Zurück</button>
+  <h2>Meine Games</h2>
+  <p>Hier musst du selber gucken.</p>
+</section>
