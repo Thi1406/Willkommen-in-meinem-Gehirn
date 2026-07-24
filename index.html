@@ -98,7 +98,7 @@
 
   <!-- REITER 1: KI-SPAß -->
   <div id="tab-ki-spass" class="tab-content">
-    <h3>KI-Spaß</h3>
+    <h3>KI-Spaß <button onclick="würfeleKiBilder()" style="cursor:pointer; background:none; border:none; font-size:1.2rem;">🎲</button></h3>
     
     <!-- Dropdown-Filter für Kategorien -->
     <div class="filter-box">
@@ -146,9 +146,17 @@
         <label>Farbe:</label>
         <input type="color" id="frei-paint-farbe" value="#00f3ff">
         
-        <label>Werkzeug:</label>
-        <button class="btn-tool active" onclick="setzeFreiWerkzeug('bleistift')">Bleistift</button>
-        <button class="btn-tool" onclick="setzeFreiWerkzeug('kugelschreiber')">Kugelschreiber</button>
+        <div class="werkzeug-leiste">
+  <button class="btn-tool active" onclick="setzeFreiWerkzeug('bleistift', event)">✏️ Bleistift</button>
+  <button class="btn-tool" onclick="setzeFreiWerkzeug('kugelschreiber', event)">🖊️ Kugelschreiber</button>
+  <button class="btn-tool" onclick="setzeFreiWerkzeug('spray', event)">💨 Spraydose</button>
+  <button class="btn-tool" onclick="setzeFreiWerkzeug('radiergummi', event)">🧽 Radiergummi</button>
+  <button class="btn-tool" onclick="allesAusfuellenFreiCanvas()">🪣 Alles Ausfüllen</button>
+  <button class="btn-tool" onclick="löscheFreiCanvas()">🗑️ Leeren</button>
+  <input type="color" id="frei-paint-farbe" value="#00f3ff">
+  <input type="range" id="frei-paint-groesse" min="1" max="30" value="5">
+</div>
+<canvas id="frei-paint-canvas" width="600" height="400" style="border:2px solid #00f3ff; background:#111; cursor:crosshair;"></canvas>
 
         <label>Strichstärke:</label>
         <input type="range" id="frei-paint-groesse" min="1" max="20" value="3">
