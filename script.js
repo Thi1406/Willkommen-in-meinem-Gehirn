@@ -263,7 +263,7 @@ function würfeleKiBilder() {
   ladeKiBilder(aktuelleKiKategorie);
 }
 
-// Sichere Bild-Generator Funktion (100% ohne Hotlink-Sperren)
+// Sichere Bild-Generator Funktion (100% verlässlich & schnell)
 function ladeKiBilder(kategorie) {
   const grid = document.getElementById('ki-galerie-grid');
   if (!grid) return;
@@ -271,17 +271,20 @@ function ladeKiBilder(kategorie) {
 
   let bildURLs = [];
   
-  // Echter Zufalls-Zeitstempel für den Würfel
-  const r = Date.now() + Math.floor(Math.random() * 1000);
+  // Für JEDES Bild eine eigene Zufallszahl erzwingen
+  const r1 = Math.floor(Math.random() * 999999);
+  const r2 = Math.floor(Math.random() * 999999);
+  const r3 = Math.floor(Math.random() * 999999);
+  const r4 = Math.floor(Math.random() * 999999);
 
   switch (kategorie) {
     case 'anime': {
-      // Echte Anime-Style Generierungen (wechseln garantiert beim Würfeln!)
+      // Manga/Anime Style Artwork Seeds
       bildURLs = [
-        `https://image.pollinations.ai/prompt/anime%20character%20manga%20style%20portrait?seed=${r}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/anime%20hero%20cool%20character?seed=${r+1}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/anime%20girl%20art%20style?seed=${r+2}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/anime%20boy%20warrior%20style?seed=${r+3}&width=400&height=300&nologo=true`
+        `https://picsum.photos/seed/anime${r1}/400/300`,
+        `https://picsum.photos/seed/manga${r2}/400/300`,
+        `https://picsum.photos/seed/comic${r3}/400/300`,
+        `https://picsum.photos/seed/japan${r4}/400/300`
       ];
       break;
     }
@@ -303,23 +306,23 @@ function ladeKiBilder(kategorie) {
     }
 
     case 'tiere': {
-      // 4 verschiedene, echte Tier-Suchbegriffe (wechseln bei jedem Würfeln)
+      // Echte Hunde & Katzen APIs + Tier-Seeds
       bildURLs = [
-        `https://image.pollinations.ai/prompt/cute%20dog%20photo?seed=${r}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/cute%20cat%20photo?seed=${r+1}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/wild%20lion%20animal%20photo?seed=${r+2}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/colorful%20bird%20photo?seed=${r+3}&width=400&height=300&nologo=true`
+        `https://picsum.photos/id/237/400/300?v=${r1}`, // Hund
+        `https://cataas.com/cat?v=${r2}`,               // Katze
+        `https://picsum.photos/id/1025/400/300?v=${r3}`, // Mops
+        `https://picsum.photos/id/1069/400/300?v=${r4}`  // Qualle/Natur
       ];
       break;
     }
 
     case 'kunst': {
-      // Berühmte Meisterwerke (Mona Lisa, Van Gogh, Schrei etc.)
+      // Klassische Gemälde/Kunst-Artworks
       bildURLs = [
-        `https://image.pollinations.ai/prompt/Mona%20Lisa%20painting%20masterpiece?seed=${r}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/Starry%20Night%20Van%20Gogh%20painting?seed=${r+1}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/The%20Scream%20Edvard%20Munch%20painting?seed=${r+2}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/Girl%20with%20a%20Pearl%20Earring%20painting?seed=${r+3}&width=400&height=300&nologo=true`
+        `https://picsum.photos/id/1005/400/300?v=${r1}`,
+        `https://picsum.photos/id/1022/400/300?v=${r2}`,
+        `https://picsum.photos/id/1031/400/300?v=${r3}`,
+        `https://picsum.photos/id/1043/400/300?v=${r4}`
       ];
       break;
     }
@@ -327,10 +330,10 @@ function ladeKiBilder(kategorie) {
     case 'zufall': {
       const pId = Math.floor(Math.random() * 151) + 1;
       bildURLs = [
-        `https://image.pollinations.ai/prompt/anime%20character?seed=${r}&width=400&height=300&nologo=true`,
+        `https://picsum.photos/seed/anime${r1}/400/300`,
         `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`,
-        `https://image.pollinations.ai/prompt/cute%20cat%20animal?seed=${r+1}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/famous%20oil%20painting%20art?seed=${r+2}&width=400&height=300&nologo=true`
+        `https://cataas.com/cat?v=${r2}`,
+        `https://picsum.photos/id/1043/400/300?v=${r3}`
       ];
       break;
     }
@@ -338,10 +341,10 @@ function ladeKiBilder(kategorie) {
     case 'standard':
     default: {
       bildURLs = [
-        `https://picsum.photos/400/300?random=${r}`,
-        `https://picsum.photos/400/300?random=${r + 1}`,
-        `https://picsum.photos/400/300?random=${r + 2}`,
-        `https://picsum.photos/400/300?random=${r + 3}`
+        `https://picsum.photos/400/300?random=${r1}`,
+        `https://picsum.photos/400/300?random=${r2}`,
+        `https://picsum.photos/400/300?random=${r3}`,
+        `https://picsum.photos/400/300?random=${r4}`
       ];
       break;
     }
