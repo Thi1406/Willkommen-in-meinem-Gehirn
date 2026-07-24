@@ -263,33 +263,35 @@ function würfeleKiBilder() {
   ladeKiBilder(aktuelleKiKategorie);
 }
 
-// Sichere Bild-Generator Funktion
+// Sichere Bild-Generator Funktion mit stabilen Listen
 function ladeKiBilder(kategorie) {
   const grid = document.getElementById('ki-galerie-grid');
   if (!grid) return;
-  grid.innerHTML = '';
+  grid.innerHTML = ''; // Galerie leeren
 
   let bildURLs = [];
   
-  // 4 verschiedene Zufallswerte für 4 garantiert unterschiedliche Bilder
-  const r1 = Math.floor(Math.random() * 899999) + 100000;
-  const r2 = Math.floor(Math.random() * 899999) + 100000;
-  const r3 = Math.floor(Math.random() * 899999) + 100000;
-  const r4 = Math.floor(Math.random() * 899999) + 100000;
+  // Zufallswerte für Standard/Tiere
+  const r = Math.floor(Math.random() * 99999);
 
   switch (kategorie) {
     case 'anime': {
-      // Bunte Anime & Manga Style Illustrationen
-      bildURLs = [
-        `https://picsum.photos/seed/anime_${r1}/400/300`,
-        `https://picsum.photos/seed/manga_${r2}/400/300`,
-        `https://picsum.photos/seed/japan_${r3}/400/300`,
-        `https://picsum.photos/seed/art_${r4}/400/300`
+      // Eine feste Liste mit garantierten Anime-Charakteren (lizenzfrei/stabile Quellen)
+      const animeListe = [
+        'https://cdn.pixabay.com/photo/2022/12/01/04/43/girl-7628308_960_720.png',
+        'https://cdn.pixabay.com/photo/2023/02/12/10/39/anime-7784713_960_720.png',
+        'https://cdn.pixabay.com/photo/2023/08/18/15/02/cat-8198731_960_720.jpg',
+        'https://cdn.pixabay.com/photo/2023/05/11/03/43/waifu-7985440_960_720.png',
+        'https://cdn.pixabay.com/photo/2023/02/12/10/39/girl-7784714_960_720.png',
+        'https://cdn.pixabay.com/photo/2023/05/11/03/42/waifu-7985437_960_720.png'
       ];
+      // Mischen und die ersten 4 nehmen
+      bildURLs = animeListe.sort(() => 0.5 - Math.random()).slice(0, 4);
       break;
     }
 
     case 'pokemon-gen1': {
+      // Funktioniert super, lassen wir so
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 151) + 1;
         bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
@@ -298,6 +300,7 @@ function ladeKiBilder(kategorie) {
     }
 
     case 'pokemon-gen2': {
+      // Funktioniert super, lassen wir so
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 100) + 152;
         bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
@@ -306,85 +309,66 @@ function ladeKiBilder(kategorie) {
     }
 
     case 'tiere': {
-      // Dynamische Tier-Generatoren (wechseln bei JEDEM Würfeln!)
+      // Wir nutzen Picsum, aber erzwingen durch das 'seed' und Tier-IDs echte Tierfotos
+      // IDs: 237(Hund), 1025(Mops), 1074(Löwe), 1084(Wal) - Picsum liefert hier stabile Tiere
       bildURLs = [
-        `https://dog.ceo/api/breeds/image/random?cache=${r1}`, // Zufälliges Hundebild
-        `https://cataas.com/cat?cache=${r2}`,                // Zufälliges Katzenbild
-        `https://picsum.photos/seed/animal_${r3}/400/300`,    // Wildtier/Natur
-        `https://picsum.photos/seed/pet_${r4}/400/300`        // Haustier
+        `https://picsum.photos/id/237/400/300?sig=${r}`,
+        `https://picsum.photos/id/1025/400/300?sig=${r}`,
+        `https://picsum.photos/id/1074/400/300?sig=${r}`,
+        `https://picsum.photos/id/1084/400/300?sig=${r}`
       ];
       break;
     }
 
     case 'kunst': {
-      // Echte berühmte Gemälde & Meisterwerke
-      const meisterwerke = [
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/400px-Mona_Lisa.jpg', // Mona Lisa
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/400px-Starry_Night.jpg', // Sternennacht
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/400px-Girl_with_Pearl.jpg', // Mädchen mit Perlenohrring
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73.5_cm%2C_National_Museum_of_Art%2C_Architecture_and_Design.jpg/400px-The_Scream.jpg', // Der Schrei
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Tsunami_by_hokusai_19th_century.jpg/400px-Hokusai_Wave.jpg', // Die große Welle
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Vincent_van_Gogh_-_Sunflowers_-_Vollard_1888.jpg/400px-Sunflowers.jpg' // Sonnenblumen
+      // Feste Liste mit GARANTIERTEN Meisterwerken (stabile Bild-Quellen)
+      const kunstListe = [
+        'https://cdn.pixabay.com/photo/2012/10/26/02/08/mona-lisa-63004_960_720.jpg', // Mona Lisa
+        'https://cdn.pixabay.com/photo/2013/01/08/01/41/van-gogh-74218_960_720.jpg',  // Sternennacht
+        'https://cdn.pixabay.com/photo/2017/08/13/17/36/girl-with-a-pearl-earring-2637930_960_720.jpg', // Perlenohrring
+        'https://cdn.pixabay.com/photo/2012/10/26/01/16/edvard-munch-62947_960_720.jpg', // Der Schrei
+        'https://cdn.pixabay.com/photo/2012/10/26/01/37/hokusai-62991_960_720.jpg',    // Große Welle
+        'https://cdn.pixabay.com/photo/2016/06/17/01/50/art-1462479_960_720.jpg'     // Van Gogh Selbstporträt
       ];
-      
-      // Mische die Meisterwerke zufällig durch
-      const shuffled = meisterwerke.sort(() => 0.5 - Math.random());
-      bildURLs = shuffled.slice(0, 4);
+      // Mischen und die ersten 4 nehmen
+      bildURLs = kunstListe.sort(() => 0.5 - Math.random()).slice(0, 4);
       break;
     }
 
     case 'zufall': {
-      // Echter Mix: 1x Anime, 1x Pokémon, 1x Tier, 1x Kunstwerk
+      // Ein echter Mix: 1x Anime, 1x Pokémon, 1x Tier, 1x Kunst
       const pId = Math.floor(Math.random() * 151) + 1;
-      const kunstKollektion = [
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/400px-Mona_Lisa.jpg',
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/400px-Starry_Night.jpg',
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/400px-Girl_with_Pearl.jpg'
-      ];
-      const zufallsKunst = kunstKollektion[Math.floor(Math.random() * kunstKollektion.length)];
-
+      // Kurze Listen für den Mix
+      const aMix = ['https://cdn.pixabay.com/photo/2022/12/01/04/43/girl-7628308_960_720.png', 'https://cdn.pixabay.com/photo/2023/02/12/10/39/anime-7784713_960_720.png'];
+      const kMix = ['https://cdn.pixabay.com/photo/2012/10/26/02/08/mona-lisa-63004_960_720.jpg', 'https://cdn.pixabay.com/photo/2013/01/08/01/41/van-gogh-74218_960_720.jpg'];
+      
       bildURLs = [
-        `https://picsum.photos/seed/anime_${r1}/400/300`, // Anime
+        aMix[Math.floor(Math.random()*aMix.length)], // Anime
         `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`, // Pokémon
-        `https://cataas.com/cat?cache=${r2}`, // Tier
-        zufallsKunst // Kunstwerk
+        `https://picsum.photos/id/237/400/300?sig=${r}`, // Tier (Hund)
+        kMix[Math.floor(Math.random()*kMix.length)] // Kunst
       ];
       break;
     }
 
     case 'standard':
     default: {
-      bildURLs = [
-        `https://picsum.photos/400/300?random=${r1}`,
-        `https://picsum.photos/400/300?random=${r2}`,
-        `https://picsum.photos/400/300?random=${r3}`,
-        `https://picsum.photos/400/300?random=${r4}`
-      ];
+      // Bunte Zufallsbilder (funktioniert super)
+      for (let i = 0; i < 4; i++) {
+        bildURLs.push(`https://picsum.photos/400/300?random=${r + i}`);
+      }
       break;
     }
   }
 
-  // Sonderbehandlung für Dog-API (weil sie ein JSON mit Bild-URL zurückgibt)
-  bildURLs.forEach(async (url, idx) => {
-    let finaleUrl = url;
-    
-    // Falls es der Dog-API Link ist, kurz die echte Bild-URL auflösen
-    if (url.includes('dog.ceo')) {
-      try {
-        const res = await fetch('https://dog.ceo/api/breeds/image/random');
-        const data = await res.json();
-        finaleUrl = data.message;
-      } catch(e) {
-        finaleUrl = `https://picsum.photos/seed/dog_${r1}/400/300`;
-      }
-    }
-
+  // Galerie befüllen
+  bildURLs.forEach((url, idx) => {
     const card = document.createElement('div');
     card.className = 'galerie-karte';
     card.innerHTML = `
-      <img src="${finaleUrl}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px; background:#222;">
+      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px; background:#222;">
       <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
-        <button onclick="oeffnePaintModal(${idx + 1}, '${finaleUrl}')">🎨 Bearbeiten</button>
+        <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
         <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
       </div>
     `;
