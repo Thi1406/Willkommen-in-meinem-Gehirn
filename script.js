@@ -270,21 +270,20 @@ async function ladeKiBilder(kategorie) {
   grid.innerHTML = ''; // Galerie leeren
 
   let bildURLs = [];
-  const r = Date.now(); // Eindeutiger Zeitstempel
+  const r = Date.now(); // Eindeutiger Zeitstempel für den Würfel
 
   switch (kategorie) {
     case 'superhelden': {
-      // Riesige Liste von 80+ bekannten Helden & Comic-Charakteren (Marvel, DC, etc.)
+      // Exakt 40 geprüfte, funktionierende Helden-IDs aus der Superhero-API
       const heldenPool = [
-        1, 2, 3, 4, 10, 13, 17, 26, 30, 34, 38, 60, 63, 66, 68, 69, 70, 73, 106, 107,
-        149, 156, 165, 201, 204, 207, 208, 213, 222, 225, 233, 234, 251, 263, 265,
-        275, 303, 309, 310, 332, 346, 370, 388, 400, 405, 414, 423, 431, 480, 487,
-        490, 522, 527, 536, 561, 575, 579, 620, 638, 644, 655, 659, 680, 687, 708, 717, 720
+        1, 30, 34, 38, 60, 66, 68, 69, 70, 106, 
+        107, 149, 156, 165, 201, 204, 213, 222, 225, 233, 
+        234, 263, 265, 303, 309, 310, 332, 346, 370, 388, 
+        400, 405, 414, 490, 527, 575, 620, 644, 659, 687
       ];
       
-      // 4 zufällige aus dem großen Pool ziehen
+      // 4 zufällige aus den 40 ziehen
       const gemischt = heldenPool.sort(() => 0.5 - Math.random()).slice(0, 4);
-      
       bildURLs = gemischt.map(id => `https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/${id}.jpg`);
       break;
     }
@@ -325,18 +324,6 @@ async function ladeKiBilder(kategorie) {
           bildURLs.push(`https://images.dog.ceo/breeds/retriever-golden/n02099601_100.jpg`);
         }
       }
-      break;
-    }
-
-    case 'autos': {
-      // Stabile Auto-Bildquellen über unblockbare CDN-Pfade
-      const autoSeeds = [
-        `car_${Math.floor(Math.random()*9999)}`,
-        `sportscar_${Math.floor(Math.random()*9999)}`,
-        `vehicle_${Math.floor(Math.random()*9999)}`,
-        `auto_${Math.floor(Math.random()*9999)}`
-      ];
-      bildURLs = autoSeeds.map(s => `https://picsum.photos/seed/${s}/400/300`);
       break;
     }
 
@@ -386,7 +373,6 @@ async function ladeKiBilder(kategorie) {
     `;
     grid.appendChild(card);
   });
-}
 // ====================================================
 // 5. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
 // ====================================================
