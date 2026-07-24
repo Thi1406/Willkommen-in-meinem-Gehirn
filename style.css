@@ -1,3 +1,15 @@
+/* =======================================================
+   SCHRIFTART: MedievalSharp
+   ======================================================= */
+body, h1, h2, h3, p, button, .geschichte-text-box {
+  font-family: 'MedievalSharp', cursive !important;
+}
+
+.geschichte-text-box {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  letter-spacing: 0.5px;
+}
 /* Grunddesign */
 body {
   font-family: 'Courier New', Courier, monospace;
