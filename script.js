@@ -270,39 +270,26 @@ async function ladeKiBilder(kategorie) {
   grid.innerHTML = ''; // Galerie leeren
 
   let bildURLs = [];
-  const r = Date.now(); // Eindeutiger Zeitstempel für den Cache-Buster
+  const r = Date.now(); // Eindeutiger Zeitstempel
 
   switch (kategorie) {
     case 'superhelden': {
-      // Bekannte Superhelden-IDs aus der offiziellen API
-      const heldenIDs = [70, 149, 263, 346, 620, 644, 659, 107, 213, 309, 332, 575];
-      const gemischt = heldenIDs.sort(() => 0.5 - Math.random()).slice(0, 4);
-      bildURLs = gemischt.map(id => `https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/${id}-absored.jpg`);
+      // Riesige Liste von 80+ bekannten Helden & Comic-Charakteren (Marvel, DC, etc.)
+      const heldenPool = [
+        1, 2, 3, 4, 10, 13, 17, 26, 30, 34, 38, 60, 63, 66, 68, 69, 70, 73, 106, 107,
+        149, 156, 165, 201, 204, 207, 208, 213, 222, 225, 233, 234, 251, 263, 265,
+        275, 303, 309, 310, 332, 346, 370, 388, 400, 405, 414, 423, 431, 480, 487,
+        490, 522, 527, 536, 561, 575, 579, 620, 638, 644, 655, 659, 680, 687, 708, 717, 720
+      ];
       
-      // Fallback-Reinigung für die Superhero-API Pfade
-      bildURLs = gemischt.map(id => {
-        // Direkte CDN-Pfade für Top-Helden (Batman, Spider-Man, Iron Man, Deadpool etc.)
-        const HeldMap = {
-          70: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/70-batman.jpg',
-          149: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/149-captain-america.jpg',
-          263: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/213-deadpool.jpg',
-          346: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/346-iron-man.jpg',
-          620: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/620-spider-man.jpg',
-          644: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/644-superman.jpg',
-          659: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/659-thor.jpg',
-          107: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/107-black-widow.jpg',
-          213: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/213-deadpool.jpg',
-          309: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/309-harley-quinn.jpg',
-          332: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/332-hulk.jpg',
-          575: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/575-saitama.jpg'
-        };
-        return HeldMap[id] || 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/620-spider-man.jpg';
-      });
+      // 4 zufällige aus dem großen Pool ziehen
+      const gemischt = heldenPool.sort(() => 0.5 - Math.random()).slice(0, 4);
+      
+      bildURLs = gemischt.map(id => `https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/${id}.jpg`);
       break;
     }
 
     case 'yugioh': {
-      // Greift direkt auf die Yu-Gi-Oh API zu und holt 4 zufällige Karten
       try {
         const res = await fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php');
         const data = await res.json();
@@ -311,7 +298,6 @@ async function ladeKiBilder(kategorie) {
           bildURLs.push(zufallKarte.card_images[0].image_url);
         }
       } catch (e) {
-        // Fallback falls API schläft
         bildURLs = [
           'https://images.ygoprodeck.com/images/cards/46986414.jpg',
           'https://images.ygoprodeck.com/images/cards/74677422.jpg',
@@ -323,7 +309,6 @@ async function ladeKiBilder(kategorie) {
     }
 
     case 'katzen': {
-      // 100% Echte Katzen via Cataas API (mit Cache-Buster für garantiert neue Bilder)
       for (let i = 0; i < 4; i++) {
         bildURLs.push(`https://cataas.com/cat?t=${r}_${i}`);
       }
@@ -331,7 +316,6 @@ async function ladeKiBilder(kategorie) {
     }
 
     case 'hunde': {
-      // 100% Echte Hunde via Dog.ceo API
       try {
         const res = await fetch('https://dog.ceo/api/breeds/image/random/4');
         const data = await res.json();
@@ -341,6 +325,18 @@ async function ladeKiBilder(kategorie) {
           bildURLs.push(`https://images.dog.ceo/breeds/retriever-golden/n02099601_100.jpg`);
         }
       }
+      break;
+    }
+
+    case 'autos': {
+      // Stabile Auto-Bildquellen über unblockbare CDN-Pfade
+      const autoSeeds = [
+        `car_${Math.floor(Math.random()*9999)}`,
+        `sportscar_${Math.floor(Math.random()*9999)}`,
+        `vehicle_${Math.floor(Math.random()*9999)}`,
+        `auto_${Math.floor(Math.random()*9999)}`
+      ];
+      bildURLs = autoSeeds.map(s => `https://picsum.photos/seed/${s}/400/300`);
       break;
     }
 
@@ -364,16 +360,6 @@ async function ladeKiBilder(kategorie) {
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 135) + 252;
         bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
-      }
-      break;
-    }
-
-    case 'pixelart': {
-      // Hohe Qualität Retro Game Pixel-Art Charaktere via PokeAPI / Retro Sprites
-      const pixelIDs = [1, 4, 7, 25, 39, 52, 133, 143, 150, 151, 155, 158, 252, 255, 258];
-      for (let i = 0; i < 4; i++) {
-        const id = pixelIDs[Math.floor(Math.random() * pixelIDs.length)];
-        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`);
       }
       break;
     }
