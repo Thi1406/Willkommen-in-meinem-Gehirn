@@ -263,51 +263,84 @@ function würfeleKiBilder() {
   ladeKiBilder(aktuelleKiKategorie);
 }
 
-// Sichere Bild-Generator Funktion (100% verlässlich, ohne Hotlink-Sperren)
-function ladeKiBilder(kategorie) {
+// Sichere, API-basierte Bild-Generator Funktion
+async function ladeKiBilder(kategorie) {
   const grid = document.getElementById('ki-galerie-grid');
   if (!grid) return;
   grid.innerHTML = ''; // Galerie leeren
 
   let bildURLs = [];
-  
-  // Dynamische Zufallswerte für JEDES Bild, damit der Würfel IMMER neue Bilder lädt
-  const r1 = Math.floor(Math.random() * 899999) + 100000;
-  const r2 = Math.floor(Math.random() * 899999) + 100000;
-  const r3 = Math.floor(Math.random() * 899999) + 100000;
-  const r4 = Math.floor(Math.random() * 899999) + 100000;
+  const r = Date.now(); // Eindeutiger Zeitstempel für den Cache-Buster
 
   switch (kategorie) {
-    case 'getraenke': {
-      // Neutrale Getränkedosen & Flaschen ohne Logo (Perfekt zum Logo draufmalen!)
-      bildURLs = [
-        `https://picsum.photos/seed/can_${r1}/400/300`,
-        `https://picsum.photos/seed/bottle_${r2}/400/300`,
-        `https://picsum.photos/seed/soda_${r3}/400/300`,
-        `https://picsum.photos/seed/drink_${r4}/400/300`
-      ];
+    case 'superhelden': {
+      // Bekannte Superhelden-IDs aus der offiziellen API
+      const heldenIDs = [70, 149, 263, 346, 620, 644, 659, 107, 213, 309, 332, 575];
+      const gemischt = heldenIDs.sort(() => 0.5 - Math.random()).slice(0, 4);
+      bildURLs = gemischt.map(id => `https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/${id}-absored.jpg`);
+      
+      // Fallback-Reinigung für die Superhero-API Pfade
+      bildURLs = gemischt.map(id => {
+        // Direkte CDN-Pfade für Top-Helden (Batman, Spider-Man, Iron Man, Deadpool etc.)
+        const HeldMap = {
+          70: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/70-batman.jpg',
+          149: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/149-captain-america.jpg',
+          263: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/213-deadpool.jpg',
+          346: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/346-iron-man.jpg',
+          620: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/620-spider-man.jpg',
+          644: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/644-superman.jpg',
+          659: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/659-thor.jpg',
+          107: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/107-black-widow.jpg',
+          213: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/213-deadpool.jpg',
+          309: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/309-harley-quinn.jpg',
+          332: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/332-hulk.jpg',
+          575: 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/575-saitama.jpg'
+        };
+        return HeldMap[id] || 'https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/620-spider-man.jpg';
+      });
       break;
     }
 
-    case 'waende': {
-      // Leere Ziegel-, Beton- und Straßenwände (Perfekt für Graffiti!)
-      bildURLs = [
-        `https://picsum.photos/seed/wall_${r1}/400/300`,
-        `https://picsum.photos/seed/brick_${r2}/400/300`,
-        `https://picsum.photos/seed/concrete_${r3}/400/300`,
-        `https://picsum.photos/seed/streetwall_${r4}/400/300`
-      ];
+    case 'yugioh': {
+      // Greift direkt auf die Yu-Gi-Oh API zu und holt 4 zufällige Karten
+      try {
+        const res = await fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php');
+        const data = await res.json();
+        for (let i = 0; i < 4; i++) {
+          const zufallKarte = data.data[Math.floor(Math.random() * data.data.length)];
+          bildURLs.push(zufallKarte.card_images[0].image_url);
+        }
+      } catch (e) {
+        // Fallback falls API schläft
+        bildURLs = [
+          'https://images.ygoprodeck.com/images/cards/46986414.jpg',
+          'https://images.ygoprodeck.com/images/cards/74677422.jpg',
+          'https://images.ygoprodeck.com/images/cards/23771716.jpg',
+          'https://images.ygoprodeck.com/images/cards/11901678.jpg'
+        ];
+      }
       break;
     }
 
-    case 'tiere': {
-      // Echte Tierfotos (Katzen, Hunde, Bären, Vögel, Natur)
-      bildURLs = [
-        `https://cataas.com/cat?cache=${r1}`,               // Katze
-        `https://dog.ceo/api/breeds/image/random?cache=${r2}`, // Hund (wird unten aufgelöst)
-        `https://picsum.photos/seed/bear_${r3}/400/300`,    // Bär / Wildtier
-        `https://picsum.photos/seed/bird_${r4}/400/300`     // Vogel / Natur
-      ];
+    case 'katzen': {
+      // 100% Echte Katzen via Cataas API (mit Cache-Buster für garantiert neue Bilder)
+      for (let i = 0; i < 4; i++) {
+        bildURLs.push(`https://cataas.com/cat?t=${r}_${i}`);
+      }
+      break;
+    }
+
+    case 'hunde': {
+      // 100% Echte Hunde via Dog.ceo API
+      try {
+        const res = await fetch('https://dog.ceo/api/breeds/image/random/4');
+        const data = await res.json();
+        bildURLs = data.message;
+      } catch (e) {
+        for (let i = 0; i < 4; i++) {
+          bildURLs.push(`https://images.dog.ceo/breeds/retriever-golden/n02099601_100.jpg`);
+        }
+      }
       break;
     }
 
@@ -328,7 +361,6 @@ function ladeKiBilder(kategorie) {
     }
 
     case 'pokemon-gen3': {
-      // Gen 3: Hoenn-Pokémon (IDs 252 bis 386)
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 135) + 252;
         bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
@@ -336,61 +368,33 @@ function ladeKiBilder(kategorie) {
       break;
     }
 
-    case 'party': {
-      // Partys, Lichter, Festival- und DJ-Szenen
-      bildURLs = [
-        `https://picsum.photos/seed/party_${r1}/400/300`,
-        `https://picsum.photos/seed/festival_${r2}/400/300`,
-        `https://picsum.photos/seed/concert_${r3}/400/300`,
-        `https://picsum.photos/seed/dj_${r4}/400/300`
-      ];
-      break;
-    }
-
-    case 'kunst': {
-      // Kunst/Gemälde-Stil Artworks
-      bildURLs = [
-        `https://picsum.photos/seed/art_${r1}/400/300`,
-        `https://picsum.photos/seed/painting_${r2}/400/300`,
-        `https://picsum.photos/seed/artwork_${r3}/400/300`,
-        `https://picsum.photos/seed/gallery_${r4}/400/300`
-      ];
+    case 'pixelart': {
+      // Hohe Qualität Retro Game Pixel-Art Charaktere via PokeAPI / Retro Sprites
+      const pixelIDs = [1, 4, 7, 25, 39, 52, 133, 143, 150, 151, 155, 158, 252, 255, 258];
+      for (let i = 0; i < 4; i++) {
+        const id = pixelIDs[Math.floor(Math.random() * pixelIDs.length)];
+        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`);
+      }
       break;
     }
 
     case 'standard':
     default: {
-      bildURLs = [
-        `https://picsum.photos/400/300?random=${r1}`,
-        `https://picsum.photos/400/300?random=${r2}`,
-        `https://picsum.photos/400/300?random=${r3}`,
-        `https://picsum.photos/400/300?random=${r4}`
-      ];
+      for (let i = 0; i < 4; i++) {
+        bildURLs.push(`https://picsum.photos/400/300?random=${r + i}`);
+      }
       break;
     }
   }
 
-  // Bilder rendern und Eventualitäten abfangen
-  bildURLs.forEach(async (url, idx) => {
-    let finaleUrl = url;
-    
-    // Falls es die Dog-API ist, kurz die echte Bild-URL auflösen
-    if (url.includes('dog.ceo')) {
-      try {
-        const res = await fetch('https://dog.ceo/api/breeds/image/random');
-        const data = await res.json();
-        finaleUrl = data.message;
-      } catch(e) {
-        finaleUrl = `https://picsum.photos/seed/dog_${r1}/400/300`;
-      }
-    }
-
+  // Galerie im DOM befüllen
+  bildURLs.forEach((url, idx) => {
     const card = document.createElement('div');
     card.className = 'galerie-karte';
     card.innerHTML = `
-      <img src="${finaleUrl}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px; background:#1a1a1a;">
+      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:contain; border-radius:8px; background:#121212;">
       <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
-        <button onclick="oeffnePaintModal(${idx + 1}, '${finaleUrl}')">🎨 Bearbeiten</button>
+        <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
         <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
       </div>
     `;
