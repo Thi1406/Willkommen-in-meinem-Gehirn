@@ -263,33 +263,33 @@ function würfeleKiBilder() {
   ladeKiBilder(aktuelleKiKategorie);
 }
 
-// Sichere Bild-Generator Funktion (100% verlässlich & schnell)
+// Sichere Bild-Generator Funktion (KI-Generiert, 100% verlässlich & schnell)
 function ladeKiBilder(kategorie) {
   const grid = document.getElementById('ki-galerie-grid');
   if (!grid) return;
-  grid.innerHTML = '';
+  
+  // Zeige einen Lade-Hinweis, da KI-Bilder einen Moment brauchen
+  grid.innerHTML = '<p style="color:#00f3ff; grid-column:1/-1; text-align:center;">🎲 Die KI würfelt neue Bilder...</p>';
 
   let bildURLs = [];
   
-  // Für JEDES Bild eine eigene Zufallszahl erzwingen
-  const r1 = Math.floor(Math.random() * 999999);
-  const r2 = Math.floor(Math.random() * 999999);
-  const r3 = Math.floor(Math.random() * 999999);
-  const r4 = Math.floor(Math.random() * 999999);
+  // Ein echter Zufalls-Seed für den Würfel
+  const seed = Date.now();
 
   switch (kategorie) {
     case 'anime': {
-      // Manga/Anime Style Artwork Seeds
+      // KI-generierte Anime-Charaktere (ohne Lizenzrechte, echte Leute!)
       bildURLs = [
-        `https://picsum.photos/seed/anime${r1}/400/300`,
-        `https://picsum.photos/seed/manga${r2}/400/300`,
-        `https://picsum.photos/seed/comic${r3}/400/300`,
-        `https://picsum.photos/seed/japan${r4}/400/300`
+        `https://image.pollinations.ai/prompt/anime%20character%20portrait%20manga%20style%20vibrant%20colors?seed=${seed}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/cool%20anime%20hero%20digital%20art?seed=${seed+1}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/anime%20girl%20cute%20artstyle?seed=${seed+2}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/anime%20boy%20warrior%20style?seed=${seed+3}&width=400&height=300&nologo=true`
       ];
       break;
     }
 
     case 'pokemon-gen1': {
+      grid.innerHTML = ''; // Lade-Hinweis entfernen
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 151) + 1;
         bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
@@ -298,6 +298,7 @@ function ladeKiBilder(kategorie) {
     }
 
     case 'pokemon-gen2': {
+      grid.innerHTML = ''; // Lade-Hinweis entfernen
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 100) + 152;
         bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
@@ -306,23 +307,23 @@ function ladeKiBilder(kategorie) {
     }
 
     case 'tiere': {
-      // Echte Hunde & Katzen APIs + Tier-Seeds
+      // KI-generierte Tierfotos (wechseln garantiert beim Würfeln!)
       bildURLs = [
-        `https://picsum.photos/id/237/400/300?v=${r1}`, // Hund
-        `https://cataas.com/cat?v=${r2}`,               // Katze
-        `https://picsum.photos/id/1025/400/300?v=${r3}`, // Mops
-        `https://picsum.photos/id/1069/400/300?v=${r4}`  // Qualle/Natur
+        `https://image.pollinations.ai/prompt/cute%20dog%20high%20quality%20photo?seed=${seed}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/fluffy%20cat%20close%20up%20wildlife?seed=${seed+1}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/wild%20lion%20majestic%20photo?seed=${seed+2}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/colorful%20parrot%20bird%20nature?seed=${seed+3}&width=400&height=300&nologo=true`
       ];
       break;
     }
 
     case 'kunst': {
-      // Klassische Gemälde/Kunst-Artworks
+      // KI-generierte Meisterwerke (echte Gemälde-Prompts)
       bildURLs = [
-        `https://picsum.photos/id/1005/400/300?v=${r1}`,
-        `https://picsum.photos/id/1022/400/300?v=${r2}`,
-        `https://picsum.photos/id/1031/400/300?v=${r3}`,
-        `https://picsum.photos/id/1043/400/300?v=${r4}`
+        `https://image.pollinations.ai/prompt/famous%20oil%20painting%20masterpiece%20mona%20lisa%20style?seed=${seed}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/starry%20night%20van%20gogh%20style%20painting?seed=${seed+1}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/abstract%20art%20geometrical%20colorful?seed=${seed+2}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/impressionist%20water%20lilies%20painting?seed=${seed+3}&width=400&height=300&nologo=true`
       ];
       break;
     }
@@ -330,24 +331,30 @@ function ladeKiBilder(kategorie) {
     case 'zufall': {
       const pId = Math.floor(Math.random() * 151) + 1;
       bildURLs = [
-        `https://picsum.photos/seed/anime${r1}/400/300`,
+        `https://image.pollinations.ai/prompt/anime%20character?seed=${seed}&width=400&height=300&nologo=true`,
         `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`,
-        `https://cataas.com/cat?v=${r2}`,
-        `https://picsum.photos/id/1043/400/300?v=${r3}`
+        `https://image.pollinations.ai/prompt/cute%20animal%20cat?seed=${seed+1}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/classical%20oil%20painting?seed=${seed+2}&width=400&height=300&nologo=true`
       ];
       break;
     }
 
     case 'standard':
     default: {
+      grid.innerHTML = ''; // Lade-Hinweis entfernen
       bildURLs = [
-        `https://picsum.photos/400/300?random=${r1}`,
-        `https://picsum.photos/400/300?random=${r2}`,
-        `https://picsum.photos/400/300?random=${r3}`,
-        `https://picsum.photos/400/300?random=${r4}`
+        `https://picsum.photos/400/300?random=${seed}`,
+        `https://picsum.photos/400/300?random=${seed + 1}`,
+        `https://picsum.photos/400/300?random=${seed + 2}`,
+        `https://picsum.photos/400/300?random=${seed + 3}`
       ];
       break;
     }
+  }
+
+  // Fallback: Lade-Hinweis entfernen, falls er noch da ist
+  if (grid.innerHTML.includes('🎲')) {
+      grid.innerHTML = '';
   }
 
   // Galerie befüllen
