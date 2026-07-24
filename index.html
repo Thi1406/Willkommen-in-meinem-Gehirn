@@ -87,7 +87,41 @@
 
   <div class="galerie-grid" id="galerie-grid"></div>
 </section>
+<!-- UNTERSEITE: GESCHICHTEN -->
+<section id="unterseite-geschichten" class="unterseite hidden">
+  <button onclick="zeigeStartseite()">← Zurück</button>
+  <h2>Meine Geschichten</h2>
+  <p>Wähle eine Geschichte und verändere das Genre nach deinem Geschmack!</p>
 
+  <div class="geschichten-grid" id="geschichten-grid">
+    <!-- Hier werden die Geschichten per JavaScript eingefügt -->
+  </div>
+</section>
+
+<!-- MODAL / LESEFENSTER FÜR EINE GESCHICHTE -->
+<div id="modal-geschichte" class="modal hidden">
+  <div class="modal-inhalt geschichte-inhalt">
+    <h3 id="geschichte-titel">Titel der Geschichte</h3>
+    
+    <!-- Genre-Auswahl Buttons -->
+    <div class="genre-buttons">
+      <button class="btn-genre active" onclick="wechsleGenre('original')">Original</button>
+      <button class="btn-genre" onclick="wechsleGenre('horror')">Horror</button>
+      <button class="btn-genre" onclick="wechsleGenre('krimi')">Krimi</button>
+      <button class="btn-genre" onclick="wechsleGenre('kindlich')">Kindlich</button>
+      <button class="btn-genre" onclick="wechsleGenre('erotisch')">Erotisch</button>
+    </div>
+
+    <!-- Der eigentliche Textbereich -->
+    <div class="geschichte-text-box">
+      <p id="geschichte-text">Hier steht der Text...</p>
+    </div>
+
+    <div class="modal-buttons">
+      <button onclick="schliesseGeschichteModal()" class="btn-abbrechen">Schließen</button>
+    </div>
+  </div>
+</div>
 <div id="modal-beschreibung" class="modal hidden">
   <div class="modal-inhalt">
     <h3>Bild beschreiben</h3>
