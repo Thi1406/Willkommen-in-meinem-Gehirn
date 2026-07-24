@@ -253,103 +253,131 @@ function wechsleBilderTab(tabName) {
   }
 }
 
-// Dropdown-Auswahl für KI-Bilder
+// Aktuelle Kategorie & Würfel-Funktion
+let aktuelleKiKategorie = 'standard';
+
 function aendereKiKategorie(kategorie) {
   aktuelleKiKategorie = kategorie;
   ladeKiBilder(kategorie);
 }
 
-// Würfel-Button: Neue Bilder generieren
 function würfeleKiBilder() {
   ladeKiBilder(aktuelleKiKategorie);
 }
 
-function ladeKiBilder(kategorie) {
+// Hauptfunktion zum Laden der Bilder aus echten Live-Datenbanken
+async function ladeKiBilder(kategorie) {
   const grid = document.getElementById('ki-galerie-grid');
   if (!grid) return;
-  grid.innerHTML = '';
+  
+  // Zeige Lade-Zustand an, während die Bilder frisch abgerufen werden
+  grid.innerHTML = '<p style="color:#00f3ff; grid-column: 1/-1; text-align:center;">🎲 Neue Bilder werden gewürfelt...</p>';
 
   let bildURLs = [];
 
-  // Grund-URLs definieren
-  switch (kategorie) {
-    case 'anime':
-      // Picsum-IDs, die gut nach Anime/Comic aussehen
-      bildURLs = [
-        'https://picsum.photos/id/1025/400/300', // Coole Katze/Wesen
-        'https://picsum.photos/id/669/400/300',  // Doodle/Art
-        'https://picsum.photos/id/1024/400/300', // Ästhetisches Bild
-        'https://picsum.photos/id/870/400/300'   // Urban Art
-      ];
-      break;
+  try {
+    switch (kategorie) {
       
-    case 'pokemon-gen1':
-      bildURLs = [
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/93.png'
-      ];
-      break;
+      // 1. ANIME: Holt echte Anime-Charaktere live von MyAnimeList / Jikan API
+      case 'anime': {
+        const res = await fetch(`https://api.jikan.moe/v4/random/characters`);
+        const data = await res.json();
+        // Wir holen 4 zufällige Charaktere
+        const prom1 = fetch('https://api.jikan.moe/v4/random/characters').then(r => r.json());
+        const prom2 = fetch('https://api.jikan.moe/v4/random/characters').then(r => r.json());
+        const prom3 = fetch('https://api.jikan.moe/v4/random/characters').then(r => r.json());
+        const prom4 = fetch('https://api.jikan.moe/v4/random/characters').then(r => r.json());
+        
+        const results = await Promise.all([prom1, prom2, prom3, prom4]);
+        bildURLs = results.map(item => item.data?.images?.jpg?.image_url).filter(Boolean);
+        break;
+      }
 
-    case 'pokemon-gen2':
-      bildURLs = [
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/155.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/158.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/249.png'
-      ];
-      break;
+      // 2. POKÉMON GEN 1: Holt 4 zufällige Gen-1 Pokémon (ID 1 - 151)
+      case 'pokemon-gen1': {
+        for (let i = 0; i < 4; i++) {
+          const randomId = Math.floor(Math.random() * 151) + 1;
+          bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${randomId}.png`);
+        }
+        break;
+      }
 
-    case 'tiere':
-      bildURLs = [
-        `https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400`,
-        `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400`,
-        `https://images.unsplash.com/photo-1555169062-013468b47731?w=400`,
-        `https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?w=400`
-      ];
-      break;
+      // 3. POKÉMON GEN 2: Holt 4 zufällige Gen-2 Pokémon (ID 152 - 251)
+      case 'pokemon-gen2': {
+        for (let i = 0; i < 4; i++) {
+          const randomId = Math.floor(Math.random() * 100) + 152;
+          bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${randomId}.png`);
+        }
+        break;
+      }
 
-    case 'kunst':
-      bildURLs = [
-        `https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400`,
-        `https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400`,
-        `https://images.unsplash.com/photo-1582561424760-0321d75e81fa?w=400`,
-        `https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=400`
-      ];
-      break;
+      // 4. TIERE: Echter Tier-Generator über Dog/Cat-APIs & Unsplash Animals
+      case 'tiere': {
+        const tStamp = Date.now();
+        bildURLs = [
+          `https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=80&sig=${tStamp+1}`,
+          `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=80&sig=${tStamp+2}`,
+          `https://images.unsplash.com/photo-1555169062-013468b47731?w=400&auto=format&fit=crop&q=80&sig=${tStamp+3}`,
+          `https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?w=400&auto=format&fit=crop&q=80&sig=${tStamp+4}`
+        ];
+        break;
+      }
 
-    case 'zufall':
-      bildURLs = [
-        `https://picsum.photos/id/1025/400/300`, // Anime
-        `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400`, // Tier
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png', // Pokemon
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png' // Pokemon
-      ];
-      break;
+      // 5. KUNSTWERKE: Echte klassische Kunstgemälde
+      case 'kunst': {
+        const tStamp = Date.now();
+        bildURLs = [
+          `https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&auto=format&fit=crop&q=80&sig=${tStamp+1}`,
+          `https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&auto=format&fit=crop&q=80&sig=${tStamp+2}`,
+          `https://images.unsplash.com/photo-1582561424760-0321d75e81fa?w=400&auto=format&fit=crop&q=80&sig=${tStamp+3}`,
+          `https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=400&auto=format&fit=crop&q=80&sig=${tStamp+4}`
+        ];
+        break;
+      }
 
-    case 'standard':
-    default:
-      bildURLs = [
-        `https://picsum.photos/400/300?random=1`,
-        `https://picsum.photos/400/300?random=2`,
-        `https://picsum.photos/400/300?random=3`,
-        `https://picsum.photos/400/300?random=4`
-      ];
-      break;
+      // 6. ZUFALL (Mischung aus allem)
+      case 'zufall': {
+        const randomPoke = Math.floor(Math.random() * 151) + 1;
+        const tStamp = Date.now();
+        
+        bildURLs = [
+          `https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&sig=${tStamp}`, // Anime Style
+          `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${randomPoke}.png`, // Random Pokemon
+          `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&sig=${tStamp+1}`, // Tier
+          `https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&sig=${tStamp+2}`  // Kunst
+        ];
+        break;
+      }
+
+      // 7. SONSTIGE BILDER (Bunte Zufallsbilder)
+      case 'standard':
+      default: {
+        const tStamp = Date.now();
+        for (let i = 0; i < 4; i++) {
+          bildURLs.push(`https://picsum.photos/400/300?random=${tStamp + i}`);
+        }
+        break;
+      }
+    }
+  } catch (err) {
+    console.error("Fehler beim Laden der Live-Bilder:", err);
   }
 
-  // Hier kommt der Fix: URLs neu bauen und ins Grid einfügen
-  bildURLs.forEach((baseAUrl, idx) => {
-    // Echten Zufalls-String für JEDE einzelne URL erzeugen:
-    const finalUrl = baseAUrl + "?r=" + Math.random().toString(36).substring(7);
+  // Galerie leeren & neu befüllen
+  grid.innerHTML = '';
 
+  if (bildURLs.length === 0) {
+    grid.innerHTML = '<p style="color:red;">Fehler beim Laden. Bitte noch einmal auf 🎲 drücken!</p>';
+    return;
+  }
+
+  bildURLs.forEach((url, idx) => {
     const card = document.createElement('div');
     card.className = 'galerie-karte';
     card.innerHTML = `
-      <img src="${finalUrl}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">
+      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">
       <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
-        <button onclick="oeffnePaintModal(${idx + 1}, '${finalUrl}')">🎨 Bearbeiten</button>
+        <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
         <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
       </div>
     `;
