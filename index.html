@@ -171,5 +171,26 @@
     </div>
   </div>
 </div>
+
+<!-- NEUES MODAL: GESCHICHTEN-KOMMENTAR -->
+<div id="modal-geschichte-kommentar" class="modal hidden">
+  <div class="modal-inhalt">
+    <h3>Kommentar zur Geschichte</h3>
+    <p id="kommentar-story-titel" style="color: #00ffcc; font-weight: bold; margin-bottom: 10px;"></p>
+    
+    <label for="geschichte-kommentar-text">Dein Kommentar / Feedback:</label>
+    <textarea id="geschichte-kommentar-text" placeholder="Wie hat dir die Geschichte gefallen?"></textarea>
+    
+    <label for="geschichte-kommentar-name">Dein Name (Pflichtfeld)*:</label>
+    <input type="text" id="geschichte-kommentar-name" placeholder="Dein Name..." required>
+    
+    <p id="geschichte-kommentar-fehler" class="fehler-text hidden">Bitte gib deinen Namen ein!</p>
+
+    <div class="modal-buttons">
+      <button onclick="speichereGeschichteKommentar()">Speichern</button>
+      <button onclick="schliesseGeschichteKommentarModal()" class="btn-abbrechen">Abbrechen</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
