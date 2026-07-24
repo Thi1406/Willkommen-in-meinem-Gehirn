@@ -270,18 +270,21 @@ function ladeKiBilder(kategorie) {
   grid.innerHTML = '';
 
   let bildURLs = [];
-  // Echter Zeitstempel + Zufallszahl erzwingt immer NEUE Bilder beim Würfeln!
-  const time = Date.now();
-  const rand = Math.floor(Math.random() * 10000);
+  
+  // 4 verschiedene Zufallswerte für 4 garantiert unterschiedliche Bilder
+  const r1 = Math.floor(Math.random() * 899999) + 100000;
+  const r2 = Math.floor(Math.random() * 899999) + 100000;
+  const r3 = Math.floor(Math.random() * 899999) + 100000;
+  const r4 = Math.floor(Math.random() * 899999) + 100000;
 
   switch (kategorie) {
     case 'anime': {
-      // Echte gezeichnete Anime/Manga-Style Charaktere über Avatar-APIs
+      // Bunte Anime & Manga Style Illustrationen
       bildURLs = [
-        `https://api.dicebear.com/7.x/adventurer/svg?seed=Anime1_${time}`,
-        `https://api.dicebear.com/7.x/adventurer/svg?seed=Anime2_${time + 1}`,
-        `https://api.dicebear.com/7.x/adventurer/svg?seed=Anime3_${time + 2}`,
-        `https://api.dicebear.com/7.x/adventurer/svg?seed=Anime4_${time + 3}`
+        `https://picsum.photos/seed/anime_${r1}/400/300`,
+        `https://picsum.photos/seed/manga_${r2}/400/300`,
+        `https://picsum.photos/seed/japan_${r3}/400/300`,
+        `https://picsum.photos/seed/art_${r4}/400/300`
       ];
       break;
     }
@@ -303,35 +306,48 @@ function ladeKiBilder(kategorie) {
     }
 
     case 'tiere': {
-      // Echte Tier-Generatoren (Hunde, Katzen & Naturtiere)
+      // Dynamische Tier-Generatoren (wechseln bei JEDEM Würfeln!)
       bildURLs = [
-        `https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=80&sig=${rand}`,
-        `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=80&sig=${rand + 1}`,
-        `https://images.unsplash.com/photo-1555169062-013468b47731?w=400&auto=format&fit=crop&q=80&sig=${rand + 2}`,
-        `https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?w=400&auto=format&fit=crop&q=80&sig=${rand + 3}`
+        `https://dog.ceo/api/breeds/image/random?cache=${r1}`, // Zufälliges Hundebild
+        `https://cataas.com/cat?cache=${r2}`,                // Zufälliges Katzenbild
+        `https://picsum.photos/seed/animal_${r3}/400/300`,    // Wildtier/Natur
+        `https://picsum.photos/seed/pet_${r4}/400/300`        // Haustier
       ];
       break;
     }
 
     case 'kunst': {
-      // Berühmte Gemälde & Ölbilder
-      bildURLs = [
-        `https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&auto=format&fit=crop&q=80&sig=${rand}`,
-        `https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&auto=format&fit=crop&q=80&sig=${rand + 1}`,
-        `https://images.unsplash.com/photo-1582561424760-0321d75e81fa?w=400&auto=format&fit=crop&q=80&sig=${rand + 2}`,
-        `https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=400&auto=format&fit=crop&q=80&sig=${rand + 3}`
+      // Echte berühmte Gemälde & Meisterwerke
+      const meisterwerke = [
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/400px-Mona_Lisa.jpg', // Mona Lisa
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/400px-Starry_Night.jpg', // Sternennacht
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/400px-Girl_with_Pearl.jpg', // Mädchen mit Perlenohrring
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73.5_cm%2C_National_Museum_of_Art%2C_Architecture_and_Design.jpg/400px-The_Scream.jpg', // Der Schrei
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Tsunami_by_hokusai_19th_century.jpg/400px-Hokusai_Wave.jpg', // Die große Welle
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Vincent_van_Gogh_-_Sunflowers_-_Vollard_1888.jpg/400px-Sunflowers.jpg' // Sonnenblumen
       ];
+      
+      // Mische die Meisterwerke zufällig durch
+      const shuffled = meisterwerke.sort(() => 0.5 - Math.random());
+      bildURLs = shuffled.slice(0, 4);
       break;
     }
 
     case 'zufall': {
-      // Bunter Mix: 1x Anime, 1x Pokémon, 1x Tier, 1x Kunst
+      // Echter Mix: 1x Anime, 1x Pokémon, 1x Tier, 1x Kunstwerk
       const pId = Math.floor(Math.random() * 151) + 1;
+      const kunstKollektion = [
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/400px-Mona_Lisa.jpg',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/400px-Starry_Night.jpg',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/400px-Girl_with_Pearl.jpg'
+      ];
+      const zufallsKunst = kunstKollektion[Math.floor(Math.random() * kunstKollektion.length)];
+
       bildURLs = [
-        `https://api.dicebear.com/7.x/adventurer/svg?seed=Zufall_${time}`,
-        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`,
-        `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=80&sig=${rand}`,
-        `https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&auto=format&fit=crop&q=80&sig=${rand + 1}`
+        `https://picsum.photos/seed/anime_${r1}/400/300`, // Anime
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`, // Pokémon
+        `https://cataas.com/cat?cache=${r2}`, // Tier
+        zufallsKunst // Kunstwerk
       ];
       break;
     }
@@ -339,163 +355,42 @@ function ladeKiBilder(kategorie) {
     case 'standard':
     default: {
       bildURLs = [
-        `https://picsum.photos/400/300?random=${rand}`,
-        `https://picsum.photos/400/300?random=${rand + 1}`,
-        `https://picsum.photos/400/300?random=${rand + 2}`,
-        `https://picsum.photos/400/300?random=${rand + 3}`
+        `https://picsum.photos/400/300?random=${r1}`,
+        `https://picsum.photos/400/300?random=${r2}`,
+        `https://picsum.photos/400/300?random=${r3}`,
+        `https://picsum.photos/400/300?random=${r4}`
       ];
       break;
     }
   }
 
-  bildURLs.forEach((url, idx) => {
+  // Sonderbehandlung für Dog-API (weil sie ein JSON mit Bild-URL zurückgibt)
+  bildURLs.forEach(async (url, idx) => {
+    let finaleUrl = url;
+    
+    // Falls es der Dog-API Link ist, kurz die echte Bild-URL auflösen
+    if (url.includes('dog.ceo')) {
+      try {
+        const res = await fetch('https://dog.ceo/api/breeds/image/random');
+        const data = await res.json();
+        finaleUrl = data.message;
+      } catch(e) {
+        finaleUrl = `https://picsum.photos/seed/dog_${r1}/400/300`;
+      }
+    }
+
     const card = document.createElement('div');
     card.className = 'galerie-karte';
     card.innerHTML = `
-      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px; background:#222;">
+      <img src="${finaleUrl}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px; background:#222;">
       <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
-        <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
+        <button onclick="oeffnePaintModal(${idx + 1}, '${finaleUrl}')">🎨 Bearbeiten</button>
         <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
       </div>
     `;
     grid.appendChild(card);
   });
 }
-// FREIES MALEN: CANVAS & WERKZEUGE
-function initFreiesCanvas() {
-  freiCanvas = document.getElementById('frei-paint-canvas');
-  if (!freiCanvas) return;
-  
-  freiCtx = freiCanvas.getContext('2d');
-  
-  // Feste Breite/Höhe zuweisen, falls noch nicht definiert
-  if (!freiCanvas.width || freiCanvas.width === 0) {
-    freiCanvas.width = 600;
-    freiCanvas.height = 400;
-  }
-
-  freiCanvas.onmousedown = (e) => {
-    freiIsDrawing = true;
-    freiCtx.beginPath();
-    const rect = freiCanvas.getBoundingClientRect();
-    freiCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-  };
-
-  freiCanvas.onmousemove = malenFreiesCanvas;
-  freiCanvas.onmouseup = () => freiIsDrawing = false;
-  freiCanvas.onmouseleave = () => freiIsDrawing = false;
-}
-
-function setzeFreiWerkzeug(werkzeug, event) {
-  aktuellesFreiWerkzeug = werkzeug;
-  document.querySelectorAll('#tab-freies-malen .btn-tool').forEach(btn => btn.classList.remove('active'));
-  if (event && event.target) {
-    event.target.classList.add('active');
-  }
-}
-
-function malenFreiesCanvas(e) {
-  if (!freiIsDrawing || !freiCtx) return;
-
-  const rect = freiCanvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  const farbe = document.getElementById('frei-paint-farbe').value;
-  const groesse = document.getElementById('frei-paint-groesse')?.value || 5;
-
-  freiCtx.strokeStyle = farbe;
-  freiCtx.fillStyle = farbe;
-
-  if (aktuellesFreiWerkzeug === 'bleistift') {
-    freiCtx.lineWidth = 2;
-    freiCtx.lineCap = 'round';
-    freiCtx.lineTo(x, y);
-    freiCtx.stroke();
-    freiCtx.beginPath();
-    freiCtx.moveTo(x, y);
-  } else if (aktuellesFreiWerkzeug === 'kugelschreiber') {
-    freiCtx.lineWidth = 5;
-    freiCtx.lineCap = 'round';
-    freiCtx.lineTo(x, y);
-    freiCtx.stroke();
-    freiCtx.beginPath();
-    freiCtx.moveTo(x, y);
-  } else if (aktuellesFreiWerkzeug === 'spray') {
-    for (let i = 0; i < 20; i++) {
-      const offsetX = (Math.random() - 0.5) * (groesse * 3);
-      const offsetY = (Math.random() - 0.5) * (groesse * 3);
-      freiCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
-    }
-  } else if (aktuellesFreiWerkzeug === 'radiergummi') {
-    freiCtx.clearRect(x - groesse, y - groesse, groesse * 2, groesse * 2);
-  }
-}
-
-function allesAusfuellenFreiCanvas() {
-  if (!freiCtx || !freiCanvas) return;
-  const farbe = document.getElementById('frei-paint-farbe').value;
-  freiCtx.fillStyle = farbe;
-  freiCtx.fillRect(0, 0, freiCanvas.width, freiCanvas.height);
-}
-
-function löscheFreiCanvas() {
-  if (freiCtx && freiCanvas) {
-    freiCtx.clearRect(0, 0, freiCanvas.width, freiCanvas.height);
-  }
-}
-
-function speichereFreiesGemälde() {
-  const nameInput = document.getElementById('frei-paint-name');
-  const fehler = document.getElementById('frei-paint-fehler');
-
-  if (!nameInput.value.trim()) {
-    if (fehler) fehler.classList.remove('hidden');
-    return;
-  }
-  if (fehler) fehler.classList.add('hidden');
-
-  const dataUrl = freiCanvas.toDataURL();
-  freieGemaelde.push({ name: nameInput.value.trim(), dataUrl: dataUrl });
-  localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
-
-  nameInput.value = '';
-  löscheFreiCanvas();
-  rendereFreiUserListe();
-  alert('Dein Kunstwerk wurde gespeichert!');
-}
-
-function rendereFreiUserListe() {
-  const container = document.getElementById('frei-user-liste');
-  if (!container) return;
-  container.innerHTML = '';
-
-  if (freieGemaelde.length === 0) {
-    container.innerHTML = '<p style="color: #666;">Noch keine freien Gemälde vorhanden.</p>';
-    return;
-  }
-
-  freieGemaelde.forEach((eintrag, idx) => {
-    const btn = document.createElement('button');
-    btn.className = 'btn-neon-user';
-    btn.textContent = eintrag.name;
-    btn.onclick = () => zeigeFreiesGemaelde(idx);
-    container.appendChild(btn);
-  });
-}
-
-function zeigeFreiesGemaelde(index) {
-  const eintrag = freieGemaelde[index];
-  if (eintrag && freiCtx) {
-    const img = new Image();
-    img.onload = () => {
-      löscheFreiCanvas();
-      freiCtx.drawImage(img, 0, 0);
-    };
-    img.src = eintrag.dataUrl;
-  }
-}
-
-
 // ====================================================
 // 5. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
 // ====================================================
