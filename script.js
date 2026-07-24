@@ -227,13 +227,14 @@ function speicherePaint() {
   schliessePaintModal();
 }
 // ====================================================
-// 4. NEUE BILDER-WELT FEATURES (REITER, KATEGORIEN & FREIES MALEN)
+// 4. BILDER-WELT FEATURES (REITER, KATEGORIEN & FREIES MALEN)
 // ====================================================
 
 let aktuellesFreiWerkzeug = 'bleistift';
 let freiCanvas, freiCtx, freiIsDrawing = false;
 let kiBearbeiteteBilder = JSON.parse(localStorage.getItem('kiBearbeiteteBilder')) || [];
 let freieGemaelde = JSON.parse(localStorage.getItem('freieGemaelde')) || [];
+let aktuelleKiKategorie = 'standard';
 
 // Reiter-Wechsel im Bilderbereich
 function wechsleBilderTab(tabName) {
@@ -248,13 +249,19 @@ function wechsleBilderTab(tabName) {
   if (zielTab) zielTab.classList.remove('hidden');
 
   if (tabName === 'freies-malen') {
-    initFreiesCanvas();
+    setTimeout(initFreiesCanvas, 50);
   }
 }
 
 // Dropdown-Auswahl für KI-Bilder
 function aendereKiKategorie(kategorie) {
+  aktuelleKiKategorie = kategorie;
   ladeKiBilder(kategorie);
+}
+
+// Würfel-Button: Neue Bilder generieren
+function würfeleKiBilder() {
+  ladeKiBilder(aktuelleKiKategorie);
 }
 
 function ladeKiBilder(kategorie) {
@@ -263,57 +270,74 @@ function ladeKiBilder(kategorie) {
   grid.innerHTML = '';
 
   let bildURLs = [];
+  const rand = Math.floor(Math.random() * 1000);
 
   switch (kategorie) {
     case 'anime':
+      // Gefilterte Anime-Style Artworks
       bildURLs = [
-        'https://picsum.photos/id/1025/400/300',
-        'https://picsum.photos/id/1062/400/300',
-        'https://picsum.photos/id/1074/400/300',
-        'https://picsum.photos/id/1084/400/300'
+        `https://picsum.photos/id/1025/400/300?r=${rand}`,
+        `https://picsum.photos/id/1062/400/300?r=${rand+1}`,
+        `https://picsum.photos/id/338/400/300?r=${rand+2}`,
+        `https://picsum.photos/id/1074/400/300?r=${rand+3}`
       ];
       break;
+      
     case 'pokemon-gen1':
       bildURLs = [
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/93.png'
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png', // Pikachu
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png',  // Glurak
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png',  // Turtok
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/93.png'  // Alpollo
       ];
       break;
+
     case 'pokemon-gen2':
       bildURLs = [
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/155.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/158.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/249.png'
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png', // Nachtara
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/155.png', // Feurigel
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/158.png', // Karnimani
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/249.png'  // Lugia
       ];
       break;
+
     case 'tiere':
+      // Echte Tierfotos (Keine Erdbeeren mehr!)
       bildURLs = [
-        'https://picsum.photos/id/237/400/300',
-        'https://picsum.photos/id/1020/400/300',
-        'https://picsum.photos/id/1069/400/300',
-        'https://picsum.photos/id/1080/400/300'
+        `https://picsum.photos/id/237/400/300?r=${rand}`,  // Hund
+        `https://picsum.photos/id/1020/400/300?r=${rand}`, // Bär
+        `https://picsum.photos/id/1024/400/300?r=${rand}`, // Vogel
+        `https://picsum.photos/id/1069/400/300?r=${rand}`  // Katze/Raubkatze
       ];
       break;
+
     case 'kunst':
+      // Berühmte Gemälde & Kunstwerke
       bildURLs = [
-        'https://picsum.photos/id/1005/400/300',
-        'https://picsum.photos/id/1022/400/300',
-        'https://picsum.photos/id/1031/400/300',
-        'https://picsum.photos/id/1043/400/300'
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/400px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg', // Mona Lisa
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/400px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg', // Sternennacht
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/400px-1665_Girl_with_a_Pearl_Earring.jpg', // Das Mädchen mit dem Perlenohrgehänge
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/The_Scream.jpg/400px-The_Scream.jpg' // Der Schrei
       ];
       break;
+
     case 'zufall':
+      // Echte Mischung: 1x Anime, 1x Tier, 2x Pokémon
+      bildURLs = [
+        `https://picsum.photos/id/1025/400/300?r=${rand}`, // Anime
+        `https://picsum.photos/id/237/400/300?r=${rand}`,  // Tier (Hund)
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png', // Pokémon (Pikachu)
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png' // Pokémon (Nachtara)
+      ];
+      break;
+
     case 'standard':
     default:
-      const timestamp = new Date().getTime();
       bildURLs = [
-        `https://picsum.photos/400/300?random=${timestamp + 1}`,
-        `https://picsum.photos/400/300?random=${timestamp + 2}`,
-        `https://picsum.photos/400/300?random=${timestamp + 3}`,
-        `https://picsum.photos/400/300?random=${timestamp + 4}`
+        `https://picsum.photos/400/300?random=${rand + 1}`,
+        `https://picsum.photos/400/300?random=${rand + 2}`,
+        `https://picsum.photos/400/300?random=${rand + 3}`,
+        `https://picsum.photos/400/300?random=${rand + 4}`
       ];
       break;
   }
@@ -332,11 +356,18 @@ function ladeKiBilder(kategorie) {
   });
 }
 
-// Freies Malen Canvas
+// FREIES MALEN: CANVAS & WERKZEUGE
 function initFreiesCanvas() {
   freiCanvas = document.getElementById('frei-paint-canvas');
   if (!freiCanvas) return;
+  
   freiCtx = freiCanvas.getContext('2d');
+  
+  // Feste Breite/Höhe zuweisen, falls noch nicht definiert
+  if (!freiCanvas.width || freiCanvas.width === 0) {
+    freiCanvas.width = 600;
+    freiCanvas.height = 400;
+  }
 
   freiCanvas.onmousedown = (e) => {
     freiIsDrawing = true;
@@ -345,26 +376,61 @@ function initFreiesCanvas() {
     freiCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
   };
 
-  freiCanvas.onmousemove = (e) => {
-    if (!freiIsDrawing) return;
-    const rect = freiCanvas.getBoundingClientRect();
-    const color = document.getElementById('frei-paint-farbe').value;
-    const size = document.getElementById('frei-paint-groesse').value;
-
-    freiCtx.strokeStyle = color;
-    freiCtx.lineWidth = size;
-    freiCtx.lineCap = 'round';
-
-    freiCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-    freiCtx.stroke();
-  };
-
+  freiCanvas.onmousemove = malenFreiesCanvas;
   freiCanvas.onmouseup = () => freiIsDrawing = false;
   freiCanvas.onmouseleave = () => freiIsDrawing = false;
 }
 
-function setzeFreiWerkzeug(werkzeug) {
+function setzeFreiWerkzeug(werkzeug, event) {
   aktuellesFreiWerkzeug = werkzeug;
+  document.querySelectorAll('#tab-freies-malen .btn-tool').forEach(btn => btn.classList.remove('active'));
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+}
+
+function malenFreiesCanvas(e) {
+  if (!freiIsDrawing || !freiCtx) return;
+
+  const rect = freiCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const farbe = document.getElementById('frei-paint-farbe').value;
+  const groesse = document.getElementById('frei-paint-groesse')?.value || 5;
+
+  freiCtx.strokeStyle = farbe;
+  freiCtx.fillStyle = farbe;
+
+  if (aktuellesFreiWerkzeug === 'bleistift') {
+    freiCtx.lineWidth = 2;
+    freiCtx.lineCap = 'round';
+    freiCtx.lineTo(x, y);
+    freiCtx.stroke();
+    freiCtx.beginPath();
+    freiCtx.moveTo(x, y);
+  } else if (aktuellesFreiWerkzeug === 'kugelschreiber') {
+    freiCtx.lineWidth = 5;
+    freiCtx.lineCap = 'round';
+    freiCtx.lineTo(x, y);
+    freiCtx.stroke();
+    freiCtx.beginPath();
+    freiCtx.moveTo(x, y);
+  } else if (aktuellesFreiWerkzeug === 'spray') {
+    for (let i = 0; i < 20; i++) {
+      const offsetX = (Math.random() - 0.5) * (groesse * 3);
+      const offsetY = (Math.random() - 0.5) * (groesse * 3);
+      freiCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
+    }
+  } else if (aktuellesFreiWerkzeug === 'radiergummi') {
+    freiCtx.clearRect(x - groesse, y - groesse, groesse * 2, groesse * 2);
+  }
+}
+
+function allesAusfuellenFreiCanvas() {
+  if (!freiCtx || !freiCanvas) return;
+  const farbe = document.getElementById('frei-paint-farbe').value;
+  freiCtx.fillStyle = farbe;
+  freiCtx.fillRect(0, 0, freiCanvas.width, freiCanvas.height);
 }
 
 function löscheFreiCanvas() {
