@@ -237,3 +237,28 @@ function speicherePaint() {
 
   schliessePaintModal();
 }
+// Navigations-Funktionen für die Unterseiten
+function zeigeBereich(bereich) {
+  // Versteckt die Startseite (Navigation-Grid)
+  document.querySelector('.navigation-grid').classList.add('hidden');
+
+  // Alle Unterseiten sicherheitshalber ausblenden
+  document.getElementById('unterseite-bilder').classList.add('hidden');
+  document.getElementById('unterseite-geschichten').classList.add('hidden');
+
+  // Nur die gewählte Unterseite anzeigen
+  if (bereich === 'bilder') {
+    document.getElementById('unterseite-bilder').classList.remove('hidden');
+  } else if (bereich === 'geschichten') {
+    document.getElementById('unterseite-geschichten').classList.remove('hidden');
+  }
+}
+
+function zeigeStartseite() {
+  // Versteckt alle Unterseiten
+  document.getElementById('unterseite-bilder').classList.add('hidden');
+  document.getElementById('unterseite-geschichten').classList.add('hidden');
+
+  // Zeigt die Startseite wieder an
+  document.querySelector('.navigation-grid').classList.remove('hidden');
+}
