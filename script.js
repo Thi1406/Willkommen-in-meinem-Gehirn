@@ -270,92 +270,86 @@ function ladeKiBilder(kategorie) {
   grid.innerHTML = '';
 
   let bildURLs = [];
-  // Echter Zufallsstempel, damit der Würfel-Button garantiert neu lädt:
-  const timeStamp = Date.now();
 
+  // Grund-URLs definieren
   switch (kategorie) {
     case 'anime':
-      // Feste Anime-Charaktere (Naruto, Ichigo, Eren, Sasuke)
+      // Picsum-IDs, die gut nach Anime/Comic aussehen
       bildURLs = [
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png', // Platzhalter/Fallback falls extern geblockt
-        'https://cdn.pixabay.com/photo/2023/08/18/15/02/cat-8198731_1280.jpg',
-        'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400', // Anime Aesthetic
-        'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400'  // Anime Style
-      ];
-      // Wenn du spezifische Online-Renderings hast, nutzen wir hier direkte Charakter-Artworks:
-      bildURLs = [
-        'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&t=' + timeStamp, // Anime Art
-        'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&t=' + timeStamp, 
-        'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&t=' + timeStamp,
-        'https://images.unsplash.com/photo-1563089145-599997674d42?w=400&t=' + timeStamp
+        'https://picsum.photos/id/1025/400/300', // Coole Katze/Wesen
+        'https://picsum.photos/id/669/400/300',  // Doodle/Art
+        'https://picsum.photos/id/1024/400/300', // Ästhetisches Bild
+        'https://picsum.photos/id/870/400/300'   // Urban Art
       ];
       break;
       
     case 'pokemon-gen1':
       bildURLs = [
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png', // Pikachu
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png',  // Glurak
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png',  // Turtok
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/93.png'  // Alpollo
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/93.png'
       ];
       break;
 
     case 'pokemon-gen2':
       bildURLs = [
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png', // Nachtara
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/155.png', // Feurigel
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/158.png', // Karnimani
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/249.png'  // Lugia
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/155.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/158.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/249.png'
       ];
       break;
 
     case 'tiere':
       bildURLs = [
-        `https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&t=${timeStamp}`, // Hund
-        `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&t=${timeStamp}`, // Katze
-        `https://images.unsplash.com/photo-1555169062-013468b47731?w=400&t=${timeStamp}`, // Vogel
-        `https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?w=400&t=${timeStamp}`  // Löwe
+        `https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400`,
+        `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400`,
+        `https://images.unsplash.com/photo-1555169062-013468b47731?w=400`,
+        `https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?w=400`
       ];
       break;
 
     case 'kunst':
-      // Klassische berühmte Kunstwerke über zuverlässiges CDN
       bildURLs = [
-        `https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&t=${timeStamp}`, // Klassische Malerei
-        `https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&t=${timeStamp}`, // Kunstgalerie Gemälde
-        `https://images.unsplash.com/photo-1582561424760-0321d75e81fa?w=400&t=${timeStamp}`, // Vintage Portrait
-        `https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=400&t=${timeStamp}`  // Klassisches Ölgemälde
+        `https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400`,
+        `https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400`,
+        `https://images.unsplash.com/photo-1582561424760-0321d75e81fa?w=400`,
+        `https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=400`
       ];
       break;
 
     case 'zufall':
-      // 1x Anime, 1x Tier, 2x Pokémon
       bildURLs = [
-        `https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&t=${timeStamp}`,
-        `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&t=${timeStamp}`,
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png',
-        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png'
+        `https://picsum.photos/id/1025/400/300`, // Anime
+        `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400`, // Tier
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png', // Pokemon
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png' // Pokemon
       ];
       break;
 
     case 'standard':
     default:
       bildURLs = [
-        `https://picsum.photos/400/300?random=${timeStamp}`,
-        `https://picsum.photos/400/300?random=${timeStamp + 1}`,
-        `https://picsum.photos/400/300?random=${timeStamp + 2}`,
-        `https://picsum.photos/400/300?random=${timeStamp + 3}`
+        `https://picsum.photos/400/300?random=1`,
+        `https://picsum.photos/400/300?random=2`,
+        `https://picsum.photos/400/300?random=3`,
+        `https://picsum.photos/400/300?random=4`
       ];
       break;
   }
 
-  bildURLs.forEach((url, idx) => {
+  // Hier kommt der Fix: URLs neu bauen und ins Grid einfügen
+  bildURLs.forEach((baseAUrl, idx) => {
+    // Echten Zufalls-String für JEDE einzelne URL erzeugen:
+    const finalUrl = baseAUrl + "?r=" + Math.random().toString(36).substring(7);
+
     const card = document.createElement('div');
     card.className = 'galerie-karte';
     card.innerHTML = `
-      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">
+      <img src="${finalUrl}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">
       <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
-        <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
+        <button onclick="oeffnePaintModal(${idx + 1}, '${finalUrl}')">🎨 Bearbeiten</button>
         <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
       </div>
     `;
