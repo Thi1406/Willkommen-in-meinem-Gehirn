@@ -264,7 +264,7 @@ Es riss mich aus meinen Gedanken, als ich plötzlich Schritte hörte, sie klange
 
 Die Schritte, die ich vernahm, wurden lauter und ich war mir in dem Moment immer noch nicht sicher, ob es richtig ist weiter wegzulaufen oder doch zu warten bis mich jemand findet. An der nächsten Ecke überwog der Gedanke, wissen zu wollen, wer mich verfolgte. Ich blieb stehen, wartete und in dem Moment hörte ich meinen Herzschlag und meinen Puls immer schneller werden. Diese Angst und gleichzeitige Aggression ließen das Adrenalin in die Höhe schießen, so sehr, dass ich es in den Adern spürte und es mir das Gefühl gab alles und jeden zu Boden zu reißen, der sich mir und meiner Freiheit in den Weg stellen wollte. Still stehend versuchte ich herauszuhören wie viele Schritte es sein könnten. "Wie viele kamen dort auf mich zu? Wer oder was könnte der Mensch oder die Menschen von mir wollen? Sollte ich direkt zuschlagen, sollte ich erst fragen? Was soll ich machen, wenn ich jemanden sehe?" sagte ich so leise wie noch nie zu mir selbst.
 
-Die Schritte wurden hörbar schneller und kamen immer näher und näher. Mein Puls stieg noch weiter an und sorgte für ein drückendes Engegefühl in meinem Hals. Ich dachte dass mir die Luft zum Atmen wegbleibt, da es mir immer schwerer fiel und ich spürte dass die Schnelligkeit meiner Atmung nicht mehr unter meiner Kontrolle war. Ich wurde nervöser, unruhiger und bemerkte dass sich Panik ausbreitete, was sich mit größer werdender Verzweiflung mischte. Im nächsten Moment nahm ich nur noch die Schritte wahr die keine zwei Minuten mehr von mir entfernt waren. Das war das Signal für meinen Körper alles an Adrenalin auszuschütten, was ich noch zur Verfügung hatte. Mein Puls ging noch mehr in die Höhe, mein Herz fing an zu schmerzen, mein Kopf fühlte sich an als würde er jede Sekunde platzen und meine Lungen als würden sie gleich kollabieren. Währenddessen schoss mir eine Frage durch den Kopf: "Sollte ich vielleicht jetzt mit meinem Leben abschließen?"
+Die Schritte wurden hörbar schneller und kamen immer näher und näher. Mein Puls stieg noch weiter an und sorgte für ein drückendes Engegefühl in meinem Hals. Ich dachte dass mir die Luft zum Atmen wegbleibt, da es mir immer schwerer fiel und ich spürte dass die Schnelligkeit meiner Atmung nicht mehr unter meiner Kontrolle war. Ich wurde nervöser, unruhiger und bemerkte dass sich Panik ausbreitete, was sich mit größer werdender Verzweiflung mischte. Im nächsten Moment nahm ich nur noch die Schritte wahr die keine zwei Minuten mehr von mir entfernt waren. Das war das Signal für meinen Körper alles an Adrenalin auszusschütten, was ich noch zur Verfügung hatte. Mein Puls ging noch mehr in die Höhe, mein Herz fing an zu schmerzen, mein Kopf fühlte sich an als würde er jede Sekunde platzen und meine Lungen als würden sie gleich kollabieren. Währenddessen schoss mir eine Frage durch den Kopf: "Sollte ich vielleicht jetzt mit meinem Leben abschließen?"
 
 Ich weinte und zitterte am ganzen Körper ohne einen Ton von mir zu geben. Hockte wieder auf dem kalten Boden, schaute jede Sekunde um die Ecke um zu sehen, wann der Mensch da ist. "Wann ist es denn endlich vorbei? Wann kann ich aufgeben oder gehen?" flüsterte ich mir zu. Ich wollte nur noch raus, raus aus dieser schrecklichen Situation. Ich war am Ende, konnte nicht mehr, dieses elende Warten, es fühlte sich an wie Stunden, die ich hier unten schon war. 
 
@@ -300,7 +300,7 @@ Plötzlich hörte ich Schritte. Tap, tap, tap. War da etwa ein Monster unterwegs
 
 Ein feuchter Tropfen traf meinen Nacken und rann langsam an meiner Wirbelsäule hinab. Mein Atem wurde schneller, verlangend und unkontrolliert. Auf der Flucht durch die dunklen Gänge stolperte ich, die Haut an meinem Bein riss leicht auf – ein brennender Schmerz, der meine Sinne nur noch mehr anfeuerte.
 
-Schritte hallten durch den Gang. Schwer, dominant und immer näher kommend. Mein Puls raste, mein Körper bebte vor Erwartung. Wer war dieser Unbekannte, der mich jagte? 
+Schritte hallten durch den Gang. Schwer, dominant und immer näher kommen. Mein Puls raste, mein Körper bebte vor Erwartung. Wer war dieser Unbekannte, der mich jagte? 
 
 Als die Gestalt schließlich um die Ecke trat, raubte mir der Anblick den Atem. Mit einem intensiven, raunenden Blick trat die Person an mich heran. "Da bist du ja...", hauchte eine dunkle Stimme. Eine warme, kräftige Hand legte sich sanft, aber bestimmt auf meine Schulter und zog mich nah heran. Der vertraute, berauschende Duft des Parfums stieg mir in die Nase – eine Umarmung, die mich alle Angst auf der Stelle vergessen ließ...`
     }
@@ -372,6 +372,9 @@ function aktualisiereGenreText() {
   }
 }
 
-function schliesseGeschichteModal() {
-  document.getElementById('modal-geschichte').classList.add('hidden');
+function schliesseGeschichteModal(event) {
+  // Schließt das Fenster, wenn man auf den Abbrechen-Button drückt oder direkt auf den dunklen Hintergrund außerhalb klickt
+  if (!event || event.target.id === 'modal-geschichte' || event.target.classList.contains('btn-abbrechen')) {
+    document.getElementById('modal-geschichte').classList.add('hidden');
+  }
 }
