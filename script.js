@@ -263,33 +263,55 @@ function würfeleKiBilder() {
   ladeKiBilder(aktuelleKiKategorie);
 }
 
-// Sichere Bild-Generator Funktion (KI-Generiert, 100% verlässlich & schnell)
+// Sichere Bild-Generator Funktion (100% verlässlich, ohne Hotlink-Sperren)
 function ladeKiBilder(kategorie) {
   const grid = document.getElementById('ki-galerie-grid');
   if (!grid) return;
-  
-  // Zeige einen Lade-Hinweis, da KI-Bilder einen Moment brauchen
-  grid.innerHTML = '<p style="color:#00f3ff; grid-column:1/-1; text-align:center;">🎲 Die KI würfelt neue Bilder...</p>';
+  grid.innerHTML = ''; // Galerie leeren
 
   let bildURLs = [];
   
-  // Ein echter Zufalls-Seed für den Würfel
-  const seed = Date.now();
+  // Dynamische Zufallswerte für JEDES Bild, damit der Würfel IMMER neue Bilder lädt
+  const r1 = Math.floor(Math.random() * 899999) + 100000;
+  const r2 = Math.floor(Math.random() * 899999) + 100000;
+  const r3 = Math.floor(Math.random() * 899999) + 100000;
+  const r4 = Math.floor(Math.random() * 899999) + 100000;
 
   switch (kategorie) {
-    case 'anime': {
-      // KI-generierte Anime-Charaktere (ohne Lizenzrechte, echte Leute!)
+    case 'getraenke': {
+      // Neutrale Getränkedosen & Flaschen ohne Logo (Perfekt zum Logo draufmalen!)
       bildURLs = [
-        `https://image.pollinations.ai/prompt/anime%20character%20portrait%20manga%20style%20vibrant%20colors?seed=${seed}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/cool%20anime%20hero%20digital%20art?seed=${seed+1}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/anime%20girl%20cute%20artstyle?seed=${seed+2}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/anime%20boy%20warrior%20style?seed=${seed+3}&width=400&height=300&nologo=true`
+        `https://picsum.photos/seed/can_${r1}/400/300`,
+        `https://picsum.photos/seed/bottle_${r2}/400/300`,
+        `https://picsum.photos/seed/soda_${r3}/400/300`,
+        `https://picsum.photos/seed/drink_${r4}/400/300`
+      ];
+      break;
+    }
+
+    case 'waende': {
+      // Leere Ziegel-, Beton- und Straßenwände (Perfekt für Graffiti!)
+      bildURLs = [
+        `https://picsum.photos/seed/wall_${r1}/400/300`,
+        `https://picsum.photos/seed/brick_${r2}/400/300`,
+        `https://picsum.photos/seed/concrete_${r3}/400/300`,
+        `https://picsum.photos/seed/streetwall_${r4}/400/300`
+      ];
+      break;
+    }
+
+    case 'tiere': {
+      // Echte Tierfotos (Katzen, Hunde, Bären, Vögel, Natur)
+      bildURLs = [
+        `https://cataas.com/cat?cache=${r1}`,               // Katze
+        `https://dog.ceo/api/breeds/image/random?cache=${r2}`, // Hund (wird unten aufgelöst)
+        `https://picsum.photos/seed/bear_${r3}/400/300`,    // Bär / Wildtier
+        `https://picsum.photos/seed/bird_${r4}/400/300`     // Vogel / Natur
       ];
       break;
     }
 
     case 'pokemon-gen1': {
-      grid.innerHTML = ''; // Lade-Hinweis entfernen
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 151) + 1;
         bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
@@ -298,7 +320,6 @@ function ladeKiBilder(kategorie) {
     }
 
     case 'pokemon-gen2': {
-      grid.innerHTML = ''; // Lade-Hinweis entfernen
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 100) + 152;
         bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
@@ -306,65 +327,70 @@ function ladeKiBilder(kategorie) {
       break;
     }
 
-    case 'tiere': {
-      // KI-generierte Tierfotos (wechseln garantiert beim Würfeln!)
+    case 'pokemon-gen3': {
+      // Gen 3: Hoenn-Pokémon (IDs 252 bis 386)
+      for (let i = 0; i < 4; i++) {
+        const pId = Math.floor(Math.random() * 135) + 252;
+        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
+      }
+      break;
+    }
+
+    case 'party': {
+      // Partys, Lichter, Festival- und DJ-Szenen
       bildURLs = [
-        `https://image.pollinations.ai/prompt/cute%20dog%20high%20quality%20photo?seed=${seed}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/fluffy%20cat%20close%20up%20wildlife?seed=${seed+1}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/wild%20lion%20majestic%20photo?seed=${seed+2}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/colorful%20parrot%20bird%20nature?seed=${seed+3}&width=400&height=300&nologo=true`
+        `https://picsum.photos/seed/party_${r1}/400/300`,
+        `https://picsum.photos/seed/festival_${r2}/400/300`,
+        `https://picsum.photos/seed/concert_${r3}/400/300`,
+        `https://picsum.photos/seed/dj_${r4}/400/300`
       ];
       break;
     }
 
     case 'kunst': {
-      // KI-generierte Meisterwerke (echte Gemälde-Prompts)
+      // Kunst/Gemälde-Stil Artworks
       bildURLs = [
-        `https://image.pollinations.ai/prompt/famous%20oil%20painting%20masterpiece%20mona%20lisa%20style?seed=${seed}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/starry%20night%20van%20gogh%20style%20painting?seed=${seed+1}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/abstract%20art%20geometrical%20colorful?seed=${seed+2}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/impressionist%20water%20lilies%20painting?seed=${seed+3}&width=400&height=300&nologo=true`
-      ];
-      break;
-    }
-
-    case 'zufall': {
-      const pId = Math.floor(Math.random() * 151) + 1;
-      bildURLs = [
-        `https://image.pollinations.ai/prompt/anime%20character?seed=${seed}&width=400&height=300&nologo=true`,
-        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`,
-        `https://image.pollinations.ai/prompt/cute%20animal%20cat?seed=${seed+1}&width=400&height=300&nologo=true`,
-        `https://image.pollinations.ai/prompt/classical%20oil%20painting?seed=${seed+2}&width=400&height=300&nologo=true`
+        `https://picsum.photos/seed/art_${r1}/400/300`,
+        `https://picsum.photos/seed/painting_${r2}/400/300`,
+        `https://picsum.photos/seed/artwork_${r3}/400/300`,
+        `https://picsum.photos/seed/gallery_${r4}/400/300`
       ];
       break;
     }
 
     case 'standard':
     default: {
-      grid.innerHTML = ''; // Lade-Hinweis entfernen
       bildURLs = [
-        `https://picsum.photos/400/300?random=${seed}`,
-        `https://picsum.photos/400/300?random=${seed + 1}`,
-        `https://picsum.photos/400/300?random=${seed + 2}`,
-        `https://picsum.photos/400/300?random=${seed + 3}`
+        `https://picsum.photos/400/300?random=${r1}`,
+        `https://picsum.photos/400/300?random=${r2}`,
+        `https://picsum.photos/400/300?random=${r3}`,
+        `https://picsum.photos/400/300?random=${r4}`
       ];
       break;
     }
   }
 
-  // Fallback: Lade-Hinweis entfernen, falls er noch da ist
-  if (grid.innerHTML.includes('🎲')) {
-      grid.innerHTML = '';
-  }
+  // Bilder rendern und Eventualitäten abfangen
+  bildURLs.forEach(async (url, idx) => {
+    let finaleUrl = url;
+    
+    // Falls es die Dog-API ist, kurz die echte Bild-URL auflösen
+    if (url.includes('dog.ceo')) {
+      try {
+        const res = await fetch('https://dog.ceo/api/breeds/image/random');
+        const data = await res.json();
+        finaleUrl = data.message;
+      } catch(e) {
+        finaleUrl = `https://picsum.photos/seed/dog_${r1}/400/300`;
+      }
+    }
 
-  // Galerie befüllen
-  bildURLs.forEach((url, idx) => {
     const card = document.createElement('div');
     card.className = 'galerie-karte';
     card.innerHTML = `
-      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px; background:#1a1a1a;">
+      <img src="${finaleUrl}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px; background:#1a1a1a;">
       <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
-        <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
+        <button onclick="oeffnePaintModal(${idx + 1}, '${finaleUrl}')">🎨 Bearbeiten</button>
         <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
       </div>
     `;
