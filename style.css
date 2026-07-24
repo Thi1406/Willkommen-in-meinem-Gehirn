@@ -682,3 +682,70 @@ header h1 {
 #geschichte-text {
   white-space: pre-line;
 }
+/* Positionierung der Karte für das Badge oben rechts */
+.geschichte-karte {
+  position: relative;
+  padding: 20px;
+  cursor: pointer;
+}
+
+/* Sprechblase oben rechts, leicht abseits */
+.karte-header-action {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #00ffcc;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 5;
+}
+
+.karte-header-action:hover {
+  background: #00ffcc;
+  color: #000;
+  box-shadow: 0 0 10px #00ffcc;
+  transform: scale(1.05);
+}
+
+/* Footer-Bereich der Karte (Aufrufe & Sterne) */
+.geschichte-karte-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Aufruf-Zähler */
+.views-count {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+/* Sterne-Bewertung */
+.sterne-rating {
+  display: flex;
+  gap: 4px;
+}
+
+.stern {
+  font-size: 1.3rem;
+  color: #555; /* Ausgegraut */
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.stern:hover {
+  transform: scale(1.2);
+}
+
+/* Neon-Grün für aktive Sterne */
+.stern.aktiv {
+  color: #39ff14 !important;
+  text-shadow: 0 0 8px #39ff14, 0 0 15px #39ff14;
+}
