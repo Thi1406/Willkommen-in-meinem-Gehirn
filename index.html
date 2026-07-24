@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Willkommen in meinem Hirn</title>
+    <!-- Stummschaltung für fehlendes Favicon (behebt den 404-Fehler in der Konsole) -->
+    <link rel="icon" href="data:,">
     <!-- CSS-Datei wurde hier eingebunden: -->
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:,">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="script.js" defer></script>
 </head>
@@ -83,12 +84,97 @@
   </div>
 </main>
 
+<!-- UNTERSEITE: BILDER (MIT 3 REITER-SUBNAVI) -->
 <section id="unterseite-bilder" class="unterseite hidden">
   <button onclick="zeigeStartseite()">← Zurück</button>
-  <h2>Meine Bilder</h2>
-  <p>Hier gibt es einiges zu sehen.</p>
+  <h2>Bilderwelt</h2>
 
-  <div class="galerie-grid" id="galerie-grid"></div>
+  <!-- Sub-Navigation / Reiter -->
+  <div class="bilder-tabs">
+    <button class="btn-tab active" onclick="wechsleBilderTab('ki-spass')">KI-Spaß</button>
+    <button class="btn-tab" onclick="wechsleBilderTab('meine-werke')">Meine Werke</button>
+    <button class="btn-tab" onclick="wechsleBilderTab('freies-malen')">Freies Malen</button>
+  </div>
+
+  <!-- REITER 1: KI-SPAß -->
+  <div id="tab-ki-spass" class="tab-content">
+    <h3>KI-Spaß</h3>
+    
+    <!-- Dropdown-Filter für Kategorien -->
+    <div class="filter-box">
+      <label for="ki-kategorie">Kategorie wählen:</label>
+      <select id="ki-kategorie" onchange="aendereKiKategorie(this.value)">
+        <option value="standard">Standard (Zufallsbilder)</option>
+        <option value="zufall">Zufällig (Alle gemischt)</option>
+        <option value="anime">Anime</option>
+        <option value="pokemon-gen1">Pokémon (1. Generation)</option>
+        <option value="pokemon-gen2">Pokémon (2. Generation)</option>
+        <option value="tiere">Tiere (ohne Spinnen & Insekten)</option>
+        <option value="kunst">Kunstwerke</option>
+      </select>
+    </div>
+
+    <!-- Das Raster für die 4 KI-Bilder -->
+    <div class="galerie-grid" id="ki-galerie-grid"></div>
+
+    <!-- Bereich für von Usern bearbeitete KI-Bilder (Neon-Cyan Namens-Buttons) -->
+    <div class="bearbeitete-werke-bereich">
+      <h4>Bearbeitete Werke der Besucher:</h4>
+      <div id="ki-user-liste" class="neon-button-grid">
+        <!-- Hier werden die Neon-Cyan Namensbuttons per JS eingefügt -->
+      </div>
+    </div>
+  </div>
+
+  <!-- REITER 2: MEINE WERKE -->
+  <div id="tab-meine-werke" class="tab-content hidden">
+    <h3>Meine eigenen Kunstwerke</h3>
+    <p>Hier siehst du meine selbstgezeichneten Werke.</p>
+
+    <div class="galerie-grid" id="meine-werke-grid">
+      <!-- Hier werden deine Werke inkl. Augen-Klickzähler & Sprechblasen-Icon gerendert -->
+    </div>
+  </div>
+
+  <!-- REITER 3: FREIES MALEN -->
+  <div id="tab-freies-malen" class="tab-content hidden">
+    <h3>Freies Malen</h3>
+    <p>Lass deiner Kreativität freien Lauf!</p>
+
+    <div class="freies-malen-container">
+      <div class="paint-tools">
+        <label>Farbe:</label>
+        <input type="color" id="frei-paint-farbe" value="#00f3ff">
+        
+        <label>Werkzeug:</label>
+        <button class="btn-tool active" onclick="setzeFreiWerkzeug('bleistift')">Bleistift</button>
+        <button class="btn-tool" onclick="setzeFreiWerkzeug('kugelschreiber')">Kugelschreiber</button>
+
+        <label>Strichstärke:</label>
+        <input type="range" id="frei-paint-groesse" min="1" max="20" value="3">
+        
+        <button class="btn-abbrechen" onclick="löscheFreiCanvas()">Canvas leeren</button>
+      </div>
+
+      <div class="canvas-container freies-canvas-box">
+        <canvas id="frei-paint-canvas" width="800" height="500"></canvas>
+      </div>
+
+      <div class="frei-paint-speichern-box">
+        <input type="text" id="frei-paint-name" placeholder="Dein Name (Pflichtfeld)*" required>
+        <p id="frei-paint-fehler" class="fehler-text hidden">Bitte gib deinen Namen ein!</p>
+        <button onclick="speichereFreiesGemälde()">Werk speichern</button>
+      </div>
+
+      <!-- Galerie der freigemalten Werke -->
+      <div class="bearbeitete-werke-bereich">
+        <h4>Frei gemalte Werke der Besucher:</h4>
+        <div id="frei-user-liste" class="neon-button-grid">
+          <!-- Hier landen die Neon-Cyan Namensbuttons für freie Zeichnungen -->
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- UNTERSEITE: GESCHICHTEN -->
@@ -127,6 +213,7 @@
   </div>
 </div>
 
+<!-- MODAL: BILD BESCHREIBEN / KOMMENTIEREN -->
 <div id="modal-beschreibung" class="modal hidden">
   <div class="modal-inhalt">
     <h3>Bild beschreiben</h3>
@@ -144,6 +231,20 @@
   </div>
 </div>
 
+<!-- MODAL: ALLE KOMMENTARE EINES BILDES ANZEIGEN -->
+<div id="modal-alle-kommentare" class="modal hidden">
+  <div class="modal-inhalt">
+    <h3 id="kommentare-bild-titel">Kommentare zum Bild</h3>
+    <div id="kommentare-liste" class="kommentare-liste-box">
+      <!-- Hier werden alle Kommentare aufgelistet -->
+    </div>
+    <div class="modal-buttons">
+      <button onclick="schliesseKommentareModal()" class="btn-abbrechen">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PAINT (KI-BILD BEARBEITEN) -->
 <div id="modal-paint" class="modal hidden">
   <div class="modal-inhalt paint-inhalt">
     <h3>Bild bearbeiten & bemalen</h3>
@@ -173,7 +274,7 @@
   </div>
 </div>
 
-<!-- NEUES MODAL: GESCHICHTEN-KOMMENTAR -->
+<!-- MODAL: GESCHICHTEN-KOMMENTAR -->
 <div id="modal-geschichte-kommentar" class="modal hidden">
   <div class="modal-inhalt">
     <h3>Kommentar zur Geschichte</h3>
