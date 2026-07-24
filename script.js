@@ -263,35 +263,30 @@ function würfeleKiBilder() {
   ladeKiBilder(aktuelleKiKategorie);
 }
 
-// Sichere Bild-Generator Funktion mit stabilen Listen
+// Sichere Bild-Generator Funktion (100% ohne Hotlink-Sperren)
 function ladeKiBilder(kategorie) {
   const grid = document.getElementById('ki-galerie-grid');
   if (!grid) return;
-  grid.innerHTML = ''; // Galerie leeren
+  grid.innerHTML = '';
 
   let bildURLs = [];
   
-  // Zufallswerte für Standard/Tiere
-  const r = Math.floor(Math.random() * 99999);
+  // Echter Zufalls-Zeitstempel für den Würfel
+  const r = Date.now() + Math.floor(Math.random() * 1000);
 
   switch (kategorie) {
     case 'anime': {
-      // Eine feste Liste mit garantierten Anime-Charakteren (lizenzfrei/stabile Quellen)
-      const animeListe = [
-        'https://cdn.pixabay.com/photo/2022/12/01/04/43/girl-7628308_960_720.png',
-        'https://cdn.pixabay.com/photo/2023/02/12/10/39/anime-7784713_960_720.png',
-        'https://cdn.pixabay.com/photo/2023/08/18/15/02/cat-8198731_960_720.jpg',
-        'https://cdn.pixabay.com/photo/2023/05/11/03/43/waifu-7985440_960_720.png',
-        'https://cdn.pixabay.com/photo/2023/02/12/10/39/girl-7784714_960_720.png',
-        'https://cdn.pixabay.com/photo/2023/05/11/03/42/waifu-7985437_960_720.png'
+      // Echte Anime-Style Generierungen (wechseln garantiert beim Würfeln!)
+      bildURLs = [
+        `https://image.pollinations.ai/prompt/anime%20character%20manga%20style%20portrait?seed=${r}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/anime%20hero%20cool%20character?seed=${r+1}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/anime%20girl%20art%20style?seed=${r+2}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/anime%20boy%20warrior%20style?seed=${r+3}&width=400&height=300&nologo=true`
       ];
-      // Mischen und die ersten 4 nehmen
-      bildURLs = animeListe.sort(() => 0.5 - Math.random()).slice(0, 4);
       break;
     }
 
     case 'pokemon-gen1': {
-      // Funktioniert super, lassen wir so
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 151) + 1;
         bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
@@ -300,7 +295,6 @@ function ladeKiBilder(kategorie) {
     }
 
     case 'pokemon-gen2': {
-      // Funktioniert super, lassen wir so
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 100) + 152;
         bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
@@ -309,54 +303,46 @@ function ladeKiBilder(kategorie) {
     }
 
     case 'tiere': {
-      // Wir nutzen Picsum, aber erzwingen durch das 'seed' und Tier-IDs echte Tierfotos
-      // IDs: 237(Hund), 1025(Mops), 1074(Löwe), 1084(Wal) - Picsum liefert hier stabile Tiere
+      // 4 verschiedene, echte Tier-Suchbegriffe (wechseln bei jedem Würfeln)
       bildURLs = [
-        `https://picsum.photos/id/237/400/300?sig=${r}`,
-        `https://picsum.photos/id/1025/400/300?sig=${r}`,
-        `https://picsum.photos/id/1074/400/300?sig=${r}`,
-        `https://picsum.photos/id/1084/400/300?sig=${r}`
+        `https://image.pollinations.ai/prompt/cute%20dog%20photo?seed=${r}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/cute%20cat%20photo?seed=${r+1}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/wild%20lion%20animal%20photo?seed=${r+2}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/colorful%20bird%20photo?seed=${r+3}&width=400&height=300&nologo=true`
       ];
       break;
     }
 
     case 'kunst': {
-      // Feste Liste mit GARANTIERTEN Meisterwerken (stabile Bild-Quellen)
-      const kunstListe = [
-        'https://cdn.pixabay.com/photo/2012/10/26/02/08/mona-lisa-63004_960_720.jpg', // Mona Lisa
-        'https://cdn.pixabay.com/photo/2013/01/08/01/41/van-gogh-74218_960_720.jpg',  // Sternennacht
-        'https://cdn.pixabay.com/photo/2017/08/13/17/36/girl-with-a-pearl-earring-2637930_960_720.jpg', // Perlenohrring
-        'https://cdn.pixabay.com/photo/2012/10/26/01/16/edvard-munch-62947_960_720.jpg', // Der Schrei
-        'https://cdn.pixabay.com/photo/2012/10/26/01/37/hokusai-62991_960_720.jpg',    // Große Welle
-        'https://cdn.pixabay.com/photo/2016/06/17/01/50/art-1462479_960_720.jpg'     // Van Gogh Selbstporträt
+      // Berühmte Meisterwerke (Mona Lisa, Van Gogh, Schrei etc.)
+      bildURLs = [
+        `https://image.pollinations.ai/prompt/Mona%20Lisa%20painting%20masterpiece?seed=${r}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/Starry%20Night%20Van%20Gogh%20painting?seed=${r+1}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/The%20Scream%20Edvard%20Munch%20painting?seed=${r+2}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/Girl%20with%20a%20Pearl%20Earring%20painting?seed=${r+3}&width=400&height=300&nologo=true`
       ];
-      // Mischen und die ersten 4 nehmen
-      bildURLs = kunstListe.sort(() => 0.5 - Math.random()).slice(0, 4);
       break;
     }
 
     case 'zufall': {
-      // Ein echter Mix: 1x Anime, 1x Pokémon, 1x Tier, 1x Kunst
       const pId = Math.floor(Math.random() * 151) + 1;
-      // Kurze Listen für den Mix
-      const aMix = ['https://cdn.pixabay.com/photo/2022/12/01/04/43/girl-7628308_960_720.png', 'https://cdn.pixabay.com/photo/2023/02/12/10/39/anime-7784713_960_720.png'];
-      const kMix = ['https://cdn.pixabay.com/photo/2012/10/26/02/08/mona-lisa-63004_960_720.jpg', 'https://cdn.pixabay.com/photo/2013/01/08/01/41/van-gogh-74218_960_720.jpg'];
-      
       bildURLs = [
-        aMix[Math.floor(Math.random()*aMix.length)], // Anime
-        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`, // Pokémon
-        `https://picsum.photos/id/237/400/300?sig=${r}`, // Tier (Hund)
-        kMix[Math.floor(Math.random()*kMix.length)] // Kunst
+        `https://image.pollinations.ai/prompt/anime%20character?seed=${r}&width=400&height=300&nologo=true`,
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`,
+        `https://image.pollinations.ai/prompt/cute%20cat%20animal?seed=${r+1}&width=400&height=300&nologo=true`,
+        `https://image.pollinations.ai/prompt/famous%20oil%20painting%20art?seed=${r+2}&width=400&height=300&nologo=true`
       ];
       break;
     }
 
     case 'standard':
     default: {
-      // Bunte Zufallsbilder (funktioniert super)
-      for (let i = 0; i < 4; i++) {
-        bildURLs.push(`https://picsum.photos/400/300?random=${r + i}`);
-      }
+      bildURLs = [
+        `https://picsum.photos/400/300?random=${r}`,
+        `https://picsum.photos/400/300?random=${r + 1}`,
+        `https://picsum.photos/400/300?random=${r + 2}`,
+        `https://picsum.photos/400/300?random=${r + 3}`
+      ];
       break;
     }
   }
@@ -366,7 +352,7 @@ function ladeKiBilder(kategorie) {
     const card = document.createElement('div');
     card.className = 'galerie-karte';
     card.innerHTML = `
-      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px; background:#222;">
+      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px; background:#1a1a1a;">
       <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
         <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
         <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
