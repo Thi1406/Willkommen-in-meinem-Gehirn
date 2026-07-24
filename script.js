@@ -230,11 +230,11 @@ function speicherePaint() {
 // 4. BILDER-WELT FEATURES (REITER, KATEGORIEN & FREIES MALEN)
 // ====================================================
 
+let aktuelleKiKategorie = 'standard';
 let aktuellesFreiWerkzeug = 'bleistift';
 let freiCanvas, freiCtx, freiIsDrawing = false;
 let kiBearbeiteteBilder = JSON.parse(localStorage.getItem('kiBearbeiteteBilder')) || [];
 let freieGemaelde = JSON.parse(localStorage.getItem('freieGemaelde')) || [];
-let aktuelleKiKategorie = 'standard';
 
 // Reiter-Wechsel im Bilderbereich
 function wechsleBilderTab(tabName) {
@@ -253,9 +253,7 @@ function wechsleBilderTab(tabName) {
   }
 }
 
-// Aktuelle Kategorie & Würfel-Funktion
-let aktuelleKiKategorie = 'standard';
-
+// Dropdown & Würfel
 function aendereKiKategorie(kategorie) {
   aktuelleKiKategorie = kategorie;
   ladeKiBilder(kategorie);
@@ -265,110 +263,84 @@ function würfeleKiBilder() {
   ladeKiBilder(aktuelleKiKategorie);
 }
 
-// Hauptfunktion zum Laden der Bilder aus echten Live-Datenbanken
-async function ladeKiBilder(kategorie) {
+// Sichere Bild-Generator Funktion
+function ladeKiBilder(kategorie) {
   const grid = document.getElementById('ki-galerie-grid');
   if (!grid) return;
-  
-  // Zeige Lade-Zustand an, während die Bilder frisch abgerufen werden
-  grid.innerHTML = '<p style="color:#00f3ff; grid-column: 1/-1; text-align:center;">🎲 Neue Bilder werden gewürfelt...</p>';
-
-  let bildURLs = [];
-
-  try {
-    switch (kategorie) {
-      
-      // 1. ANIME: Holt echte Anime-Charaktere live von MyAnimeList / Jikan API
-      case 'anime': {
-        const res = await fetch(`https://api.jikan.moe/v4/random/characters`);
-        const data = await res.json();
-        // Wir holen 4 zufällige Charaktere
-        const prom1 = fetch('https://api.jikan.moe/v4/random/characters').then(r => r.json());
-        const prom2 = fetch('https://api.jikan.moe/v4/random/characters').then(r => r.json());
-        const prom3 = fetch('https://api.jikan.moe/v4/random/characters').then(r => r.json());
-        const prom4 = fetch('https://api.jikan.moe/v4/random/characters').then(r => r.json());
-        
-        const results = await Promise.all([prom1, prom2, prom3, prom4]);
-        bildURLs = results.map(item => item.data?.images?.jpg?.image_url).filter(Boolean);
-        break;
-      }
-
-      // 2. POKÉMON GEN 1: Holt 4 zufällige Gen-1 Pokémon (ID 1 - 151)
-      case 'pokemon-gen1': {
-        for (let i = 0; i < 4; i++) {
-          const randomId = Math.floor(Math.random() * 151) + 1;
-          bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${randomId}.png`);
-        }
-        break;
-      }
-
-      // 3. POKÉMON GEN 2: Holt 4 zufällige Gen-2 Pokémon (ID 152 - 251)
-      case 'pokemon-gen2': {
-        for (let i = 0; i < 4; i++) {
-          const randomId = Math.floor(Math.random() * 100) + 152;
-          bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${randomId}.png`);
-        }
-        break;
-      }
-
-      // 4. TIERE: Echter Tier-Generator über Dog/Cat-APIs & Unsplash Animals
-      case 'tiere': {
-        const tStamp = Date.now();
-        bildURLs = [
-          `https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=80&sig=${tStamp+1}`,
-          `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=80&sig=${tStamp+2}`,
-          `https://images.unsplash.com/photo-1555169062-013468b47731?w=400&auto=format&fit=crop&q=80&sig=${tStamp+3}`,
-          `https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?w=400&auto=format&fit=crop&q=80&sig=${tStamp+4}`
-        ];
-        break;
-      }
-
-      // 5. KUNSTWERKE: Echte klassische Kunstgemälde
-      case 'kunst': {
-        const tStamp = Date.now();
-        bildURLs = [
-          `https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&auto=format&fit=crop&q=80&sig=${tStamp+1}`,
-          `https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&auto=format&fit=crop&q=80&sig=${tStamp+2}`,
-          `https://images.unsplash.com/photo-1582561424760-0321d75e81fa?w=400&auto=format&fit=crop&q=80&sig=${tStamp+3}`,
-          `https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=400&auto=format&fit=crop&q=80&sig=${tStamp+4}`
-        ];
-        break;
-      }
-
-      // 6. ZUFALL (Mischung aus allem)
-      case 'zufall': {
-        const randomPoke = Math.floor(Math.random() * 151) + 1;
-        const tStamp = Date.now();
-        
-        bildURLs = [
-          `https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&sig=${tStamp}`, // Anime Style
-          `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${randomPoke}.png`, // Random Pokemon
-          `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&sig=${tStamp+1}`, // Tier
-          `https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&sig=${tStamp+2}`  // Kunst
-        ];
-        break;
-      }
-
-      // 7. SONSTIGE BILDER (Bunte Zufallsbilder)
-      case 'standard':
-      default: {
-        const tStamp = Date.now();
-        for (let i = 0; i < 4; i++) {
-          bildURLs.push(`https://picsum.photos/400/300?random=${tStamp + i}`);
-        }
-        break;
-      }
-    }
-  } catch (err) {
-    console.error("Fehler beim Laden der Live-Bilder:", err);
-  }
-
-  // Galerie leeren & neu befüllen
   grid.innerHTML = '';
 
-  if (bildURLs.length === 0) {
-    grid.innerHTML = '<p style="color:red;">Fehler beim Laden. Bitte noch einmal auf 🎲 drücken!</p>';
-    return;
+  let bildURLs = [];
+  const r = Math.floor(Math.random() * 900000) + 100000;
+
+  switch (kategorie) {
+    case 'anime': {
+      bildURLs = [
+        `https://picsum.photos/400/300?random=${r+1}`,
+        `https://picsum.photos/400/300?random=${r+2}`,
+        `https://picsum.photos/400/300?random=${r+3}`,
+        `https://picsum.photos/400/300?random=${r+4}`
+      ];
+      break;
+    }
+
+    case 'pokemon-gen1': {
+      for (let i = 0; i < 4; i++) {
+        const pId = Math.floor(Math.random() * 151) + 1;
+        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
+      }
+      break;
+    }
+
+    case 'pokemon-gen2': {
+      for (let i = 0; i < 4; i++) {
+        const pId = Math.floor(Math.random() * 100) + 152;
+        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
+      }
+      break;
+    }
+
+    case 'tiere': {
+      bildURLs = [
+        `https://picsum.photos/id/237/400/300?sig=${r+1}`,
+        `https://picsum.photos/id/1020/400/300?sig=${r+2}`,
+        `https://picsum.photos/id/1024/400/300?sig=${r+3}`,
+        `https://picsum.photos/id/1069/400/300?sig=${r+4}`
+      ];
+      break;
+    }
+
+    case 'kunst': {
+      bildURLs = [
+        `https://picsum.photos/id/1005/400/300?sig=${r+1}`,
+        `https://picsum.photos/id/1022/400/300?sig=${r+2}`,
+        `https://picsum.photos/id/1031/400/300?sig=${r+3}`,
+        `https://picsum.photos/id/1043/400/300?sig=${r+4}`
+      ];
+      break;
+    }
+
+    case 'zufall': {
+      const pId1 = Math.floor(Math.random() * 151) + 1;
+      const pId2 = Math.floor(Math.random() * 100) + 152;
+      bildURLs = [
+        `https://picsum.photos/400/300?random=${r+1}`,
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId1}.png`,
+        `https://picsum.photos/id/237/400/300?sig=${r}`,
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId2}.png`
+      ];
+      break;
+    }
+
+    case 'standard':
+    default: {
+      bildURLs = [
+        `https://picsum.photos/400/300?random=${r+10}`,
+        `https://picsum.photos/400/300?random=${r+20}`,
+        `https://picsum.photos/400/300?random=${r+30}`,
+        `https://picsum.photos/400/300?random=${r+40}`
+      ];
+      break;
+    }
   }
 
   bildURLs.forEach((url, idx) => {
@@ -384,7 +356,6 @@ async function ladeKiBilder(kategorie) {
     grid.appendChild(card);
   });
 }
-
 // FREIES MALEN: CANVAS & WERKZEUGE
 function initFreiesCanvas() {
   freiCanvas = document.getElementById('frei-paint-canvas');
