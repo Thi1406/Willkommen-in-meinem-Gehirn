@@ -254,11 +254,11 @@ const geschichtenDaten = {
     genres: {
       original: `Der kalte und leicht nasse Luftzug aus den alten maroden Kellerräumen zog in meinen Nacken und sorgte für Gänsehaut, die ich am ganzen Körper verspürte. Die Angst beherrschte meine Gedanken und sorgte dafür, dass ich an jeder Ecke befürchtete, dass dort etwas Schlimmes passieren könnte, dass jemand kommen könnte und mich findet. Nichts ahnend ging ich immer weiter durch die kalten und dunklen Kellergänge, dabei waren die lautesten Worte in meinem Kopf: "Werde ich hier sterben?"
 
-Ein Tropfen fiel in meinen Nacken und ließ mich für einen Moment erstarren und innehalten. Ich dachte nur daran, dass ich hier schnellstmöglich raus muss, zurück ins Tageslicht. Ob es überhaupt hell draußen war oder ob ich in einer belebten Gegend war, wusste ich nicht. Ein lauter Schrei ertönte aus der Richtung, aus der ich kam. Ich lief den Gang immer schneller entlang. Links, rechts, einfach weiter – nicht immer die gleiche Richtung nehmen, damit ich nicht aus Versehen im Kreis laufe. Ich spürte, wie die Panik in mir immer größer wurde, bis ich anfing, immer schneller zu atmen. Beim Laufen versuchte ich mir zu merken, ob ich schon irgendeine Tür gesehen hatte. Die Verzweiflung schlich sich immer mehr in meine Gedanken, sie sorgte dafür, dass einige Tränen über mein Gesicht flossen. 
+Ein Tropfen fiel in meinen Nacken und ließ mich für einen Moment erstarren und innehalten. Ich dachte nur daran, dass ich hier schnellstmöglich raus muss, zurück ins Tageslicht. Ob es überhaupt hell draußen war oder ob ich in einer belebten Gegend war, wusste ich nicht. Ein lauter Schrei ertönte aus der Richtung, aus der ich kam. Ich lief den Gang immer schneller entlang. Links, rechts, einfach weiter – nicht immer die gleiche Richtung nehmen, damit ich nicht aus Versehen im Kreis laufe. Ich spürte, wie die Panik in mir immer größer wurde, bis ich anfing, immer schneller zu atmen. Beim Laufen versuchte ich mir zu merken, ob ich schon irgendeine Tür gesehen hatte. Die Verzweiflung schlich sich immer mehr in meine Gedanken, sie sorgte dafür, dass einige Tränen über mein Gesicht flossen.
 
-Total benebelt von meinen Gedanken und dem Laufen, stolperte ich über einen erhöhten Stein und zog mir eine Schürfwunde zu, sie brannte und juckte aber das konnte ich schnell wieder ausblenden denn mein Kopf war viel zu beschäftigt mit den anderen Gedanken als sich dem Schmerz zu widmen. Ich fasste neuen Mut, lief weiter in die Richtung, aus der ein leichter Luftstrom durch meine Haare wehte. Ausgang war das Wort, was sich in meinen Gedanken ständig wiederholte bis ich auf einmal stolperte, über den gleichen Stein wie schon zuvor. Ich realisierte, dass ich im Kreis lief und fing an zu Boden zu sinken. Ich weinte und wusste nicht mehr weiter. Meine Gedanken kreisten und ich fing an zu schreien, auch wenn mich jemand bemerken könnte, in dem Moment wollte ich nur noch aus dieser Situation raus, raus aus diesen nassen, dunklen Kellerräumen. 
+Total benebelt von meinen Gedanken und dem Laufen, stolperte ich über einen erhöhten Stein und zog mir eine Schürfwunde zu, sie brannte und juckte aber das konnte ich schnell wieder ausblenden denn mein Kopf war viel zu beschäftigt mit den anderen Gedanken als sich dem Schmerz zu widmen. Ich fasste neuen Mut, lief weiter in die Richtung, aus der ein leichter Luftstrom durch meine Haare wehte. Ausgang war das Wort, was sich in meinen Gedanken ständig wiederholte bis ich auf einmal stolperte, über den gleichen Stein wie schon zuvor. Ich realisierte, dass ich im Kreis lief und fing an zu Boden zu sinken. Ich weinte und wusste nicht mehr weiter. Meine Gedanken kreisten und ich fing an zu schreien, auch wenn mich jemand bemerken könnte, in dem Moment wollte ich nur noch aus dieser Situation raus, raus aus diesen nassen, dunklen Kellerräumen.
 
-Die Zeit verging und ich verzweifelte immer mehr, mehr Tränen, mehr Schreie, nach einer Weile saß ich ganz auf dem Boden, alles sah einfach nur gleich aus. Verzweiflung machte sich breit und ich sah keine Chance mehr jemals diesen Ausgang zu finden. Ich starrte auf meine Schürfwunde am Knie und sah wie ein Bluttropfen an meinem Bein herunterlief, der Gedanke dass sich die Wunde entzünden konnte, wurde immer lauter, weil hier unten alles kalt, nass und dreckig war. 
+Die Zeit verging und ich verzweifelte immer mehr, mehr Tränen, mehr Schreie, nach einer Weile saß ich ganz auf dem Boden, alles sah einfach nur gleich aus. Verzweiflung machte sich breit und ich sah keine Chance mehr jemals diesen Ausgang zu finden. Ich starrte auf meine Schürfwunde am Knie und sah wie ein Bluttropfen an meinem Bein herunterlief, der Gedanke dass sich die Wunde entzünden konnte, wurde immer lauter, weil hier unten alles kalt, nass und dreckig war.
 
 Es riss mich aus meinen Gedanken, als ich plötzlich Schritte hörte, sie klangen weit weg, so weit weg und leise, dass ich die Richtung nicht bestimmen konnte. Ein Zwiespalt machte sich in mir breit, sollte ich sitzen bleiben und warten, aber worauf? Oder sollte ich weglaufen, aber wohin? Fragen über Fragen und trotzdem werde ich die richtige Antwort nicht rechtzeitig finden. Ich stand auf und ging doch weiter, denn alles andere ergab für mich keinen Sinn. Der Schmerz der Schürfwunde zog durch mein ganzes Bein und ich fing an unbewusst leicht zu humpeln.
 
@@ -266,17 +266,17 @@ Die Schritte, die ich vernahm, wurden lauter und ich war mir in dem Moment immer
 
 Die Schritte wurden hörbar schneller und kamen immer näher und näher. Mein Puls stieg noch weiter an und sorgte für ein drückendes Engegefühl in meinem Hals. Ich dachte dass mir die Luft zum Atmen wegbleibt, da es mir immer schwerer fiel und ich spürte dass die Schnelligkeit meiner Atmung nicht mehr unter meiner Kontrolle war. Ich wurde nervöser, unruhiger und bemerkte dass sich Panik ausbreitete, was sich mit größer werdender Verzweiflung mischte. Im nächsten Moment nahm ich nur noch die Schritte wahr die keine zwei Minuten mehr von mir entfernt waren. Das war das Signal für meinen Körper alles an Adrenalin auszusschütten, was ich noch zur Verfügung hatte. Mein Puls ging noch mehr in die Höhe, mein Herz fing an zu schmerzen, mein Kopf fühlte sich an als würde er jede Sekunde platzen und meine Lungen als würden sie gleich kollabieren. Währenddessen schoss mir eine Frage durch den Kopf: "Sollte ich vielleicht jetzt mit meinem Leben abschließen?"
 
-Ich weinte und zitterte am ganzen Körper ohne einen Ton von mir zu geben. Hockte wieder auf dem kalten Boden, schaute jede Sekunde um die Ecke um zu sehen, wann der Mensch da ist. "Wann ist es denn endlich vorbei? Wann kann ich aufgeben oder gehen?" flüsterte ich mir zu. Ich wollte nur noch raus, raus aus dieser schrecklichen Situation. Ich war am Ende, konnte nicht mehr, dieses elende Warten, es fühlte sich an wie Stunden, die ich hier unten schon war. 
+Ich weinte und zitterte am ganzen Körper ohne einen Ton von mir zu geben. Hockte wieder auf dem kalten Boden, schaute jede Sekunde um die Ecke um zu sehen, wann der Mensch da ist. "Wann ist es denn endlich vorbei? Wann kann ich aufgeben oder gehen?" flüsterte ich mir zu. Ich wollte nur noch raus, raus aus dieser schrecklichen Situation. Ich war am Ende, konnte nicht mehr, dieses elende Warten, es fühlte sich an wie Stunden, die ich hier unten schon war.
 
-Plötzlich sah ich ein Gesicht, was beim Anblick meiner verzweifelten Gestalt sagte: "Da bist du ja". Mir kam das Gesicht bekannt vor, aber mir war nicht klar woher. Die Angst und Panik legte sich, denn ich fühlte mich nicht mehr so hilflos, sondern befreit, denn der Mensch dem vermutlich die Schritte gehörten war freundlich mir gegenüber. Dennoch war ich skeptisch, als die Person langsam näher kam, eine Hand auf meine Schulter legte und sagte: "Ich habe dich schon sehr lange gesucht, denn vermutlich bist du dir dem gerade nicht bewusst, dass du demenzkrank bist und dich vermutlich deshalb auf dem Weg zur Toilette, hier im Dinosaurier-Museum in den Kellerräumen verlaufen hast." 
+Plötzlich sah ich ein Gesicht, was beim Anblick meiner verzweifelten Gestalt sagte: "Da bist du ja". Mir kam das Gesicht bekannt vor, aber mir war nicht klar woher. Die Angst und Panik legte sich, denn ich fühlte mich nicht mehr so hilflos, sondern befreit, denn der Mensch dem vermutlich die Schritte gehörten war freundlich mir gegenüber. Dennoch war ich skeptisch, als die Person langsam näher kam, eine Hand auf meine Schulter legte und sagte: "Ich habe dich schon sehr lange gesucht, denn vermutlich bist du dir dem gerade nicht bewusst, dass du demenzkrank bist und dich vermutlich deshalb auf dem Weg zur Toilette, hier im Dinosaurier-Museum in den Kellerräumen verlaufen hast."
 
 Nach diesem Satz spürte ich dass meine Emotionen mich jeden Moment überrumpeln und kein Atemzug später platzte es aus mir heraus. Ich fing bitterlich an zu weinen, war verwirrt, traurig und wütend, denn dadurch dass ich die Diagnose noch nicht lange hatte, konnte ich meinem Gegenüber Glauben schenken. Das Parfum, was ich vernahm, habe ich der Person vor geraumer Zeit geschenkt. Nachdem ich mich etwas gesammelt hatte, gingen wir hoch und ich sah die Skelette der Dinosaurier-Ausstellung. Ich erwischte mich wieder dabei in Gedanken zu schwelgen bis mich meine Begleitperson rausriss: "Also wie du siehst sind wir wirklich in einem Museum und nachdem ich dich habe ausrufen lassen und du nicht aufgetaucht bist, ging ich auf die Suche in Richtung Toiletten und konnte in der Ferne weglaufende Schritte wahrnehmen, weshalb ich nachsah. Ich denke dass diese Situation schrecklich für dich gewesen sein muss. Ich werde dir ein Pflaster besorgen und würde dich dann gerne nach Hause bringen."`,
 
       horror: `Ein moderiger, nach Verwesung stinkender Hauch zog aus der pechschwarzen Tiefe der Gewölbe empor. Die Dunkelheit schien nicht nur die Abwesenheit von Licht zu sein, sondern eine krallende, lebendige Masse. "Werde ich hier sterben?", kreischte die Stimme der Verzweiflung in meinem Schädel.
 
-Ein eiskalter Tropfen – oder war es Blut? – traf meinen Nacken. Aus der Finsternis hinter mir drang ein verzerrter, nicht-menschlicher Schrei. Ich rannte. Meine Lungen brannten, die Orientierung war längst verloren. Ich stolperte über eine hervorstehende Wurzel, die sich anfühlte wie die fingerdicken Knochen einer Leiche. Das Fleisch an meinem Knie riss auf, warmes Blut sickerte meine Haut hinab. 
+Ein eiskalter Tropfen – oder war es Blut? – traf meinen Nacken. Aus der Finsternis hinter mir drang ein verzerrter, nicht-menschlicher Schrei. Ich rannte. Meine Lungen brannten, die Orientierung war längst verloren. Ich stolperte über eine hervorstehende Wurzel, die sich anfühlte wie die fingerdicken Knochen einer Leiche. Das Fleisch an meinem Knie riss auf, warmes Blut sickerte meine Haut hinab.
 
-Als ich kurz darauf erneut über dieselbe Stelle stürzte, überkam mich das grauenhafte Verlangen aufzugeben. Die Wände schienen sich eng um mich zu schließen. Dann ertönten die Schritte. Kein menschlicher Gang, sondern ein schweres, rhythmisches Scharren. 
+Als ich kurz darauf erneut über dieselbe Stelle stürzte, überkam mich das grauenhafte Verlangen aufzugeben. Die Wände schienen sich eng um mich zu schließen. Dann ertönten die Schritte. Kein menschlicher Gang, sondern ein schweres, rhythmisches Scharren.
 
 Eine Gestalt trat aus dem Schatten. Ihr Gesicht wirkte wie eine Wachsmaske im fahlen Restlicht. "Da bist du ja...", flüsterte die Kreatur mit einer Stimme, die wie trockenes Laub raschelte. Eine eiskalte Hand legte sich auf meine Schulter. "Du kannst dem Museum der Toten nicht entkommen. Du hast vergessen, wer du bist – und jetzt gehörst du für immer zu den Knochen im Keller..."`,
 
@@ -288,9 +288,9 @@ Doch zwei Minuten später stehe ich wieder vor demselben Hindernis. Kreisbewegun
 
 Ich hole tief Luft, mache mich bereit zur Gegenwehr. Da schwenkt eine Taschenlampe um die Ecke. Ein Mann blendet mich. "Da bist du ja!", ruft er und senkt die Lampe. "Gott sei Dank! Ich bin der Ermittler vom Sicherheitsdienst. Sie stehen unter Schock. Ihre Begleitperson hat Sie vor einer Stunde vermisst gemeldet – Sie haben das Museumsorientierungssystem aufgrund Ihres Anfalls aus den Augen verloren."`,
 
-      kindlich: `Huui, da pfeift aber ein ganz schön kalter Wind durch die dunklen Höhlenräume! Zitternd zog ich meine Jacke enger zusammen. Wo war nur der Ausgang von diesem riesigen Versteckspiel-Labyrinth? 
+      kindlich: `Huui, da pfeift aber ein ganz schön kalter Wind durch die dunklen Höhlenräume! Zitternd zog ich meine Jacke enger zusammen. Wo war nur der Ausgang von diesem riesigen Versteckspiel-Labyrinth?
 
-*Plitsch!* Ein dicker Wassertropfen landete mitten auf meiner Nase. "Ohoh, schnell raus hier!", dachte ich mir und hüpfte mit großen Schritten über die dunklen Fliesen. Aber ach je – da lag ein frecher Kieselstein im Weg! Ich stolperte und schnaufte tief durch. Aua, mein Knie hatte einen kleinen Kratzer abbekommen. 
+*Plitsch!* Ein dicker Wassertropfen landete mitten auf meiner Nase. "Ohoh, schnell raus hier!", dachte ich mir und hüpfte mit großen Schritten über die dunklen Fliesen. Aber ach je – da lag ein frecher Kieselstein im Weg! Ich stolperte und schnaufte tief durch. Aua, mein Knie hatte einen kleinen Kratzer abbekommen.
 
 Ich lief weiter, immer an der Wand entlang, bis ich plötzlich wieder an demselben frechen Kieselstein vorbeikam. "Menno!", rief ich und setzte mich schmollend auf den Boden. Wo ging es nur wieder zurück zu den bunten Lichtern?
 
@@ -300,9 +300,130 @@ Plötzlich hörte ich Schritte. Tap, tap, tap. War da etwa ein Monster unterwegs
 
 Ein feuchter Tropfen traf meinen Nacken und rann langsam an meiner Wirbelsäule hinab. Mein Atem wurde schneller, verlangend und unkontrolliert. Auf der Flucht durch die dunklen Gänge stolperte ich, die Haut an meinem Bein riss leicht auf – ein brennender Schmerz, der meine Sinne nur noch mehr anfeuerte.
 
-Schritte hallten durch den Gang. Schwer, dominant und immer näher kommen. Mein Puls raste, mein Körper bebte vor Erwartung. Wer war dieser Unbekannte, der mich jagte? 
+Schritte hallten durch den Gang. Schwer, dominant und immer näher kommen. Mein Puls raste, mein Körper bebte vor Erwartung. Wer war dieser Unbekannte, der mich jagte?
 
 Als die Gestalt schließlich um die Ecke trat, raubte mir der Anblick den Atem. Mit einem intensiven, raunenden Blick trat die Person an mich heran. "Da bist du ja...", hauchte eine dunkle Stimme. Eine warme, kräftige Hand legte sich sanft, aber bestimmt auf meine Schulter und zog mich nah heran. Der vertraute, berauschende Duft des Parfums stieg mir in die Nase – eine Umarmung, die mich alle Angst auf der Stelle vergessen ließ...`
+    }
+  },
+
+  platinen: {
+    titel: "Der Platinen-Abgrund: Überleben im Kern",
+    vorschau: "Ein Sturz in die Finsternis, kaputte Werkzeuge und ein harter Kampf ums Überleben...",
+    klasse: "card-geschichte-2",
+    genres: {
+      original: `Kapitel 1: Der Sturz in die Tiefe
+
+Ein ganz normaler Arbeitstag – dachte ich zumindest. Ich muss die Außenfassade im Sektor B-11 überprüfen. Das ist das Viertel der Unterschicht, wo die Luft nach heißem Metall und altem Ozon schmeckt. Anscheinend haben ein paar Platinen einen Defekt. Ich bin AJ und arbeite seit drei Jahren als offizielle Wartungsangestellte. Für jemanden wie mich, der aus einer Familie von „Kupfer-Putzern“ stammt, ist das ein echter Aufstieg.
+
+Wir leben in einem gigantischen Hightech-Magnetwürfel, der uns vor der „Großen Leere“ schützt – einer endlosen Wüste da draußen, die alles Leben verschlingt. Der Platinen-Abgrund ist die Haut unseres Würfels. Würden die Platinen versagen, würde der Magnetismus nachlassen und der Wüstensand uns zerquetschen.
+
+Ich packe Proviant für zwei Tage und kümmere mich um Bavin 787, meine Katze aus Fleisch und Blut. Ein schneller Kuss auf das Foto meiner Süßen, dann geht es los. Am Rand des Abgrunds lasse ich mich am Seil hinab. Doch dann: Sirenen. Ein Polizeiwagen rast über meinen Sicherheitsanker. Ein Kreischen von berstendem Metall, das Seil reißt wie ein Peitschenhieb. Sekundenlang gibt es nur den freien Fall, bis die Welt in Schmerz explodiert.
+
+
+Kapitel 2: Blut und Silizium
+
+Als ich wieder zu mir komme, liege ich auf einem Leichnam. Ein Toter hat meinen Sturz abgefedert. Ich versuche, nach meinem Werkzeug zu greifen, doch mein Herz sinkt: Mein Multimeter ist zerbrochen, die Lötstation Schrott. „Verdammt!“, schluchze ich. Ich kann hier unten gar nichts reparieren. Alles umsonst.
+
+Ein markerschütternder Schmerz explodiert in meinem linken Knöchel, als ich mich bewege. Mein Fuß steht in einem unnatürlichen Winkel ab. Jede kleinste Bewegung schickt eine Schockwelle durch mein Bein. Ich schiebe mich vom Toten herunter und finde ein verrostetes Metallrohr. Ich nehme es mit – mein einziges „Werkzeug“ in dieser Hölle.
+
+Der Anblick ist widerlich, und der Gedanke an das, was ich tun muss, lässt meinen Magen revoltieren. Ich zögere, das Metallrohr zu heben. Es kostet mich eine unfassbare Überwindung, den harten Widerstand des Gewebes zu durchstoßen. Es ist unhygienisch, gefährlich – wer weiß, welche Infektionen hier unten lauern? Aber der Durst ist stäker als der Ekel. Mit zitternden Händen ramme ich das Rohr in den Hals des Toten, um ein paar Tropfen metallisch schmeckendes Blut zu gewinnen. Es ist ein Akt der puren Verzweiflung.
+
+
+Kapitel 3: Das Licht am Ende
+
+Der Schmerz im Bein ist mittlerweile ein dumpfes Dröhnen, das mein Denken vernebelt. Endlich erreiche ich das Schild der Rettungskammer. Ich drücke den Knopf, binde mir das Seil um und werde nach oben gezogen. Jedes Mal, wenn mein gebrochener Fuß gegen eine Kante schlägt, schreie ich lautlos auf.
+
+Oben angekommen, sehe ich sie. Meine Süße nimmt mich stürmisch in den Arm. Ich spüre ihre Wärme, ihre Tränen auf meiner Haut. Ich versuche etwas zu sagen, doch die Erschöpfung gewinnt. In ihren Armen verliere ich das Bewusstsein.
+
+Einige Stunden später öffne ich die Augen. Bavin 787 schnurrt auf meinem Bauch. Es riecht nach Pommes und Porree-Salat. Meine Süße steht am Herd, und als sie sieht, dass ich wach bin, kommt sie sofort herüber.
+
+„Ich dachte, ich hätte dich verloren“, flüstert sie und streichelt mir übers Haar. Ich nehme ihre Hand. „Es war... wie in einem Albtraum. Überall Leichen, diese blauen Blitze... und mein Werkzeug ist weg. Ich konnte nichts reparieren. Ich bin nur gekrochen, nur um wieder zu dir zu kommen. Der Schmerz im Fuß hat mich fast wahnsinnig gemacht, aber ich musste an dich denken.“ Ich schaue sie fest an. „Danke, dass du hier bist. Ich liebe dich so sehr. Was ich dich eigentlich schon im Sektor B-11 fragen wollte... willst du bei mir einziehen?“
+
+Sie lächelt durch ihre Tränen. „Ich bin schon längst hier, AJ. Die Koffer stehen im Flur. Ich lass dich nie wieder allein in diesen Abgrund. Und Bavin 787 habe ich auch schon adoptiert.“ Tränen laufen mir übers Gesicht. Ich bin endlich sicher.`,
+
+      horror: `Kapitel 1: Das Grab im Stahl
+
+Sektor B-11 stank nach Tod und verbranntem Fleisch. Als Wartungsangestellte AJ wusste ich, dass die Platinen am Rande des Magnetwürfels versagten. Doch es war keine gewöhnliche Störung. Aus den dunklen Ritzen der Wände drang ein trockenes, schabendes Geräusch, als würde der Wüstensand draußen gierig an unserer Zuflucht kauen.
+
+Nach einem flüchtigen Abschied von meiner Katze Bavin 787 und einem Blick auf das Foto meiner Liebsten stieg ich in die Tiefe. Plötzlich ertönten Sirenen wie das Geschrei Sterbender. Ein Polizeiwagen krachte in meinen Sicherheitsanker. Das Seil riss. Ich fiel – vorbei an schimmernden Silizium-Eingeweiden – hinein in eine tiefschwarze, hungrige Finsternis.
+
+
+Kapitel 2: Fleisch und Korrosion
+
+Ich erwachte auf etwas Weichem, Nassmachendem. Unter mir lag ein entstellter, kalter Kadaver, dessen Augen mich starr aus der Dunkelheit anstarrten. Mein Sturz war abgefedert worden, doch mein Werkzeug war zermalmt. Ein entsetzlicher Schmerz durchzuckte mein Bein: Mein Fuß stand völlig verdreht nach hinten ab, die Knochen splitterten unter der Haut.
+
+Ein unerträglicher Brand brannte in meiner Kehle. Von Verzweiflung getrieben, griff ich nach einem verrosteten Metallrohr. Der Leichnam unter mir hatte bereits grünliche Verwesungsflecken, doch der Durst trieb mich in den Wahnsinn. Mit einem feuchten, krachenden Geräusch stieß ich das Rohr in die Halsschlagader der Leiche. Der dicke, metallische Saft lief mir über das Kinn – verflucht, unhygienisch, voller Erreger, aber es war das einzige Elixier, das mich vor dem Tod bewahrte.
+
+
+Kapitel 3: Das blutige Erwachen
+
+Halb wahnsinnig vor Schmerz schleifte ich meinen gebrochenen Körper zur Rettungskammer. Die Seilwinde zog mich nach oben, während mein zertrümmertes Bein grausam an den Stahlkanten entlangschleifte.
+
+Oben fing mich meine Süße auf. Ihr Schrei hallte in meinen Ohren nach, ehe mich das schwarze Nichts verschlang. Als ich Stunden später erwachte, lag Bavin 787 schwer auf meiner Brust. Der süßliche Geruch von Essen vermischte sich mit dem Gestank von Verwesung, den ich noch immer in der Nase hatte.
+
+Meine Liebste kniete neben mir, die Augen rot geweint. Ich fasste ihre zitternde Hand: „Es war die Hölle da unten... Überall Verstümmelung und Finsternis. Aber dein Bild hat mich am Leben gehalten. Willst du zu mir ziehen?“ Sie nickte schluchzend und zeigte auf die Koffer. Doch als ich die Augen schloss, spürte ich noch immer den kalten Geschmack des Blutes auf meiner Zunge.`,
+
+      krimi: `Kapitel 1: Der Sabotagefall
+
+Ein Routineeinsatz in Sektor B-11 entpuppte sich rasch als Tatort. Wartungstechnikerin AJ verließ die Unterkunft, nachdem sie Katze Bavin 787 versorgt und ihre Lebensgefährtin benachrichtigt hatte. Am Magnetwürfel schwächelten die Systeme – doch die Telemetrie deutete auf Fremdeinwirkung hin.
+
+Beim Abseilen geschah das Verbrechen: Ein herannahender Streifenwagen kappte durch gezielte Rammung den Sicherheitsanker. Sabotage. Das Seil riss präzise unter der Belastungsgrenze, und AJ stürzte in den unbeleuchteten Versorgungsschacht.
+
+
+Kapitel 2: Spurensicherung im Untergrund
+
+Der Aufprall wurde durch das Opfer eines früheren Verbrechens gedämpft. AJ erlangte das Bewusstsein auf einer männlichen Leiche wieder. Die Analyse der Ausrüstung ergab Totalschaden: Multimeter und Lötstation waren unbrauchbar gemacht worden.
+
+Trotz einer schweren Fraktur des linken Sprunggelenks sicherte AJ ein verrostetes Metallrohr als Primärwerkzeug und Beweismittel. Um ein Verdursten in der isolierten Zone zu verhindern, nutzte sie das Rohr zur Entnahme von Körperflüssigkeit aus der Halsschlagader des Leichnams. Eine extreme, aber unter den gegebenen Umständen logische Überlebensmaßnahme zur Aufrechterhaltung der Vitalfunktionen.
+
+
+Kapitel 3: Die Aussage
+
+Unter Erhaltung der letzten Kräfte aktivierte AJ den Notruf der Rettungskammer. Am oberen Ausstieg nahm ihre Partnerin die Schwerverletzte in Empfang, woraufhin AJ aufgrund des traumatischen Schocks kollabierte.
+
+Die Rekonstruktion der Ereignisse erfolgte Stunden später in der gemeinsamen Wohnung. Bei Porree-Salat und Pommes gab AJ zu Protokoll: „Der Sturz war kein Unfall. Die Ausrüstung wurde zerstört, aber ich habe überlebt.“ Im Zuge der Beweisaufnahme stellte AJ die entscheidende private Frage bezüglich des gemeinsamen Wohnsitzes. Die Koffer im Flur bestätigten, dass die Ermittlungen in diesem Fall mit einer Zusammenlegung der Haushalte abgeschlossen werden konnten.`,
+
+      kindlich: `Kapitel 1: Die Reise in die Tiefe
+
+AJ hatte einen ganz besonderen Beruf: Sie war die Beschützerin der riesigen Zauber-Platinen, die die ganze Stadt wie ein bunter Magnetwürfel zusammenhielten! Wenn die Platinen kitzelten oder wackelten, musste AJ nach dem Rechten sehen.
+
+An diesem Morgen fütterte sie noch schnell ihre kleine Schnurr-Katze Bavin 787, gab ihrer Lieblingsperson einen dicken Kuss und machte sich auf den Weg. Doch huch! Ein rasantes Spielzeug-Polizeiauto sauste vorbei und schubste versehentlich AJs Kletterseil um. *Pling!* – und AJ rutschte wie auf einer riesigen Rutsche tief hinab ins Abenteuerland.
+
+
+Kapitel 2: Eine knifflige Aufgabe
+
+*Puff!* AJ landete weich auf einem großen, alten Schutzanzug, der unten im Schacht lag. Schade aber auch: Das Werkzeug war leider im Eimer. Und auwei, der linke Fuß tat ganz schön weh und war etwas verdreht.
+
+Aber AJ gab nicht auf! Sie fand ein Alurohr und schaffte es mit viel Mut und Mühe, ein paar Wassertropfen aus den alten Vorratsleitungen zu fischen, um den großen Durst zu löschen. Bäh, schmeckte das ein bisschen nach Blech! Aber ein echter Abenteurer hält durch.
+
+
+Kapitel 3: Wieder zu Hause
+
+Mit Ruckzuck-Kraft kroch AJ zur Notfall-Glocke. *Bimm-Bimm!* Ein Zauberseil zog sie wieder nach oben, direkt in die Arme ihrer Liebsten. Die drückte AJ ganz fest, bis AJ vor Müdigkeit ein kleines Nickerchen machte.
+
+Als sie aufwachte, lag Katze Bavin 787 schnurrend auf ihrem Bauch und es duftete lecker nach knusprigen Pommes! „Möchtest du eigentlich fest bei mir einziehen?“, fragte AJ ganz lieb. Ihre Freundin strahlte übers ganze Gesicht: „Aber klar doch, meine Koffer stehen schon da!“ Und so kuschelten sie sich zusammen und wussten, dass alles gut war.`,
+
+      erotisch: `Kapitel 1: Gefährliche Hingabe
+
+Die Luft im Sektor B-11 war heiß, aufgeladen mit Knistern und dem berauschenden Duft von Ozon. Als Wartungsangestellte AJ verlangte mir dieser Ort alles ab. Doch bevor ich mich in die Tiefe des Magnetwürfels wagte, gehörte mein ganzer Gedanke meiner Liebsten. Das Foto auf meinem Tisch ließ meine Haut kribbeln. Ein sanftes Streicheln über das Fell von Katze Bavin 787, dann ließ ich mich am Seil hinab.
+
+Doch die Kontrolle entglitt mir brutal. Sirenen heulten, ein Wagen riss meine Verankerung los. Das Seil peitschte durch die Luft, und ich ergab mich dem hilflosen, Rausch-ähnlichen freien Fall in den Abgrund.
+
+
+Kapitel 2: Schmerz und Begehren
+
+Ich erwachte auf einem fremden, leblosen Körper. Mein eigener Leib brannte. Mein Werkzeug war zerstört, mein Fuß in einer schrecklich verlockenden, schmerzvollen Hilflosigkeit gefangen. Jede Bewegung schickte heiße Wellen durch meine Nerven.
+
+Die Hitze in der Tiefe ließ meine Lippen austrocknen. Ein dunkles, Verzweiflung-getriebenes Verlangen nach Überleben ergriff Besitz von mir. Ich nahm ein kühles Metallrohr, stieß es durch das feste Gewebe am Hals des Leichnams und saugte die dunkle, metallisch schmeckende Flüssigkeit auf. Es war ein intimer, verbotener Akt des puren Überlebenswillens, der mein Herz wie wild gegen meine Rippen hämmern ließ.
+
+
+Kapitel 3: In deinen Armen
+
+Als die Rettungskammer mich nach oben zog, war jeder Stoß an meinem Bein eine Qual, die mich stöhnen ließ. Doch oben warteten ihre weichen Lippen, ihre zitternden Hände, die gierig nach mir griffen. Ich spürte ihre Körperschmelze, ehe die Dunkelheit mich einhüllte.
+
+Ich erwachte beim Duft von warmem Essen. Bavin 787 lag auf meinem Leib, doch mein Blick suchte nur sie. Sie trat an mein Bett, streichelte zärtlich über meine erhitzte Haut. „Es war ein Albtraum“, flüsterte ich, meine Stimme rau vor Verlangen und Erschöpfung. „Ich habe nur an deinen Körper, deine Wärme gedacht... Zieh bei mir ein. Bleib für immer.“
+
+Ihre Augen glänzten, als sie sich über mich beugte: „Ich bin schon da, AJ. Meine Koffer stehen im Flur.“ Als sich unsere Lippen trafen, schmolz all der Schmerz des Abgrunds in reinem Glück dahin.`
     }
   }
 };
@@ -320,6 +441,12 @@ function ladeGeschichtenUebersicht() {
     const story = geschichtenDaten[id];
     const karte = document.createElement('div');
     karte.className = 'geschichte-karte';
+    
+    // Verpasst der Karte die eigene Neon-Klasse, falls definiert
+    if (story.klasse) {
+      karte.classList.add(story.klasse);
+    }
+    
     karte.onclick = () => oeffneGeschichte(id);
     karte.innerHTML = `
       <h3>${story.titel}</h3>
@@ -373,7 +500,6 @@ function aktualisiereGenreText() {
 }
 
 function schliesseGeschichteModal(event) {
-  // Schließt das Fenster, wenn man auf den Abbrechen-Button drückt oder direkt auf den dunklen Hintergrund außerhalb klickt
   if (!event || event.target.id === 'modal-geschichte' || event.target.classList.contains('btn-abbrechen')) {
     document.getElementById('modal-geschichte').classList.add('hidden');
   }
