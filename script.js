@@ -87,12 +87,12 @@ erstelleGalerie();
 // ====================================================
 function oeffneBeschreibungModal(bildId) {
   aktuellesBildId = bildId;
-  document.getElementById("modal-beschreibung").classList.remove("hidden");
-  document.getElementById("modal-fehler").classList.add("hidden");
+  document.getElementById("modal-beschreibung")?.classList.remove("hidden");
+  document.getElementById("modal-fehler")?.classList.add("hidden");
 }
 
 function schliesseBeschreibungModal() {
-  document.getElementById("modal-beschreibung").classList.add("hidden");
+  document.getElementById("modal-beschreibung")?.classList.add("hidden");
   document.getElementById("beschreibung-text").value = "";
   document.getElementById("beschreibung-name").value = "";
 }
@@ -102,7 +102,7 @@ function speichereBeschreibung() {
   const name = document.getElementById("beschreibung-name").value.trim();
 
   if (name === "") {
-    document.getElementById("modal-fehler").classList.remove("hidden");
+    document.getElementById("modal-fehler")?.classList.remove("hidden");
     return;
   }
 
@@ -110,18 +110,22 @@ function speichereBeschreibung() {
   document.getElementById(`wolke-autor-${aktuellesBildId}`).innerText = `— ${name}`;
 
   const karte = document.getElementById(`karte-${aktuellesBildId}`);
-  const badge = karte.querySelector(".sprechblase");
-  const anzahlSpan = karte.querySelector(".anzahl-beschreibungen");
-  
-  badge.classList.remove("hidden");
-  anzahlSpan.innerText = parseInt(anzahlSpan.innerText) + 1;
+  if (karte) {
+    const badge = karte.querySelector(".sprechblase");
+    const anzahlSpan = karte.querySelector(".anzahl-beschreibungen");
+    
+    badge?.classList.remove("hidden");
+    if (anzahlSpan) {
+      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0") + 1;
+    }
+  }
 
   schliesseBeschreibungModal();
 }
 
 function zeigWolke(bildId) {
   const wolke = document.getElementById(`wolke-${bildId}`);
-  wolke.classList.toggle("hidden");
+  wolke?.classList.toggle("hidden");
 }
 
 function initCanvas() {
@@ -150,16 +154,17 @@ function oeffnePaintModal(bildId, bildUrl) {
   const modal = document.getElementById('modal-paint');
   const img = document.getElementById('paint-hintergrund-bild');
   
-  img.src = bildUrl;
-  modal.classList.remove('hidden');
-  document.getElementById('paint-fehler').classList.add('hidden');
+  if (img) img.src = bildUrl;
+  modal?.classList.remove('hidden');
+  document.getElementById('paint-fehler')?.classList.add('hidden');
 
   setTimeout(initCanvas, 100);
 }
 
 function schliessePaintModal() {
-  document.getElementById('modal-paint').classList.add('hidden');
-  document.getElementById('paint-name').value = '';
+  document.getElementById('modal-paint')?.classList.add('hidden');
+  const nameInput = document.getElementById('paint-name');
+  if (nameInput) nameInput.value = '';
   if (ctx && canvas) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
@@ -181,7 +186,7 @@ function zeichnen(e) {
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
-  const farbe = document.getElementById('paint-farbe').value;
+  const farbe = document.getElementById('paint-farbe')?.value || '#000000';
 
   ctx.strokeStyle = farbe;
   ctx.fillStyle = farbe;
@@ -213,19 +218,24 @@ function speicherePaint() {
   const name = document.getElementById('paint-name').value.trim();
 
   if (name === '') {
-    document.getElementById('paint-fehler').classList.remove('hidden');
+    document.getElementById('paint-fehler')?.classList.remove('hidden');
     return;
   }
 
   const karte = document.getElementById(`karte-${aktuellesBildId}`);
-  const badge = karte.querySelector('.farbklecks');
-  const anzahlSpan = karte.querySelector('.anzahl-paintings');
+  if (karte) {
+    const badge = karte.querySelector('.farbklecks');
+    const anzahlSpan = karte.querySelector('.anzahl-paintings');
 
-  badge.classList.remove('hidden');
-  anzahlSpan.innerText = parseInt(anzahlSpan.innerText) + 1;
+    badge?.classList.remove('hidden');
+    if (anzahlSpan) {
+      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0") + 1;
+    }
+  }
 
   schliessePaintModal();
 }
+
 // ====================================================
 // 4. BILDER-WELT FEATURES (REITER, KATEGORIEN & FREIES MALEN)
 // ====================================================
@@ -373,6 +383,7 @@ async function ladeKiBilder(kategorie) {
     `;
     grid.appendChild(card);
   });
+}
 // ====================================================
 // 5. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
 // ====================================================
