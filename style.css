@@ -1,8 +1,8 @@
 /* =======================================================
-   SCHRIFTART: MedievalSharp
+   SCHRIFTART: Cinzel
    ======================================================= */
 body, h1, h2, h3, p, button, .geschichte-text-box {
-  font-family: 'MedievalSharp', cursive !important;
+  font-family: 'Cinzel', serif !important;
 }
 
 .geschichte-text-box {
