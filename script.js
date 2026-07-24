@@ -2,39 +2,33 @@
 // 1. SEITEN-NAVIGATION (Startseite & Unterseiten)
 // ====================================================
 function zeigeBereich(bereichId) {
-  // Versteckt die Startseite komplett
   document.querySelector('header')?.classList.add('hidden');
   document.querySelector('.navigation-grid')?.classList.add('hidden');
   
-  // Versteckt alle Unterseiten zur Sicherheit
   const alleUnterseiten = document.querySelectorAll('.unterseite');
   alleUnterseiten.forEach(seite => seite.classList.add('hidden'));
   
-  // Zeigt die geklickte Unterseite an
   const zielSeite = document.getElementById('unterseite-' + bereichId);
   if (zielSeite) {
     zielSeite.classList.remove('hidden');
   }
 
-  // Wenn Geschichten geladen werden, die Liste aufbauen
   if (bereichId === 'geschichten') {
     ladeGeschichtenUebersicht();
   }
 }
 
 function zeigeStartseite() {
-  // Versteckt alle Unterseiten wieder
   const alleUnterseiten = document.querySelectorAll('.unterseite');
   alleUnterseiten.forEach(seite => seite.classList.add('hidden'));
   
-  // Bringt die Hauptkacheln und den Header zurück
   document.querySelector('header')?.classList.remove('hidden');
   document.querySelector('.navigation-grid')?.classList.remove('hidden');
 }
 
 
 // ====================================================
-// 2. BILDER-LINKS (Hier deine Bilder eintragen!)
+// 2. BILDER-LINKS & GALERIE
 // ====================================================
 const meineBilder = [
   "https://picsum.photos/300/200?random=1",
@@ -43,24 +37,19 @@ const meineBilder = [
   "https://picsum.photos/300/200?random=4"
 ];
 
-// globale Variablen für die Logik
 let aktuellesBildId = null;
 let isDrawing = false;
 let aktuellesWerkzeug = 'bleistift';
 let canvas, ctx;
 
-
-// ====================================================
-// 3. GALERIE AUTOMATISCH GENERIEREN
-// ====================================================
 function erstelleGalerie() {
   const galerieGrid = document.getElementById("galerie-grid");
-  if (!galerieGrid) return; // Sicherheitsabfrage
+  if (!galerieGrid) return;
   
-  galerieGrid.innerHTML = ""; // Zurücksetzen
+  galerieGrid.innerHTML = "";
 
   meineBilder.forEach((bildUrl, index) => {
-    const id = index + 1; // 1, 2, 3...
+    const id = index + 1;
 
     const karteHtml = `
       <div class="bild-karte" id="karte-${id}">
@@ -89,12 +78,11 @@ function erstelleGalerie() {
   });
 }
 
-// Beim Laden der Seite Galerie sofort aufbauen
 erstelleGalerie();
 
 
 // ====================================================
-// 4. LOGIK FÜR DAS BESCHREIBEN-MODAL
+// 3. BESCHREIBEN & PAINT MODALS
 // ====================================================
 function oeffneBeschreibungModal(bildId) {
   aktuellesBildId = bildId;
@@ -135,16 +123,11 @@ function zeigWolke(bildId) {
   wolke.classList.toggle("hidden");
 }
 
-
-// ====================================================
-// 5. LOGIK FÜR DAS PAINT-MAL-STUDIO
-// ====================================================
 function initCanvas() {
   canvas = document.getElementById('paint-canvas');
   if (!canvas) return;
   
   ctx = canvas.getContext('2d');
-
   canvas.width = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
 
@@ -245,12 +228,15 @@ function speicherePaint() {
 
 
 // ====================================================
-// 6. GESCHICHTEN-DATENBANK & UMSCHALT-LOGIK
+// 4. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
 // ====================================================
 const geschichtenDaten = {
   demenz: {
     titel: "Der kalte Gang",
     vorschau: "Ein feuchter Keller, Schritte in der Dunkelheit und die Panik im Nacken...",
+    views: 142,
+    rating: 0,
+    kommentareCount: 0,
     genres: {
       original: `Der kalte und leicht nasse Luftzug aus den alten maroden Kellerräumen zog in meinen Nacken und sorgte für Gänsehaut, die ich am ganzen Körper verspürte. Die Angst beherrschte meine Gedanken und sorgte dafür, dass ich an jeder Ecke befürchtete, dass dort etwas Schlimmes passieren könnte, dass jemand kommen könnte und mich findet. Nichts ahnend ging ich immer weiter durch die kalten und dunklen Kellergänge, dabei waren die lautesten Worte in meinem Kopf: "Werde ich hier sterben?"
 
@@ -310,6 +296,9 @@ Als die Gestalt schließlich um die Ecke trat, raubte mir der Anblick den Atem. 
     titel: "Der Platinen-Abgrund: Überleben im Kern",
     vorschau: "Ein Sturz in die Finsternis, kaputte Werkzeuge und ein harter Kampf ums Überleben...",
     klasse: "card-geschichte-2",
+    views: 89,
+    rating: 0,
+    kommentareCount: 0,
     genres: {
       original: `Kapitel 1: Der Sturz in die Tiefe
 
@@ -428,7 +417,6 @@ Ihre Augen glänzten, als sie sich über mich beugte: „Ich bin schon da, AJ. M
   }
 };
 
-// Aktuell ausgewählte Geschichte und Genre
 let aktuelleStoryId = 'demenz';
 let aktuellesGenre = 'original';
 
@@ -442,27 +430,57 @@ function ladeGeschichtenUebersicht() {
     const karte = document.createElement('div');
     karte.className = 'geschichte-karte';
     
-    // Verpasst der Karte die eigene Neon-Klasse, falls definiert
     if (story.klasse) {
       karte.classList.add(story.klasse);
     }
     
-    karte.onclick = () => oeffneGeschichte(id);
+    // HTML für Sterne aufbauen
+    let sterneHtml = '';
+    for (let i = 1; i <= 5; i++) {
+      const aktivKlasse = i <= story.rating ? 'aktiv' : '';
+      sterneHtml += `<span class="stern ${aktivKlasse}" onclick="bewerten(event, '${id}', ${i})">★</span>`;
+    }
+
     karte.innerHTML = `
-      <h3>${story.titel}</h3>
-      <p>${story.vorschau}</p>
+      <div class="karte-header-action" onclick="oeffneGeschichteKommentarModal(event, '${id}')" title="Kommentar schreiben">
+        💬 <span>${story.kommentareCount}</span>
+      </div>
+      
+      <div onclick="oeffneGeschichte('${id}')">
+        <h3>${story.titel}</h3>
+        <p>${story.vorschau}</p>
+      </div>
+
+      <div class="geschichte-karte-footer">
+        <div class="views-count" title="Anzahl der Aufrufe">
+          👁️ ${story.views}
+        </div>
+        <div class="sterne-rating">
+          ${sterneHtml}
+        </div>
+      </div>
     `;
+    
     container.appendChild(karte);
   }
+}
+
+// Sterne bewerten Funktion
+function bewerten(event, storyId, sternAnzahl) {
+  event.stopPropagation(); // Verhindert, dass sich das Lese-Modal öffnet
+  geschichtenDaten[storyId].rating = sternAnzahl;
+  ladeGeschichtenUebersicht(); // Ansicht neu laden, um grüne Sterne zu zeigen
 }
 
 function oeffneGeschichte(id) {
   aktuelleStoryId = id;
   aktuellesGenre = 'original';
   
+  // Aufrufzähler um 1 erhöhen beim Lesen
+  geschichtenDaten[id].views++;
+  
   document.getElementById('geschichte-titel').innerText = geschichtenDaten[id].titel;
   
-  // Setze den "Original"-Button optisch wieder als aktiv
   const buttons = document.querySelectorAll('.btn-genre');
   buttons.forEach(btn => {
     if (btn.innerText.toLowerCase() === 'original') {
@@ -502,5 +520,46 @@ function aktualisiereGenreText() {
 function schliesseGeschichteModal(event) {
   if (!event || event.target.id === 'modal-geschichte' || event.target.classList.contains('btn-abbrechen')) {
     document.getElementById('modal-geschichte').classList.add('hidden');
+    ladeGeschichtenUebersicht(); // Aktualisiert die Aufruf-Zahl auf den Karten
   }
+}
+
+
+// ====================================================
+// 5. GESCHICHTEN KOMMENTAR MODAL LOGIK
+// ====================================================
+let kommentarStoryTargetId = null;
+
+function oeffneGeschichteKommentarModal(event, storyId) {
+  event.stopPropagation(); // Verhindert das Öffnen der Geschichte selbst
+  kommentarStoryTargetId = storyId;
+  
+  const story = geschichtenDaten[storyId];
+  document.getElementById('kommentar-story-titel').innerText = story.titel;
+  document.getElementById('geschichte-kommentar-text').value = '';
+  document.getElementById('geschichte-kommentar-name').value = '';
+  document.getElementById('geschichte-kommentar-fehler').classList.add('hidden');
+  
+  document.getElementById('modal-geschichte-kommentar').classList.remove('hidden');
+}
+
+function schliesseGeschichteKommentarModal() {
+  document.getElementById('modal-geschichte-kommentar').classList.add('hidden');
+}
+
+function speichereGeschichteKommentar() {
+  const name = document.getElementById('geschichte-kommentar-name').value.trim();
+  
+  if (name === '') {
+    document.getElementById('geschichte-kommentar-fehler').classList.remove('hidden');
+    return;
+  }
+
+  // Erhöhe die Kommentar-Anzahl
+  if (kommentarStoryTargetId && geschichtenDaten[kommentarStoryTargetId]) {
+    geschichtenDaten[kommentarStoryTargetId].kommentareCount++;
+  }
+
+  schliesseGeschichteKommentarModal();
+  ladeGeschichtenUebersicht(); // Aktualisiert das Badge oben rechts mit der neuen Anzahl
 }
