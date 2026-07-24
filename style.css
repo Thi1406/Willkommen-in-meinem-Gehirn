@@ -10,9 +10,11 @@ body, h1, h2, h3, p, button, .geschichte-text-box {
   line-height: 1.7;
   letter-spacing: 0.5px;
 }
-/* Grunddesign */
+
+/* =======================================================
+   GRUNDDESIGN
+   ======================================================= */
 body {
-  font-family: 'Courier New', Courier, monospace;
   background-color: #000000;
   color: #ffffff;
   display: flex;
@@ -24,8 +26,15 @@ body {
   box-sizing: border-box;
 }
 
-header { text-align: center; margin-bottom: 50px; }
-header h1 { font-size: 2.5rem; letter-spacing: 2px; }
+header { 
+  text-align: center; 
+  margin-bottom: 50px; 
+}
+
+header h1 { 
+  font-size: 2.5rem; 
+  letter-spacing: 2px; 
+}
 
 .navigation-grid {
   display: grid;
@@ -46,11 +55,14 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.card:hover { transform: translateY(-5px); }
+.card:hover { 
+  transform: translateY(-5px); 
+}
 
 .card-title {
   position: absolute;
-  top: 50%; left: 50%;
+  top: 50%; 
+  left: 50%;
   transform: translate(-50%, -50%);
   font-size: 1.8rem;
   font-weight: bold;
@@ -96,7 +108,7 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
 
 .runner .torso { width: 2px; height: 16px; position: absolute; top: 12px; left: 9px; }
 
-/* NATÜRLICHE GLIEDMASSEN: Hängen runter und schwingen locker vor/zurück */
+/* NATÜRLICHE GLIEDMASSEN */
 .runner .arm-l, .runner .arm-r { 
   width: 11px; 
   height: 2px; 
@@ -119,161 +131,132 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
 .runner .leg-l { animation: beinLaufTakt 0.6s infinite alternate ease-in-out; }
 .runner .leg-r { animation: beinLaufTakt 0.6s infinite alternate-reverse ease-in-out; }
 
-/* Standard-Lauftakt (Pendeln nach unten gerichtet) */
 @keyframes armLaufTakt { from { transform: rotate(65deg); } to { transform: rotate(115deg); } }
 @keyframes beinLaufTakt { from { transform: rotate(25deg); } to { transform: rotate(-25deg); } }
 
-
-/* EINZELNE TIMINGS FÜR DAS VERSATZTE REINLAUFEN & NEBENEINANDER STEHENBLEIBEN */
-/* Gesamtlänge der Choreografie: 16 Sekunden */
-
-/* Läufer 1 (Rot): Läuft zuerst los, wartet ganz rechts in der Mitte (X: 160px) */
+/* TIMINGS FÜR DAS VERSATZTE REINLAUFEN */
 .r1 { animation: wegLinksNachRechts1 16s infinite linear; animation-delay: 0s; }
-/* Läufer 2 (Hellblau): Wartet kurz, läuft los, stellt sich links neben Rot (X: 145px) */
 .r2 { animation: wegLinksNachRechts2 16s infinite linear; animation-delay: 0.4s; }
-/* Läufer 3 (Grün): Findet seinen Platz bei X: 130px */
 .r3 { animation: wegLinksNachRechts3 16s infinite linear; animation-delay: 0.8s; }
-/* Läufer 4 (Türkis): Findet seinen Platz bei X: 115px */
 .r4 { animation: wegLinksNachRechts4 16s infinite linear; animation-delay: 1.2s; }
-/* Läufer 5 (Orange): Kommt als Letzter an bei X: 100px. Sobald er steht, JUBELN ALLE! */
 .r5 { animation: wegLinksNachRechts5 16s infinite linear; animation-delay: 1.6s; }
 
-
-/* --- TIMELINES: CO-ORDINIERTER GRUPPENJUBEL (HINWEG) & RÜCKWEG --- */
-
-/* Läufer 1 (Rot) - Steht ganz rechts in der Gruppe */
+/* TIMELINES: GRUPPENJUBEL & RÜCKWEG */
 @keyframes wegLinksNachRechts1 {
   0% { left: -40px; transform: scaleX(1); }
-  10% { left: 160px; transform: scaleX(1); }  /* Kommt früh an und wartet */
+  10% { left: 160px; transform: scaleX(1); }
   28% { left: 160px; transform: scaleX(1); }  
-  29% { transform: scaleX(1) translateY(-2px); } /* JUBEL-START: Macht sich bereit */
-  30%, 33% { transform: scaleX(1) translateY(-5px); } /* REISST ARME HOCH (Simuliert durch Hüpfen/Strecken) */
-  35% { transform: scaleX(1) translateY(0); }   /* JUBEL ENDE */
-  38% { left: 160px; transform: scaleX(1); }  /* Wartet bis alle losgehen */
-  48% { left: 340px; transform: scaleX(1); }  /* Läuft als Erster nach rechts raus */
-  53% { left: 340px; transform: scaleX(-1); } /* Dreht sich um für den Rückweg */
-  
-  /* RÜCKWEG (Von rechts nach links) */
-  58% { left: 100px; transform: scaleX(-1); } /* Läuft weit nach hinten durch */
+  29% { transform: scaleX(1) translateY(-2px); }
+  30%, 33% { transform: scaleX(1) translateY(-5px); }
+  35% { transform: scaleX(1) translateY(0); }
+  38% { left: 160px; transform: scaleX(1); }
+  48% { left: 340px; transform: scaleX(1); }
+  53% { left: 340px; transform: scaleX(-1); }
+  58% { left: 100px; transform: scaleX(-1); }
   78% { left: 100px; transform: scaleX(-1); } 
-  79% { transform: scaleX(-1) translateY(-2px); } /* ZWEITER GEMEINSAMER JUBEL */
+  79% { transform: scaleX(-1) translateY(-2px); }
   80%, 83% { transform: scaleX(-1) translateY(-5px); }
   85% { transform: scaleX(-1) translateY(0); }
   92% { left: 100px; transform: scaleX(-1); } 
-  100% { left: -40px; transform: scaleX(-1); } /* Läuft als Letzter nach links raus */
+  100% { left: -40px; transform: scaleX(-1); }
 }
 
-/* Läufer 2 (Hellblau) */
 @keyframes wegLinksNachRechts2 {
   0% { left: -40px; transform: scaleX(1); }
   12% { left: 145px; transform: scaleX(1); }
   28% { left: 145px; transform: scaleX(1); }
   29% { transform: scaleX(1) translateY(-2px); }
-  30%, 33% { transform: scaleX(1) translateY(-5px); } /* GEMEINSAMER JUBEL */
+  30%, 33% { transform: scaleX(1) translateY(-5px); }
   35% { transform: scaleX(1) translateY(0); }
   40% { left: 145px; transform: scaleX(1); }
   50% { left: 340px; transform: scaleX(1); }
   53% { left: 340px; transform: scaleX(-1); }
-  
-  /* RÜCKWEG */
   60% { left: 115px; transform: scaleX(-1); }
   78% { left: 115px; transform: scaleX(-1); }
-  79% { transform: scaleX(-1) translateY(-2px); } /* GEMEINSAMER JUBEL */
+  79% { transform: scaleX(-1) translateY(-2px); }
   80%, 83% { transform: scaleX(-1) translateY(-5px); }
   85% { transform: scaleX(-1) translateY(0); }
   90% { left: 115px; transform: scaleX(-1); }
   98% { left: -40px; transform: scaleX(-1); }
 }
 
-/* Läufer 3 (Grün) - Genau in der Mitte */
 @keyframes wegLinksNachRechts3 {
   0% { left: -40px; transform: scaleX(1); }
   14% { left: 130px; transform: scaleX(1); }
   28% { left: 130px; transform: scaleX(1); }
   29% { transform: scaleX(1) translateY(-2px); }
-  30%, 33% { transform: scaleX(1) translateY(-5px); } /* GEMEINSAMER JUBEL */
+  30%, 33% { transform: scaleX(1) translateY(-5px); }
   35% { transform: scaleX(1) translateY(0); }
   42% { left: 130px; transform: scaleX(1); }
   52% { left: 340px; transform: scaleX(1); }
   53% { left: 340px; transform: scaleX(-1); }
-  
-  /* RÜCKWEG */
   62% { left: 130px; transform: scaleX(-1); }
   78% { left: 130px; transform: scaleX(-1); }
-  79% { transform: scaleX(-1) translateY(-2px); } /* GEMEINSAMER JUBEL */
+  79% { transform: scaleX(-1) translateY(-2px); }
   80%, 83% { transform: scaleX(-1) translateY(-5px); }
   85% { transform: scaleX(-1) translateY(0); }
   88% { left: 130px; transform: scaleX(-1); }
   96% { left: -40px; transform: scaleX(-1); }
 }
 
-/* Läufer 4 (Türkis) */
 @keyframes wegLinksNachRechts4 {
   0% { left: -40px; transform: scaleX(1); }
   16% { left: 115px; transform: scaleX(1); }
   28% { left: 115px; transform: scaleX(1); }
   29% { transform: scaleX(1) translateY(-2px); }
-  30%, 33% { transform: scaleX(1) translateY(-5px); } /* GEMEINSAMER JUBEL */
+  30%, 33% { transform: scaleX(1) translateY(-5px); }
   35% { transform: scaleX(1) translateY(0); }
   44% { left: 115px; transform: scaleX(1); }
   54% { left: 340px; transform: scaleX(1); }
   55% { left: 340px; transform: scaleX(-1); }
-  
-  /* RÜCKWEG */
   64% { left: 145px; transform: scaleX(-1); }
   78% { left: 145px; transform: scaleX(-1); }
-  79% { transform: scaleX(-1) translateY(-2px); } /* GEMEINSAMER JUBEL */
+  79% { transform: scaleX(-1) translateY(-2px); }
   80%, 83% { transform: scaleX(-1) translateY(-5px); }
   85% { transform: scaleX(-1) translateY(0); }
   86% { left: 145px; transform: scaleX(-1); }
   94% { left: -40px; transform: scaleX(-1); }
 }
 
-/* Läufer 5 (Orange) - Kommt als Letzter an, geht als Letzter weg */
 @keyframes wegLinksNachRechts5 {
   0% { left: -40px; transform: scaleX(1); }
-  18% { left: 100px; transform: scaleX(1); } /* Kommt an */
+  18% { left: 100px; transform: scaleX(1); }
   28% { left: 100px; transform: scaleX(1); }
   29% { transform: scaleX(1) translateY(-2px); }
-  30%, 33% { transform: scaleX(1) translateY(-5px); } /* GEMEINSAMER JUBEL JETZT STARTEN! */
+  30%, 33% { transform: scaleX(1) translateY(-5px); }
   35% { transform: scaleX(1) translateY(0); }
   46% { left: 100px; transform: scaleX(1); }
   56% { left: 340px; transform: scaleX(1); }
   57% { left: 340px; transform: scaleX(-1); }
-  
-  /* RÜCKWEG */
-  66% { left: 160px; transform: scaleX(-1); } /* Kommt als Letzter an */
+  66% { left: 160px; transform: scaleX(-1); }
   78% { left: 160px; transform: scaleX(-1); }
-  79% { transform: scaleX(-1) translateY(-2px); } /* GEMEINSAMER JUBEL */
+  79% { transform: scaleX(-1) translateY(-2px); }
   80%, 83% { transform: scaleX(-1) translateY(-5px); }
   85% { transform: scaleX(-1) translateY(0); }
   85.5% { left: 160px; transform: scaleX(-1); }
-  92% { left: -40px; transform: scaleX(-1); } /* Flitzt als Erster nach links weg */
+  92% { left: -40px; transform: scaleX(-1); }
 }
 
-
-/* DYNAMISCHE ARMAUSRICHTUNG WÄHREND DES JUBEL-MOMENTS (Prozentual abgestimmt auf 30%-33% und 80%-83%) */
 .runner .arm-l { animation: armLaufTakt 0.6s infinite alternate ease-in-out, armJubelChoreoL 16s infinite linear; }
 .runner .arm-r { animation: armLaufTakt 0.6s infinite alternate-reverse ease-in-out, armJubelChoreoR 16s infinite linear; }
 
 @keyframes armJubelChoreoL {
-  0%, 28% {     --override: none; }
-  /* Arme schnellen steil nach oben zum Feiern */
-  29%, 34% {   transform: rotate(-75deg) !important; }
-  35%, 78% {   --override: none; }
-  79%, 84% {   transform: rotate(-75deg) !important; }
-  85%, 100% {  --override: none; }
+  0%, 28% { transform: none; }
+  29%, 34% { transform: rotate(-75deg); }
+  35%, 78% { transform: none; }
+  79%, 84% { transform: rotate(-75deg); }
+  85%, 100% { transform: none; }
 }
+
 @keyframes armJubelChoreoR {
-  0%, 28% {     --override: none; }
-  29%, 34% {   transform: rotate(-95deg) !important; }
-  35%, 78% {   --override: none; }
-  79%, 84% {   transform: rotate(-95deg) !important; }
-  85%, 100% {  --override: none; }
+  0%, 28% { transform: none; }
+  29%, 34% { transform: rotate(-95deg); }
+  35%, 78% { transform: none; }
+  79%, 84% { transform: rotate(-95deg); }
+  85%, 100% { transform: none; }
 }
 
-
-/* FARBEN */
+/* LÄUFER FARBEN */
 .rot .head { border-color: #ff3333; } 
 .rot .torso, .rot .leg-l, .rot .leg-r, .rot .eye, .rot .arm-l, .rot .arm-r { background-color: #ff3333 !important; }
 .hellblau .head { border-color: #33ccff; } 
@@ -350,6 +333,7 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   61% { opacity: 0; left: 150px; }
   100% { opacity: 0; }
 }
+
 @keyframes laserVorwaertsRot2 {
   0%, 70% { opacity: 0; left: 0; }
   71% { opacity: 1; left: 0; }
@@ -368,6 +352,7 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   12% { opacity: 0; left: 150px; }
   100% { opacity: 0; }
 }
+
 @keyframes laserVorwaertsBlau2 {
   20% { opacity: 0; left: 0; }
   21% { opacity: 1; left: 0; }
@@ -376,12 +361,33 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   100% { opacity: 0; }
 }
 
-/* Unterseiten-Logik */
-.unterseite { background-color: #111111; border: 2px solid #555; border-radius: 12px; padding: 30px; width: 100%; max-width: 800px; margin-top: 20px; }
-.unterseite button { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
+/* =======================================================
+   UNTERSEITEN & GALERIE
+   ======================================================= */
+.unterseite { 
+  background-color: #111111; 
+  border: 2px solid #555; 
+  border-radius: 12px; 
+  padding: 30px; 
+  width: 100%; 
+  max-width: 800px; 
+  margin-top: 20px; 
+}
+
+.unterseite button { 
+  background: #333; 
+  color: white; 
+  border: none; 
+  padding: 10px 20px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  margin-bottom: 20px; 
+}
+
 .unterseite button:hover { background: #555; }
+
 .hidden { display: none !important; }
-/* Galerie-Layout */
+
 .galerie-grid {
   display: flex;
   flex-wrap: wrap;
@@ -402,13 +408,9 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   transition: transform 0.3s ease;
 }
 
-.bild-karte:hover {
-  transform: translateY(-5px);
-}
+.bild-karte:hover { transform: translateY(-5px); }
 
-.bild-container {
-  position: relative;
-}
+.bild-container { position: relative; }
 
 .bild-container img {
   width: 100%;
@@ -416,7 +418,6 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   display: block;
 }
 
-/* Badges (Sprechblase & Farbklecks) */
 .badges-container {
   position: absolute;
   top: 10px;
@@ -436,7 +437,6 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   box-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
 }
 
-/* Transparente Neon-Wolke */
 .beschreibung-wolke {
   position: absolute;
   top: 10px;
@@ -463,7 +463,6 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   font-weight: bold;
 }
 
-/* Buttons unter dem Bild */
 .button-gruppe {
   display: flex;
   gap: 10px;
@@ -487,7 +486,7 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   color: #000;
 }
 
-/* Modals / Pop-ups */
+/* MODALS / POP-UPS */
 .modal {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
@@ -536,7 +535,7 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   color: #fff !important;
 }
 
-/* Paint Studio Styles */
+/* PAINT STUDIO */
 .paint-inhalt {
   max-width: 500px !important;
   width: 95% !important;
@@ -589,9 +588,6 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   cursor: crosshair;
 }
 
-.hidden {
-  display: none !important;
-}
 /* =======================================================
    GESCHICHTEN LAYOUT, KARTEN & MODAL-SCROLLBAR
    ======================================================= */
@@ -602,7 +598,6 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   margin-top: 20px;
 }
 
-/* Kasten um den Titel (Klickbare Karte) */
 .geschichte-karte {
   background-color: #111;
   border: 2px solid #0088ff;
@@ -626,29 +621,26 @@ header h1 { font-size: 2.5rem; letter-spacing: 2px; }
   font-size: 1.3rem;
 }
 
-/* Lesefenster / Modal-Anpassung */
 .geschichte-inhalt {
-  max-width: 800px !important; /* Breiter gestaltet */
+  max-width: 800px !important;
   width: 90% !important;
-  max-height: 85vh; /* Verhindert, dass das Fenster den ganzen Bildschirm sprengt */
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Der Textbereich mit fester Höhe und Scrollbalken */
 .geschichte-text-box {
   background: #0a0a10;
   border: 1px solid #333;
   padding: 20px;
   border-radius: 8px;
-  max-height: 380px; /* Kompakte Länge */
-  overflow-y: auto;  /* Aktiviert das Scrollen */
+  max-height: 380px;
+  overflow-y: auto;
   line-height: 1.6;
   white-space: pre-line;
   margin-bottom: 15px;
 }
 
-/* Styling für den Scrollbalken */
 .geschichte-text-box::-webkit-scrollbar {
   width: 8px;
 }
