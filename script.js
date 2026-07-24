@@ -234,7 +234,7 @@ const geschichtenDaten = {
   demenz: {
     titel: "Der kalte Gang",
     vorschau: "Ein feuchter Keller, Schritte in der Dunkelheit und die Panik im Nacken...",
-    views: 142,
+    views: 0,
     rating: 0,
     kommentareCount: 0,
     genres: {
@@ -296,7 +296,7 @@ Als die Gestalt schließlich um die Ecke trat, raubte mir der Anblick den Atem. 
     titel: "Der Platinen-Abgrund: Überleben im Kern",
     vorschau: "Ein Sturz in die Finsternis, kaputte Werkzeuge und ein harter Kampf ums Überleben...",
     klasse: "card-geschichte-2",
-    views: 89,
+    views: 0,
     rating: 0,
     kommentareCount: 0,
     genres: {
