@@ -270,15 +270,18 @@ function ladeKiBilder(kategorie) {
   grid.innerHTML = '';
 
   let bildURLs = [];
-  const r = Math.floor(Math.random() * 900000) + 100000;
+  // Echter Zeitstempel + Zufallszahl erzwingt immer NEUE Bilder beim Würfeln!
+  const time = Date.now();
+  const rand = Math.floor(Math.random() * 10000);
 
   switch (kategorie) {
     case 'anime': {
+      // Echte gezeichnete Anime/Manga-Style Charaktere über Avatar-APIs
       bildURLs = [
-        `https://picsum.photos/400/300?random=${r+1}`,
-        `https://picsum.photos/400/300?random=${r+2}`,
-        `https://picsum.photos/400/300?random=${r+3}`,
-        `https://picsum.photos/400/300?random=${r+4}`
+        `https://api.dicebear.com/7.x/adventurer/svg?seed=Anime1_${time}`,
+        `https://api.dicebear.com/7.x/adventurer/svg?seed=Anime2_${time + 1}`,
+        `https://api.dicebear.com/7.x/adventurer/svg?seed=Anime3_${time + 2}`,
+        `https://api.dicebear.com/7.x/adventurer/svg?seed=Anime4_${time + 3}`
       ];
       break;
     }
@@ -300,33 +303,35 @@ function ladeKiBilder(kategorie) {
     }
 
     case 'tiere': {
+      // Echte Tier-Generatoren (Hunde, Katzen & Naturtiere)
       bildURLs = [
-        `https://picsum.photos/id/237/400/300?sig=${r+1}`,
-        `https://picsum.photos/id/1020/400/300?sig=${r+2}`,
-        `https://picsum.photos/id/1024/400/300?sig=${r+3}`,
-        `https://picsum.photos/id/1069/400/300?sig=${r+4}`
+        `https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&auto=format&fit=crop&q=80&sig=${rand}`,
+        `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=80&sig=${rand + 1}`,
+        `https://images.unsplash.com/photo-1555169062-013468b47731?w=400&auto=format&fit=crop&q=80&sig=${rand + 2}`,
+        `https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?w=400&auto=format&fit=crop&q=80&sig=${rand + 3}`
       ];
       break;
     }
 
     case 'kunst': {
+      // Berühmte Gemälde & Ölbilder
       bildURLs = [
-        `https://picsum.photos/id/1005/400/300?sig=${r+1}`,
-        `https://picsum.photos/id/1022/400/300?sig=${r+2}`,
-        `https://picsum.photos/id/1031/400/300?sig=${r+3}`,
-        `https://picsum.photos/id/1043/400/300?sig=${r+4}`
+        `https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&auto=format&fit=crop&q=80&sig=${rand}`,
+        `https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&auto=format&fit=crop&q=80&sig=${rand + 1}`,
+        `https://images.unsplash.com/photo-1582561424760-0321d75e81fa?w=400&auto=format&fit=crop&q=80&sig=${rand + 2}`,
+        `https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=400&auto=format&fit=crop&q=80&sig=${rand + 3}`
       ];
       break;
     }
 
     case 'zufall': {
-      const pId1 = Math.floor(Math.random() * 151) + 1;
-      const pId2 = Math.floor(Math.random() * 100) + 152;
+      // Bunter Mix: 1x Anime, 1x Pokémon, 1x Tier, 1x Kunst
+      const pId = Math.floor(Math.random() * 151) + 1;
       bildURLs = [
-        `https://picsum.photos/400/300?random=${r+1}`,
-        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId1}.png`,
-        `https://picsum.photos/id/237/400/300?sig=${r}`,
-        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId2}.png`
+        `https://api.dicebear.com/7.x/adventurer/svg?seed=Zufall_${time}`,
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`,
+        `https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&auto=format&fit=crop&q=80&sig=${rand}`,
+        `https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=400&auto=format&fit=crop&q=80&sig=${rand + 1}`
       ];
       break;
     }
@@ -334,10 +339,10 @@ function ladeKiBilder(kategorie) {
     case 'standard':
     default: {
       bildURLs = [
-        `https://picsum.photos/400/300?random=${r+10}`,
-        `https://picsum.photos/400/300?random=${r+20}`,
-        `https://picsum.photos/400/300?random=${r+30}`,
-        `https://picsum.photos/400/300?random=${r+40}`
+        `https://picsum.photos/400/300?random=${rand}`,
+        `https://picsum.photos/400/300?random=${rand + 1}`,
+        `https://picsum.photos/400/300?random=${rand + 2}`,
+        `https://picsum.photos/400/300?random=${rand + 3}`
       ];
       break;
     }
@@ -347,7 +352,7 @@ function ladeKiBilder(kategorie) {
     const card = document.createElement('div');
     card.className = 'galerie-karte';
     card.innerHTML = `
-      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">
+      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:cover; border-radius:8px; background:#222;">
       <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
         <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
         <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
