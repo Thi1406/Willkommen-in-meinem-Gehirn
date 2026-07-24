@@ -78,6 +78,7 @@ function erstelleGalerie() {
   });
 }
 
+// Initialisieren der Galerie
 erstelleGalerie();
 
 
@@ -225,10 +226,207 @@ function speicherePaint() {
 
   schliessePaintModal();
 }
+// ====================================================
+// 4. NEUE BILDER-WELT FEATURES (REITER, KATEGORIEN & FREIES MALEN)
+// ====================================================
+
+let aktuellesFreiWerkzeug = 'bleistift';
+let freiCanvas, freiCtx, freiIsDrawing = false;
+let kiBearbeiteteBilder = JSON.parse(localStorage.getItem('kiBearbeiteteBilder')) || [];
+let freieGemaelde = JSON.parse(localStorage.getItem('freieGemaelde')) || [];
+
+// Reiter-Wechsel im Bilderbereich
+function wechsleBilderTab(tabName) {
+  document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+  
+  const zielTab = document.getElementById(`tab-${tabName}`);
+  if (zielTab) zielTab.classList.remove('hidden');
+
+  if (tabName === 'freies-malen') {
+    initFreiesCanvas();
+  }
+}
+
+// Dropdown-Auswahl für KI-Bilder
+function aendereKiKategorie(kategorie) {
+  ladeKiBilder(kategorie);
+}
+
+function ladeKiBilder(kategorie) {
+  const grid = document.getElementById('ki-galerie-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  let bildURLs = [];
+
+  switch (kategorie) {
+    case 'anime':
+      bildURLs = [
+        'https://picsum.photos/id/1025/400/300',
+        'https://picsum.photos/id/1062/400/300',
+        'https://picsum.photos/id/1074/400/300',
+        'https://picsum.photos/id/1084/400/300'
+      ];
+      break;
+    case 'pokemon-gen1':
+      bildURLs = [
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/93.png'
+      ];
+      break;
+    case 'pokemon-gen2':
+      bildURLs = [
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/155.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/158.png',
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/249.png'
+      ];
+      break;
+    case 'tiere':
+      bildURLs = [
+        'https://picsum.photos/id/237/400/300',
+        'https://picsum.photos/id/1020/400/300',
+        'https://picsum.photos/id/1069/400/300',
+        'https://picsum.photos/id/1080/400/300'
+      ];
+      break;
+    case 'kunst':
+      bildURLs = [
+        'https://picsum.photos/id/1005/400/300',
+        'https://picsum.photos/id/1022/400/300',
+        'https://picsum.photos/id/1031/400/300',
+        'https://picsum.photos/id/1043/400/300'
+      ];
+      break;
+    case 'zufall':
+    case 'standard':
+    default:
+      const timestamp = new Date().getTime();
+      bildURLs = [
+        `https://picsum.photos/400/300?random=${timestamp + 1}`,
+        `https://picsum.photos/400/300?random=${timestamp + 2}`,
+        `https://picsum.photos/400/300?random=${timestamp + 3}`,
+        `https://picsum.photos/400/300?random=${timestamp + 4}`
+      ];
+      break;
+  }
+
+  bildURLs.forEach((url, idx) => {
+    const card = document.createElement('div');
+    card.className = 'galerie-karte';
+    card.innerHTML = `
+      <img src="${url}" alt="KI Bild ${idx + 1}">
+      <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
+        <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
+        <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// Freies Malen Canvas
+function initFreiesCanvas() {
+  freiCanvas = document.getElementById('frei-paint-canvas');
+  if (!freiCanvas) return;
+  freiCtx = freiCanvas.getContext('2d');
+
+  freiCanvas.onmousedown = (e) => {
+    freiIsDrawing = true;
+    freiCtx.beginPath();
+    const rect = freiCanvas.getBoundingClientRect();
+    freiCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  };
+
+  freiCanvas.onmousemove = (e) => {
+    if (!freiIsDrawing) return;
+    const rect = freiCanvas.getBoundingClientRect();
+    const color = document.getElementById('frei-paint-farbe').value;
+    const size = document.getElementById('frei-paint-groesse').value;
+
+    freiCtx.strokeStyle = color;
+    freiCtx.lineWidth = size;
+    freiCtx.lineCap = 'round';
+
+    freiCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    freiCtx.stroke();
+  };
+
+  freiCanvas.onmouseup = () => freiIsDrawing = false;
+  freiCanvas.onmouseleave = () => freiIsDrawing = false;
+}
+
+function setzeFreiWerkzeug(werkzeug) {
+  aktuellesFreiWerkzeug = werkzeug;
+}
+
+function löscheFreiCanvas() {
+  if (freiCtx && freiCanvas) {
+    freiCtx.clearRect(0, 0, freiCanvas.width, freiCanvas.height);
+  }
+}
+
+function speichereFreiesGemälde() {
+  const nameInput = document.getElementById('frei-paint-name');
+  const fehler = document.getElementById('frei-paint-fehler');
+
+  if (!nameInput.value.trim()) {
+    if (fehler) fehler.classList.remove('hidden');
+    return;
+  }
+  if (fehler) fehler.classList.add('hidden');
+
+  const dataUrl = freiCanvas.toDataURL();
+  freieGemaelde.push({ name: nameInput.value.trim(), dataUrl: dataUrl });
+  localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
+
+  nameInput.value = '';
+  löscheFreiCanvas();
+  rendereFreiUserListe();
+  alert('Dein Kunstwerk wurde gespeichert!');
+}
+
+function rendereFreiUserListe() {
+  const container = document.getElementById('frei-user-liste');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (freieGemaelde.length === 0) {
+    container.innerHTML = '<p style="color: #666;">Noch keine freien Gemälde vorhanden.</p>';
+    return;
+  }
+
+  freieGemaelde.forEach((eintrag, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-neon-user';
+    btn.textContent = eintrag.name;
+    btn.onclick = () => zeigeFreiesGemaelde(idx);
+    container.appendChild(btn);
+  });
+}
+
+function zeigeFreiesGemaelde(index) {
+  const eintrag = freieGemaelde[index];
+  if (eintrag && freiCtx) {
+    const img = new Image();
+    img.onload = () => {
+      löscheFreiCanvas();
+      freiCtx.drawImage(img, 0, 0);
+    };
+    img.src = eintrag.dataUrl;
+  }
+}
 
 
 // ====================================================
-// 4. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
+// 5. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
 // ====================================================
 const geschichtenDaten = {
   demenz: {
@@ -394,7 +592,7 @@ Als sie aufwachte, lag Katze Bavin 787 schnurrend auf ihrem Bauch und es duftete
 
       erotisch: `Kapitel 1: Gefährliche Hingabe
 
-Die Luft im Sektor B-11 war heiß, aufgeladen mit Knistern und dem berauschenden Duft von Ozon. Als Wartungsangestellte AJ verlangte mir dieser Ort alles ab. Doch bevor ich mich in die Tiefe des Magnetwürfels wagte, gehörte mein ganzer Gedanke meiner Liebsten. Das Foto auf meinem Tisch ließ meine Haut kribbeln. Ein sanftes Streicheln über das Fell von Katze Bavin 787, dann ließ ich mich am Seil hinab.
+Die Luft im Sektor B-11 war heiß, aufgeladen mit Knistern und dem berauschenden Duft von Ozon. Als Wartungsangestellte AJ verlangte mir dieser Ort alles ab. Doch bevor ich mich in die Tiefe des Magnetwürfels vagte, gehörte mein ganzer Gedanke meiner Liebsten. Das Foto auf meinem Tisch ließ meine Haut kribbeln. Ein sanftes Streicheln über das Fell von Katze Bavin 787, dann ließ ich mich am Seil hinab.
 
 Doch die Kontrolle entglitt mir brutal. Sirenen heulten, ein Wagen riss meine Verankerung los. Das Seil peitschte durch die Luft, und ich ergab mich dem hilflosen, Rausch-ähnlichen freien Fall in den Abgrund.
 
@@ -410,156 +608,32 @@ Kapitel 3: In deinen Armen
 
 Als die Rettungskammer mich nach oben zog, war jeder Stoß an meinem Bein eine Qual, die mich stöhnen ließ. Doch oben warteten ihre weichen Lippen, ihre zitternden Hände, die gierig nach mir griffen. Ich spürte ihre Körperschmelze, ehe die Dunkelheit mich einhüllte.
 
-Ich erwachte beim Duft von warmem Essen. Bavin 787 lag auf meinem Leib, doch mein Blick suchte nur sie. Sie trat an mein Bett, streichelte zärtlich über meine erhitzte Haut. „Es war ein Albtraum“, flüsterte ich, meine Stimme rau vor Verlangen und Erschöpfung. „Ich habe nur an deinen Körper, deine Wärme gedacht... Zieh bei mir ein. Bleib für immer.“
-
-Ihre Augen glänzten, als sie sich über mich beugte: „Ich bin schon da, AJ. Meine Koffer stehen im Flur.“ Als sich unsere Lippen trafen, schmolz all der Schmerz des Abgrunds in reinem Glück dahin.`
+Ich erwachte beim Duft von warmem Essen. Bavin 787 lag auf meinem Leib, doch mein Blick suchte nur sie. Sie trat an mein Bett, streichelte zärtlich über meine erhitzte Haut. „Es war ein Albtraum“, flüsterte ich, meine Stimme rau vor Verlangen und Erschöpfung. „Ich habe nur an deinen Körper, deine Wärme gedacht... Zieh bei mir ein. Bleib für immer.“`
     }
   }
 };
-
-let aktuelleStoryId = 'demenz';
-let aktuellesGenre = 'original';
 
 function ladeGeschichtenUebersicht() {
   const container = document.getElementById('geschichten-grid');
   if (!container) return;
   container.innerHTML = '';
 
-  for (let id in geschichtenDaten) {
-    const story = geschichtenDaten[id];
+  Object.keys(geschichtenDaten).forEach(key => {
+    const geschichte = geschichtenDaten[key];
+    const klicks = Number(localStorage.getItem(`klicks-${key}`)) || 0;
+
     const karte = document.createElement('div');
-    karte.className = 'geschichte-karte';
-    
-    if (story.klasse) {
-      karte.classList.add(story.klasse);
-    }
-    
-    // HTML für Sterne aufbauen
-    let sterneHtml = '';
-    for (let i = 1; i <= 5; i++) {
-      const aktivKlasse = i <= story.rating ? 'aktiv' : '';
-      sterneHtml += `<span class="stern ${aktivKlasse}" onclick="bewerten(event, '${id}', ${i})">★</span>`;
-    }
-
+    karte.className = `geschichte-karte ${geschichte.klasse || ''}`;
     karte.innerHTML = `
-      <div class="karte-header-action" onclick="oeffneGeschichteKommentarModal(event, '${id}')" title="Kommentar schreiben">
-        💬 <span>${story.kommentareCount}</span>
-      </div>
-      
-      <div onclick="oeffneGeschichte('${id}')">
-        <h3>${story.titel}</h3>
-        <p>${story.vorschau}</p>
-      </div>
-
-      <div class="geschichte-karte-footer">
-        <div class="views-count" title="Anzahl der Aufrufe">
-          👁️ ${story.views}
-        </div>
-        <div class="sterne-rating">
-          ${sterneHtml}
-        </div>
+      <h3>${geschichte.titel}</h3>
+      <p>${geschichte.vorschau}</p>
+      <div style="display: flex; justify-content: space-around; margin-top: 15px; align-items: center;">
+        <span style="cursor: pointer;" onclick="oeffneGeschichteModal('${key}')">
+          👁️ <strong id="klicks-${key}">${klicks}</strong>
+        </span>
+        <button onclick="oeffneGeschichteModal('${key}')" style="font-size: 0.85rem; padding: 5px 10px;">Lesen</button>
       </div>
     `;
-    
     container.appendChild(karte);
-  }
-}
-
-// Sterne bewerten Funktion
-function bewerten(event, storyId, sternAnzahl) {
-  event.stopPropagation(); // Verhindert, dass sich das Lese-Modal öffnet
-  geschichtenDaten[storyId].rating = sternAnzahl;
-  ladeGeschichtenUebersicht(); // Ansicht neu laden, um grüne Sterne zu zeigen
-}
-
-function oeffneGeschichte(id) {
-  aktuelleStoryId = id;
-  aktuellesGenre = 'original';
-  
-  // Aufrufzähler um 1 erhöhen beim Lesen
-  geschichtenDaten[id].views++;
-  
-  document.getElementById('geschichte-titel').innerText = geschichtenDaten[id].titel;
-  
-  const buttons = document.querySelectorAll('.btn-genre');
-  buttons.forEach(btn => {
-    if (btn.innerText.toLowerCase() === 'original') {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
   });
-
-  aktualisiereGenreText();
-  document.getElementById('modal-geschichte').classList.remove('hidden');
-}
-
-function wechsleGenre(genre) {
-  aktuellesGenre = genre;
-  
-  const buttons = document.querySelectorAll('.btn-genre');
-  buttons.forEach(btn => {
-    if (btn.innerText.toLowerCase() === genre) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  });
-
-  aktualisiereGenreText();
-}
-
-function aktualisiereGenreText() {
-  const story = geschichtenDaten[aktuelleStoryId];
-  const textElem = document.getElementById('geschichte-text');
-  if (textElem && story) {
-    textElem.innerText = story.genres[aktuellesGenre] || story.genres['original'];
-  }
-}
-
-function schliesseGeschichteModal(event) {
-  if (!event || event.target.id === 'modal-geschichte' || event.target.classList.contains('btn-abbrechen')) {
-    document.getElementById('modal-geschichte').classList.add('hidden');
-    ladeGeschichtenUebersicht(); // Aktualisiert die Aufruf-Zahl auf den Karten
-  }
-}
-
-
-// ====================================================
-// 5. GESCHICHTEN KOMMENTAR MODAL LOGIK
-// ====================================================
-let kommentarStoryTargetId = null;
-
-function oeffneGeschichteKommentarModal(event, storyId) {
-  event.stopPropagation(); // Verhindert das Öffnen der Geschichte selbst
-  kommentarStoryTargetId = storyId;
-  
-  const story = geschichtenDaten[storyId];
-  document.getElementById('kommentar-story-titel').innerText = story.titel;
-  document.getElementById('geschichte-kommentar-text').value = '';
-  document.getElementById('geschichte-kommentar-name').value = '';
-  document.getElementById('geschichte-kommentar-fehler').classList.add('hidden');
-  
-  document.getElementById('modal-geschichte-kommentar').classList.remove('hidden');
-}
-
-function schliesseGeschichteKommentarModal() {
-  document.getElementById('modal-geschichte-kommentar').classList.add('hidden');
-}
-
-function speichereGeschichteKommentar() {
-  const name = document.getElementById('geschichte-kommentar-name').value.trim();
-  
-  if (name === '') {
-    document.getElementById('geschichte-kommentar-fehler').classList.remove('hidden');
-    return;
-  }
-
-  // Erhöhe die Kommentar-Anzahl
-  if (kommentarStoryTargetId && geschichtenDaten[kommentarStoryTargetId]) {
-    geschichtenDaten[kommentarStoryTargetId].kommentareCount++;
-  }
-
-  schliesseGeschichteKommentarModal();
-  ladeGeschichtenUebersicht(); // Aktualisiert das Badge oben rechts mit der neuen Anzahl
 }
