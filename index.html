@@ -311,14 +311,10 @@
   <h2>Minispiele</h2>
 
   <div class="games-grid" id="games-grid">
-    <!-- Spiel 1 Card -->
+    <!-- Spiel Karte -->
     <div class="game-karte">
       <div class="game-cover-box" onclick="oeffneClipperSpiel()">
-        <!-- Hier kannst du später auch ein echtes Bild einfügen: <img src="clipper-cover.jpg"> -->
-        <div class="clipper-placeholder">
-          <span style="font-size: 3rem;">🔥</span>
-          <p style="margin: 5px 0 0; font-weight: bold; color: #00ffcc;">Clipper Catcher</p>
-        </div>
+        <img src="clipper.png" alt="Clipper Stoned" class="game-cover-img">
       </div>
       
       <div class="game-card-footer">
@@ -329,7 +325,7 @@
   </div>
 </section>
 
-<!-- MODAL: SPELFENSTER CLIPPER GAME -->
+<!-- MODAL: SPIELFENSTER CLIPPER GAME -->
 <div id="modal-clipper-game" class="modal hidden">
   <div class="modal-inhalt game-modal-inhalt">
     <div class="game-header">
@@ -343,8 +339,8 @@
     <div id="clipper-spielfeld" class="clipper-spielfeld">
       <!-- 420er Easter-Egg Elemente -->
       <div id="easter-egg-nachricht" class="easter-egg-text hidden">Glückwunsch du bist breit genug</div>
-      <div id="joint-links" class="riesen-joint links hidden">🚬💨</div>
-      <div id="joint-rechts" class="riesen-joint rechts hidden">🚬💨</div>
+      <div id="joint-links" class="riesen-joint links hidden"><img src="tuete.jpg" alt="Joint"></div>
+      <div id="joint-rechts" class="riesen-joint rechts hidden"><img src="tuete.jpg" alt="Joint"></div>
     </div>
   </div>
 </div>
@@ -353,16 +349,14 @@
 <div id="modal-highscore" class="modal hidden">
   <div class="modal-inhalt">
     <h3>🏆 Top 10 Highscore</h3>
-    <ol id="highscore-liste" class="highscore-liste">
-      <!-- Wird per JS befüllt -->
-    </ol>
+    <ol id="highscore-liste" class="highscore-liste"></ol>
     <div class="modal-buttons">
       <button onclick="schliesseHighscoreModal()" class="btn-abbrechen">Schließen</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL: GAME OVER & NAMENSEINBABE -->
+<!-- MODAL: GAME OVER & NAMENSEINGABE -->
 <div id="modal-game-over" class="modal hidden">
   <div class="modal-inhalt">
     <h3>Game Over!</h3>
