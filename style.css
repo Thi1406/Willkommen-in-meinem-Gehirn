@@ -599,6 +599,7 @@ header h1 {
 }
 
 .geschichte-karte {
+  position: relative;
   background-color: #111;
   border: 2px solid #0088ff;
   border-radius: 12px;
@@ -658,7 +659,7 @@ header h1 {
 .geschichte-text-box::-webkit-scrollbar-thumb:hover {
   background: #00ccff;
 }
-/* Stellt sicher, dass das Raster die Karten sauber anordnet */
+
 #geschichten-grid {
   display: flex;
   flex-direction: column;
@@ -666,30 +667,21 @@ header h1 {
   margin-top: 20px;
 }
 
-/* Neon-Rand für die neue Geschichte (Beispiel: Neon-Pink/Magenta) */
 .card-geschichte-2 {
   border: 2px solid #ff007f !important;
   box-shadow: 0 0 15px #ff007f, inset 0 0 10px rgba(255, 0, 127, 0.3) !important;
   transition: all 0.3s ease;
 }
 
-/* Hover-Effekt: Leuchtet beim Drüberfahren noch intensiver */
 .card-geschichte-2:hover {
   box-shadow: 0 0 25px #ff007f, inset 0 0 15px rgba(255, 0, 127, 0.5) !important;
   transform: translateY(-3px);
 }
-/* Erhält die Zeilenumbrüche und Absätze im Modal-Text aufrecht */
+
 #geschichte-text {
   white-space: pre-line;
 }
-/* Positionierung der Karte für das Badge oben rechts */
-.geschichte-karte {
-  position: relative;
-  padding: 20px;
-  cursor: pointer;
-}
 
-/* Sprechblase oben rechts, leicht abseits */
 .karte-header-action {
   position: absolute;
   top: 12px;
@@ -711,7 +703,6 @@ header h1 {
   transform: scale(1.05);
 }
 
-/* Footer-Bereich der Karte (Aufrufe & Sterne) */
 .geschichte-karte-footer {
   display: flex;
   justify-content: space-between;
@@ -721,13 +712,11 @@ header h1 {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Aufruf-Zähler */
 .views-count {
   font-size: 0.9rem;
   color: #aaa;
 }
 
-/* Sterne-Bewertung */
 .sterne-rating {
   display: flex;
   gap: 4px;
@@ -735,7 +724,7 @@ header h1 {
 
 .stern {
   font-size: 1.3rem;
-  color: #555; /* Ausgegraut */
+  color: #555;
   cursor: pointer;
   transition: color 0.2s ease, transform 0.2s ease;
 }
@@ -744,14 +733,12 @@ header h1 {
   transform: scale(1.2);
 }
 
-/* Neon-Grün für aktive Sterne */
 .stern.aktiv {
   color: #39ff14 !important;
   text-shadow: 0 0 8px #39ff14, 0 0 15px #39ff14;
 }
-/* ==========================================
-   BILDERWELT: REITER / TABS
-   ========================================== */
+
+/* BILDERWELT REITER */
 .bilder-tabs {
   display: flex;
   justify-content: center;
@@ -780,7 +767,6 @@ header h1 {
   box-shadow: 0 0 15px rgba(0, 243, 255, 0.8);
 }
 
-/* Dropdown-Filter */
 .filter-box {
   margin-bottom: 20px;
   text-align: center;
@@ -803,9 +789,6 @@ header h1 {
   cursor: pointer;
 }
 
-/* ==========================================
-   NEON-CYAN USER-BUTTONS
-   ========================================== */
 .bearbeitete-werke-bereich {
   margin-top: 35px;
   border-top: 1px solid rgba(0, 243, 255, 0.2);
@@ -847,9 +830,6 @@ header h1 {
   box-shadow: 0 0 20px #00f3ff;
 }
 
-/* ==========================================
-   FREIES MALEN CANVAS
-   ========================================== */
 .freies-malen-container {
   display: flex;
   flex-direction: column;
@@ -876,7 +856,6 @@ header h1 {
   margin-top: 10px;
 }
 
-/* Kommentare-Liste im Modal */
 .kommentare-liste-box {
   max-height: 250px;
   overflow-y: auto;
@@ -899,8 +878,9 @@ header h1 {
   font-size: 0.85rem;
   margin-bottom: 3px;
 }
+
 /* =======================================================
-   GAMES & CLIPPER GAME STYLES
+   CLIPPER GAME STYLES
    ======================================================= */
 .games-grid {
   display: flex;
@@ -913,7 +893,7 @@ header h1 {
   background-color: #111;
   border: 2px solid #aa00ff;
   border-radius: 12px;
-  width: 300px; /* Gleiche Breite wie die Bild-Karten */
+  width: 300px;
   box-shadow: 0 0 15px rgba(170, 0, 255, 0.3);
   overflow: hidden;
   display: flex;
@@ -927,15 +907,17 @@ header h1 {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  overflow: hidden;
+}
+
+.game-cover-img {
+  max-height: 100%;
+  object-fit: contain;
   transition: transform 0.2s ease;
 }
 
-.game-cover-box:hover {
-  transform: scale(1.02);
-}
-
-.clipper-placeholder {
-  text-align: center;
+.game-cover-box:hover .game-cover-img {
+  transform: scale(1.1);
 }
 
 .game-card-footer {
@@ -946,36 +928,13 @@ header h1 {
   background: #0a0a10;
 }
 
-.game-card-footer h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #aa00ff;
-}
-
 .btn-pokal {
   background: transparent !important;
   border: 1px solid #ffcc00 !important;
   color: #ffcc00 !important;
   padding: 4px 8px !important;
-  margin-bottom: 0 !important;
   font-size: 0.85rem;
   cursor: pointer;
-}
-
-/* GAME MODAL */
-.game-modal-inhalt {
-  max-width: 700px !important;
-  width: 95% !important;
-}
-
-.game-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #0d0d15;
-  padding: 8px 15px;
-  border-radius: 6px;
-  border: 1px solid #333;
 }
 
 .clipper-spielfeld {
@@ -987,25 +946,30 @@ header h1 {
   border-radius: 8px;
   overflow: hidden;
   margin-top: 10px;
-  /* Feuerzeug als Mauszeiger */
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><text y="20" font-size="20">🔥</text></svg>'), auto;
+  cursor: url('clipper.png'), pointer;
 }
 
-/* Hanfblatt Cursor nach 420 Punkte */
 .clipper-spielfeld.hanf-cursor {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><text y="20" font-size="20">🌿</text></svg>'), auto !important;
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text y="24" font-size="24">🌿</text></svg>'), pointer !important;
 }
 
-/* Ziel-Objekte */
 .game-item {
   position: absolute;
-  font-size: 2rem;
   user-select: none;
-  cursor: inherit;
-  transition: transform 0.1s;
+  cursor: pointer;
 }
 
-/* Easter Egg Styles */
+.game-item.joint img {
+  width: 60px;
+  height: auto;
+  filter: drop-shadow(0 0 5px #00ff00);
+}
+
+.game-item.zigarette {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 0 5px #ff0000);
+}
+
 .easter-egg-text {
   position: absolute;
   top: 40%;
@@ -1018,23 +982,20 @@ header h1 {
   z-index: 20;
 }
 
-.riesen-joint {
-  position: absolute;
-  bottom: 10px;
-  font-size: 5rem;
-  animation: qualmAnimation 2s infinite alternate;
+.riesen-joint img {
+  width: 100px;
+  height: auto;
 }
 
-.riesen-joint.links { left: 20px; }
-.riesen-joint.rechts { right: 20px; transform: scaleX(-1); }
-
-@keyframes qualmAnimation {
-  0% { filter: drop-shadow(0 0 5px #ffffff); }
-  100% { filter: drop-shadow(0 -15px 15px #888888); }
+.riesen-joint.links { 
+  position: absolute; 
+  bottom: 10px; 
+  left: 20px; 
 }
 
-.highscore-liste {
-  text-align: left;
-  padding-left: 20px;
-  color: #00ffcc;
+.riesen-joint.rechts { 
+  position: absolute; 
+  bottom: 10px; 
+  right: 20px; 
+  transform: scaleX(-1); 
 }
