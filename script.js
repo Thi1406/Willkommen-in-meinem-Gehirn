@@ -661,28 +661,27 @@ function spawneItemLoop() {
   item.dataset.type = isJoint ? 'joint' : 'zigarette';
 
   if (isJoint) {
-    // Verwendet dein hochgeladenes Bild 'tuete.jpg'
+    // Verwendet deine echte Grafik für den Joint
     item.innerHTML = `<img src="tuete.jpg" alt="Joint">`;
   } else {
-    // Klassisches Zigaretten-Emoji für deutlichen Unterschied
-    item.innerText = '🚬';
+    // Verwendet dieselbe Grafik, färbt sie aber leicht orange/bräunlich ein (als Zigarette)
+    item.innerHTML = `<img src="tuete.jpg" alt="Zigarette" style="filter: hue-rotate(140deg) saturate(1.5);">`;
   }
 
-  const maxX = Math.max(0, spielfeld.clientWidth - 70);
-  const maxY = Math.max(0, spielfeld.clientHeight - 70);
+  const maxX = Math.max(10, spielfeld.clientWidth - 80);
+  const maxY = Math.max(10, spielfeld.clientHeight - 80);
   item.style.left = Math.floor(Math.random() * maxX) + 'px';
   item.style.top = Math.floor(Math.random() * maxY) + 'px';
 
-  // Mechanik: 1 Sekunde gedrückt halten zum Anzünden
+  // Anzünd-Mechanik: Gedrückt halten
   item.onmousedown = (e) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0) return; // Nur linke Maustaste
     
-    // Optisches Feedback: Schrumpt leicht beim Anzünden
-    item.style.transform = 'scale(0.85)';
+    item.style.transform = 'scale(0.85)'; // Optische Rückmeldung beim Anzünden
 
     holdTimer = setTimeout(() => {
       anzuenden(item);
-    }, 1000); // Exakt 1000ms gedrückt halten
+    }, 800); // 0,8 Sekunden halten zum Anzünden
   };
 
   item.onmouseup = () => {
@@ -698,7 +697,7 @@ function spawneItemLoop() {
   spielfeld.appendChild(item);
 
   if (itemsGefangen > 0 && itemsGefangen % 10 === 0) {
-    aktuellesTempo = Math.max(500, aktuellesTempo - 150);
+    aktuellesTempo = Math.max(600, aktuellesTempo - 150);
   }
 
   const zufallsDelay = aktuellesTempo + (Math.random() * 400 - 200);
@@ -707,7 +706,6 @@ function spawneItemLoop() {
     spawneItemLoop();
   }, zufallsDelay);
 }
-
 function anzuenden(item) {
   const type = item.dataset.type;
   item.remove();
