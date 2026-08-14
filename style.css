@@ -880,7 +880,7 @@ header h1 {
 }
 
 /* =======================================================
-   CLIPPER GAME STYLES
+   CLIPPER GAME STYLES (KORRIGIERT)
    ======================================================= */
 .games-grid {
   display: flex;
@@ -937,6 +937,7 @@ header h1 {
   cursor: pointer;
 }
 
+/* Spielfeld mit Clipper als Zeiger */
 .clipper-spielfeld {
   position: relative;
   width: 100%;
@@ -946,28 +947,36 @@ header h1 {
   border-radius: 8px;
   overflow: hidden;
   margin-top: 10px;
-  cursor: url('clipper.png'), pointer;
+  /* Mit Fallback ", auto", damit Browser die PNG als Cursor annehmen */
+  cursor: url('clipper.png'), auto;
 }
 
 .clipper-spielfeld.hanf-cursor {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text y="24" font-size="24">🌿</text></svg>'), pointer !important;
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text y="24" font-size="24">🌿</text></svg>'), auto !important;
 }
 
+/* Ziel-Objekte auf dem Feld */
 .game-item {
   position: absolute;
   user-select: none;
   cursor: pointer;
 }
 
-.game-item.joint img {
-  width: 60px;
+/* Gleichmäßige Bildanzeige für Joints & Zigaretten */
+.game-item img {
+  width: 65px;
   height: auto;
-  filter: drop-shadow(0 0 5px #00ff00);
+  display: block;
+  pointer-events: none; /* Klick-Events landen direkt auf dem Parent-Div */
 }
 
-.game-item.zigarette {
-  font-size: 2.5rem;
-  filter: drop-shadow(0 0 5px #ff0000);
+/* Dezenter Leuchteffekt für den Verwechslungseffekt */
+.game-item.joint img {
+  filter: drop-shadow(0 0 4px rgba(0, 255, 0, 0.4));
+}
+
+.game-item.zigarette img {
+  filter: drop-shadow(0 0 4px rgba(255, 100, 0, 0.4));
 }
 
 .easter-egg-text {
