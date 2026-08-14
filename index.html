@@ -305,4 +305,71 @@
 </div>
 </body>
 </html>
- 
+ <!-- UNTERSEITE: GAMES -->
+<section id="unterseite-games" class="unterseite hidden">
+  <button onclick="zeigeStartseite()">← Zurück</button>
+  <h2>Minispiele</h2>
+
+  <div class="games-grid" id="games-grid">
+    <!-- Spiel 1 Card -->
+    <div class="game-karte">
+      <div class="game-cover-box" onclick="oeffneClipperSpiel()">
+        <!-- Hier kannst du später auch ein echtes Bild einfügen: <img src="clipper-cover.jpg"> -->
+        <div class="clipper-placeholder">
+          <span style="font-size: 3rem;">🔥</span>
+          <p style="margin: 5px 0 0; font-weight: bold; color: #00ffcc;">Clipper Catcher</p>
+        </div>
+      </div>
+      
+      <div class="game-card-footer">
+        <h3>Clipper Catcher</h3>
+        <button class="btn-pokal" onclick="oeffneHighscoreModal('clipper')">🏆 Highscore</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL: SPELFENSTER CLIPPER GAME -->
+<div id="modal-clipper-game" class="modal hidden">
+  <div class="modal-inhalt game-modal-inhalt">
+    <div class="game-header">
+      <div class="game-herzen" id="clipper-herzen">❤️❤️❤️</div>
+      <div class="game-timer" id="clipper-timer">00:00</div>
+      <div class="game-score">Punkte: <span id="clipper-score">0</span></div>
+      <button onclick="beendeClipperSpiel()" class="btn-abbrechen" style="padding: 2px 8px;">X</button>
+    </div>
+
+    <!-- Das Spielfeld -->
+    <div id="clipper-spielfeld" class="clipper-spielfeld">
+      <!-- 420er Easter-Egg Elemente -->
+      <div id="easter-egg-nachricht" class="easter-egg-text hidden">Glückwunsch du bist breit genug</div>
+      <div id="joint-links" class="riesen-joint links hidden">🚬💨</div>
+      <div id="joint-rechts" class="riesen-joint rechts hidden">🚬💨</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: HIGHSCORE / POKAL -->
+<div id="modal-highscore" class="modal hidden">
+  <div class="modal-inhalt">
+    <h3>🏆 Top 10 Highscore</h3>
+    <ol id="highscore-liste" class="highscore-liste">
+      <!-- Wird per JS befüllt -->
+    </ol>
+    <div class="modal-buttons">
+      <button onclick="schliesseHighscoreModal()" class="btn-abbrechen">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: GAME OVER & NAMENSEINBABE -->
+<div id="modal-game-over" class="modal hidden">
+  <div class="modal-inhalt">
+    <h3>Game Over!</h3>
+    <p>Deine Punkte: <strong id="end-score">0</strong></p>
+    <input type="text" id="player-name" placeholder="Dein Name..." required>
+    <div class="modal-buttons">
+      <button onclick="speichereHighscore()">Speichern</button>
+    </div>
+  </div>
+</div>
