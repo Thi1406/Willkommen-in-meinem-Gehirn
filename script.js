@@ -596,3 +596,179 @@ function ladeGeschichtenUebersicht() {
     container.appendChild(karte);
   });
 }
+// ====================================================
+// CLIPPER CATCHER GAME LOGIK
+// ====================================================
+let score = 0;
+let herzen = 3;
+let gameTimerInterval = null;
+let spawnTimeout = null;
+let verstreichendeSekunden = 0;
+let aktuellesTempo = 2000; // Start: Alle 2 Sek ein Item
+let itemsGefangen = 0;
+let holdTimer = null;
+let highscores = JSON.parse(localStorage.getItem('clipper_highscores')) || [];
+
+function oeffneClipperSpiel() {
+  document.getElementById('modal-clipper-game')?.classList.remove('hidden');
+  starteClipperSpiel();
+}
+
+function starteClipperSpiel() {
+  score = 0;
+  herzen = 3;
+  verstreichendeSekunden = 0;
+  aktuellesTempo = 2000;
+  itemsGefangen = 0;
+  
+  aktualisiereGameHeader();
+  
+  // Timer starten
+  if (gameTimerInterval) clearInterval(gameTimerInterval);
+  gameTimerInterval = setInterval(() => {
+    verstreichendeSekunden++;
+    const min = String(Math.floor(verstreichendeSekunden / 60)).padStart(2, '0');
+    const sec = String(verstreichendeSekunden % 60).padStart(2, '0');
+    document.getElementById('clipper-timer').innerText = `${min}:${sec}`;
+  }, 1000);
+
+  spawneItemLoop();
+}
+
+function aktualisiereGameHeader() {
+  document.getElementById('clipper-score').innerText = score;
+  let herzStr = '';
+  for (let i = 0; i < herzen; i++) herzStr += '❤️';
+  document.getElementById('clipper-herzen').innerText = herzStr;
+}
+
+function spawneItemLoop() {
+  const spielfeld = document.getElementById('clipper-spielfeld');
+  if (!spielfeld || document.getElementById('modal-clipper-game').classList.contains('hidden')) return;
+
+  // Altes Item entfernen falls noch vorhanden
+  const altesItem = document.getElementById('aktiver-item');
+  if (altesItem) altesItem.remove();
+
+  // Zufall: Joint (70% Chance) oder Zigarette (30% Chance)
+  const isJoint = Math.random() > 0.3;
+  const item = document.createElement('div');
+  item.id = 'aktiver-item';
+  item.className = 'game-item';
+  item.innerText = isJoint ? '🚬' : '🚬'; // Du kannst hier versch. Emojis oder Bilder nutzen!
+  item.dataset.type = isJoint ? 'joint' : 'zigarette';
+
+  // Zufällige Position
+  const maxX = spielfeld.clientWidth - 50;
+  const maxY = spielfeld.clientHeight - 50;
+  item.style.left = Math.floor(Math.random() * maxX) + 'px';
+  item.style.top = Math.floor(Math.random() * maxY) + 'px';
+
+  // Mouse-Down für 1 Sekunde halten!
+  item.onmousedown = (e) => {
+    if (e.button !== 0) return; // Nur linke Maustaste
+    holdTimer = setTimeout(() => {
+      anzuenden(item);
+    }, 1000); // Exakt 1 Sekunde halten
+  };
+
+  item.onmouseup = () => clearTimeout(holdTimer);
+  item.onmouseleave = () => clearTimeout(holdTimer);
+
+  spielfeld.appendChild(item);
+
+  // Nach jedem 10ten Item Tempo anziehen
+  if (itemsGefangen > 0 && itemsGefangen % 10 === 0) {
+    aktuellesTempo = Math.max(600, aktuellesTempo - 150); // Wird schneller
+  }
+
+  // Unregelmäßiger Abstand
+  const zufallsDelay = aktuellesTempo + (Math.random() * 500 - 250);
+  spawnTimeout = setTimeout(() => {
+    itemsGefangen++;
+    spawneItemLoop();
+  }, zufallsDelay);
+}
+
+function anzuenden(item) {
+  const type = item.dataset.type;
+  item.remove();
+
+  if (type === 'joint') {
+    score += 10;
+    
+    // 420er Easter Egg
+    if (score === 420) {
+      aktiviere420EasterEgg();
+    }
+  } else {
+    // Zigarette erwischt -> Herz verlieren!
+    herzen--;
+    if (herzen <= 0) {
+      beendeClipperSpiel(true);
+      return;
+    }
+  }
+  aktualisiereGameHeader();
+}
+
+function aktiviere420EasterEgg() {
+  const spielfeld = document.getElementById('clipper-spielfeld');
+  spielfeld.classList.add('hanf-cursor');
+  
+  document.getElementById('easter-egg-nachricht')?.classList.remove('hidden');
+  document.getElementById('joint-links')?.classList.remove('hidden');
+  document.getElementById('joint-rechts')?.classList.remove('hidden');
+
+  // Nach 10 Minuten zurücksetzen
+  setTimeout(() => {
+    spielfeld.classList.remove('hanf-cursor');
+    document.getElementById('easter-egg-nachricht')?.classList.add('hidden');
+    document.getElementById('joint-links')?.classList.add('hidden');
+    document.getElementById('joint-rechts')?.classList.add('hidden');
+  }, 600000); // 10 Min
+}
+
+function beendeClipperSpiel(isGameOver = false) {
+  clearInterval(gameTimerInterval);
+  clearTimeout(spawnTimeout);
+  
+  const spielfeld = document.getElementById('clipper-spielfeld');
+  const altesItem = document.getElementById('aktiver-item');
+  if (altesItem) altesItem.remove();
+
+  document.getElementById('modal-clipper-game')?.classList.add('hidden');
+
+  if (isGameOver) {
+    document.getElementById('end-score').innerText = score;
+    document.getElementById('modal-game-over')?.classList.remove('hidden');
+  }
+}
+
+// HIGHSCORE SYSTEM
+function speichereHighscore() {
+  const nameInput = document.getElementById('player-name');
+  const name = nameInput.value.trim() || 'Anonym';
+
+  highscores.push({ name: name, score: score });
+  highscores.sort((a, b) => b.score - a.score);
+  highscores = highscores.slice(0, 10); // Nur Top 10
+
+  localStorage.setItem('clipper_highscores', JSON.stringify(highscores));
+  nameInput.value = '';
+  
+  document.getElementById('modal-game-over')?.classList.add('hidden');
+  oeffneHighscoreModal();
+}
+
+function oeffneHighscoreModal() {
+  const liste = document.getElementById('highscore-liste');
+  if (liste) {
+    liste.innerHTML = highscores.map(e => `<li><strong>${e.name}</strong>: ${e.score} Punkte</li>`).join('');
+  }
+  document.getElementById('modal-highscore')?.classList.remove('hidden');
+}
+
+function schliesseHighscoreModal() {
+  document.getElementById('modal-highscore')?.classList.add('hidden');
+}
