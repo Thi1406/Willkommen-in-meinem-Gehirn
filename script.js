@@ -661,11 +661,11 @@ function spawneItemLoop() {
   item.dataset.type = isJoint ? 'joint' : 'zigarette';
 
   if (isJoint) {
-    // Verwendet deine echte Grafik für den Joint
-    item.innerHTML = `<img src="tuete.jpg" alt="Joint">`;
+    // Verwendet dein hochgeladenes Joint-Bild canvas.png
+    item.innerHTML = `<img src="canvas.png" alt="">`;
   } else {
-    // Verwendet dieselbe Grafik, färbt sie aber leicht orange/bräunlich ein (als Zigarette)
-    item.innerHTML = `<img src="tuete.jpg" alt="Zigarette" style="filter: hue-rotate(140deg) saturate(1.5);">`;
+    // Zigarette: Gleiches Bild, aber leicht eingefärbt für den Verwechslungseffekt
+    item.innerHTML = `<img src="canvas.png" alt="" style="filter: hue-rotate(140deg) saturate(2);">`;
   }
 
   const maxX = Math.max(10, spielfeld.clientWidth - 80);
@@ -673,15 +673,15 @@ function spawneItemLoop() {
   item.style.left = Math.floor(Math.random() * maxX) + 'px';
   item.style.top = Math.floor(Math.random() * maxY) + 'px';
 
-  // Anzünd-Mechanik: Gedrückt halten
+  // Anzünd-Mechanik: 1 Sekunde gedrückt halten
   item.onmousedown = (e) => {
     if (e.button !== 0) return; // Nur linke Maustaste
     
-    item.style.transform = 'scale(0.85)'; // Optische Rückmeldung beim Anzünden
+    item.style.transform = 'scale(0.85)'; // Optische Rückmeldung
 
     holdTimer = setTimeout(() => {
       anzuenden(item);
-    }, 800); // 0,8 Sekunden halten zum Anzünden
+    }, 800); // Exakt 0,8 Sekunden halten zum Anzünden
   };
 
   item.onmouseup = () => {
@@ -706,18 +706,33 @@ function spawneItemLoop() {
     spawneItemLoop();
   }, zufallsDelay);
 }
+
 function anzuenden(item) {
   const type = item.dataset.type;
+  const spielfeld = document.getElementById('clipper-spielfeld');
   item.remove();
 
   if (type === 'joint') {
     score += 10;
+    
+    // Kurzes GRÜNES Aufleuchten bei richtigem Treffer
+    if (spielfeld) {
+      spielfeld.classList.add('flash-gruen');
+      setTimeout(() => spielfeld.classList.remove('flash-gruen'), 350);
+    }
+
     if (score === 420) {
       aktiviere420EasterEgg();
     }
   } else {
-    // Zigarette angezündet = 1 Herz Abzug!
+    // Kurzes ROTES Aufleuchten & Herz-Abzug bei Zigarette!
     herzen--;
+    
+    if (spielfeld) {
+      spielfeld.classList.add('flash-rot');
+      setTimeout(() => spielfeld.classList.remove('flash-rot'), 450);
+    }
+
     if (herzen <= 0) {
       beendeClipperSpiel(true);
       return;
