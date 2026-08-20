@@ -947,11 +947,17 @@ header h1 {
   border-radius: 8px;
   overflow: hidden;
   margin-top: 10px;
-  cursor: url('clipper.png'), url('clipper_2.png'), auto;
+  /* Standard-Mauszeiger ist dein Clipper */
+  cursor: url('Clipper.png') 16 16, auto;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Visuelles Feedback beim Anzünden */
+/* Wenn gedrückt wird/angezündet wird, wechselt der Mauszeiger zum Feuer-Bild */
+.clipper-spielfeld:active {
+  cursor: url('Feuer.png') 16 16, auto !important;
+}
+
+/* Visuelles Treffer-Feedback (Grün bei Joint / Rot bei Zigarette) */
 .clipper-spielfeld.flash-gruen {
   border-color: #00ff00 !important;
   box-shadow: 0 0 35px #00ff00, inset 0 0 20px #00ff00 !important;
