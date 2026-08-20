@@ -1028,7 +1028,7 @@ header h1 {
   position: absolute;
   width: 35px;
   height: 90px;
-  pointer-events: none; /* Klicks gehen durch das Feuerzeug durch aufs Feld */
+  pointer-events: none !important; /* WICHTIG: Klicks gehen durch das Feuerzeug durch aufs Spielfeld */
   z-index: 999;
   transform: translate(-50%, -10px); /* Richtet die Spitze/Flamme exakt an der Maus aus */
   display: block; /* Direkt sichtbar */
