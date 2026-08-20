@@ -609,6 +609,48 @@ let itemsGefangen = 0;
 let holdTimer = null;
 let highscores = JSON.parse(localStorage.getItem('clipper_highscores')) || [];
 
+// ----------------------------------------------------
+// FEUERZEUG-STEUERUNG (Maus-Verfolgung & Flamme)
+// ----------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+  const spielfeld = document.getElementById('clipper-spielfeld');
+  const customCursor = document.getElementById('custom-clipper-cursor');
+  const clipperImg = document.getElementById('clipper-img');
+
+  if (spielfeld && customCursor) {
+    spielfeld.addEventListener('mousemove', (e) => {
+      const rect = spielfeld.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      customCursor.style.left = x + 'px';
+      customCursor.style.top = y + 'px';
+      customCursor.style.opacity = '1';
+    });
+
+    spielfeld.addEventListener('mouseenter', () => {
+      customCursor.style.opacity = '1';
+    });
+
+    spielfeld.addEventListener('mouseleave', () => {
+      customCursor.style.opacity = '0';
+    });
+
+    // Flamme geht an beim Klicken
+    spielfeld.addEventListener('mousedown', () => {
+      if (clipperImg) clipperImg.src = 'Feuer.png';
+    });
+
+    // Flamme geht aus beim Loslassen
+    spielfeld.addEventListener('mouseup', () => {
+      if (clipperImg) clipperImg.src = 'Clipper.png';
+    });
+  }
+});
+
+// ----------------------------------------------------
+// SPIEL-STEUERUNG
+// ----------------------------------------------------
 function oeffneClipperSpiel() {
   document.getElementById('modal-clipper-game')?.classList.remove('hidden');
   starteClipperSpiel();
@@ -660,12 +702,17 @@ function spawneItemLoop() {
   item.className = `game-item ${isJoint ? 'joint' : 'zigarette'}`;
   item.dataset.type = isJoint ? 'joint' : 'zigarette';
 
+  // Linke Anzünd-Zone + Bild/Emoji
   if (isJoint) {
-    // Nutzt dein neues Bild für den Joint (tüten)
-    item.innerHTML = `<img src="tüten.png" alt="Joint">`;
+    item.innerHTML = `
+      <div class="anzuend-zone"></div>
+      <img src="tüten.png" alt="Joint">
+    `;
   } else {
-    // Zigarette bleibt das eindeutige Emoji 🚬
-    item.innerHTML = `<span style="font-size: 3.5rem; line-height: 1; display: block;">🚬</span>`;
+    item.innerHTML = `
+      <div class="anzuend-zone"></div>
+      <span style="font-size: 3.5rem; line-height: 1; display: block; pointer-events: none;">🚬</span>
+    `;
   }
 
   const maxX = Math.max(10, spielfeld.clientWidth - 80);
@@ -673,23 +720,25 @@ function spawneItemLoop() {
   item.style.left = Math.floor(Math.random() * maxX) + 'px';
   item.style.top = Math.floor(Math.random() * maxY) + 'px';
 
-  // Anzünd-Mechanik: 0,8 Sekunden gedrückt halten
-  item.onmousedown = (e) => {
+  // Nur die Anzünd-Zone (linke Spitze) reagiert auf das Feuerzeug
+  const zone = item.querySelector('.anzuend-zone');
+
+  zone.onmousedown = (e) => {
     if (e.button !== 0) return; // Nur linke Maustaste
     
     item.style.transform = 'scale(0.85)';
 
     holdTimer = setTimeout(() => {
       anzuenden(item);
-    }, 800);
+    }, 800); // 0,8 Sekunden gedrückt halten zum Anzünden
   };
 
-  item.onmouseup = () => {
+  zone.onmouseup = () => {
     clearTimeout(holdTimer);
     if (item) item.style.transform = 'scale(1)';
   };
 
-  item.onmouseleave = () => {
+  zone.onmouseleave = () => {
     clearTimeout(holdTimer);
     if (item) item.style.transform = 'scale(1)';
   };
@@ -706,6 +755,7 @@ function spawneItemLoop() {
     spawneItemLoop();
   }, zufallsDelay);
 }
+
 function anzuenden(item) {
   const type = item.dataset.type;
   const spielfeld = document.getElementById('clipper-spielfeld');
@@ -724,7 +774,7 @@ function anzuenden(item) {
       aktiviere420EasterEgg();
     }
   } else {
-    // Kurzes ROTES Aufleuchten & Herz-Abzug bei Zigarette!
+    // Kurzes ROTES Aufleuchten & Herz-Abzug bei Zigarette
     herzen--;
     
     if (spielfeld) {
@@ -741,15 +791,11 @@ function anzuenden(item) {
 }
 
 function aktiviere420EasterEgg() {
-  const spielfeld = document.getElementById('clipper-spielfeld');
-  if (spielfeld) spielfeld.classList.add('hanf-cursor');
-  
   document.getElementById('easter-egg-nachricht')?.classList.remove('hidden');
   document.getElementById('joint-links')?.classList.remove('hidden');
   document.getElementById('joint-rechts')?.classList.remove('hidden');
 
   setTimeout(() => {
-    if (spielfeld) spielfeld.classList.remove('hanf-cursor');
     document.getElementById('easter-egg-nachricht')?.classList.add('hidden');
     document.getElementById('joint-links')?.classList.add('hidden');
     document.getElementById('joint-rechts')?.classList.add('hidden');
