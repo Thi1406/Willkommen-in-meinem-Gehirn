@@ -661,11 +661,11 @@ function spawneItemLoop() {
   item.dataset.type = isJoint ? 'joint' : 'zigarette';
 
   if (isJoint) {
-    // Verwendet dein hochgeladenes Joint-Bild canvas.png
-    item.innerHTML = `<img src="canvas.png" alt="">`;
+    // Nutzt dein neues Bild für den Joint (tüten)
+    item.innerHTML = `<img src="tüten.png" alt="Joint">`;
   } else {
-    // Zigarette: Gleiches Bild, aber leicht eingefärbt für den Verwechslungseffekt
-    item.innerHTML = `<img src="canvas.png" alt="" style="filter: hue-rotate(140deg) saturate(2);">`;
+    // Zigarette bleibt das eindeutige Emoji 🚬
+    item.innerHTML = `<span style="font-size: 3.5rem; line-height: 1; display: block;">🚬</span>`;
   }
 
   const maxX = Math.max(10, spielfeld.clientWidth - 80);
@@ -673,15 +673,15 @@ function spawneItemLoop() {
   item.style.left = Math.floor(Math.random() * maxX) + 'px';
   item.style.top = Math.floor(Math.random() * maxY) + 'px';
 
-  // Anzünd-Mechanik: 1 Sekunde gedrückt halten
+  // Anzünd-Mechanik: 0,8 Sekunden gedrückt halten
   item.onmousedown = (e) => {
     if (e.button !== 0) return; // Nur linke Maustaste
     
-    item.style.transform = 'scale(0.85)'; // Optische Rückmeldung
+    item.style.transform = 'scale(0.85)';
 
     holdTimer = setTimeout(() => {
       anzuenden(item);
-    }, 800); // Exakt 0,8 Sekunden halten zum Anzünden
+    }, 800);
   };
 
   item.onmouseup = () => {
@@ -706,7 +706,6 @@ function spawneItemLoop() {
     spawneItemLoop();
   }, zufallsDelay);
 }
-
 function anzuenden(item) {
   const type = item.dataset.type;
   const spielfeld = document.getElementById('clipper-spielfeld');
