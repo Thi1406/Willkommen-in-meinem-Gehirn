@@ -385,14 +385,34 @@
   </div>
 </div>
 
-<!-- MODAL: GAME OVER & NAMENSEINGABE -->
+<!-- MODAL: GAME OVER / GEWONNEN -->
 <div id="modal-game-over" class="modal hidden">
-  <div class="modal-inhalt">
-    <h3>Game Over!</h3>
-    <p>Deine Punkte: <strong id="end-score">0</strong></p>
-    <input type="text" id="player-name" placeholder="Dein Name..." required>
-    <div class="modal-buttons">
-      <button onclick="speichereHighscore()">Speichern</button>
+  <div class="modal-inhalt" style="text-align: center; border: 2px solid #aa00ff;">
+    <h2 id="game-over-titel" style="color: #00ff66; margin-bottom: 15px;">ZIEL ERREICHT! 🎯</h2>
+    
+    <p style="font-size: 1.1rem; margin-bottom: 10px;">
+      Punkte: <strong id="end-score" style="color: #ffcc00;">0</strong>
+    </p>
+    <p style="font-size: 1.1rem; margin-bottom: 20px;">
+      Benötigte Zeit: <strong id="end-time" style="color: #00ff66;">00:00</strong>
+    </p>
+
+    <input type="text" id="player-name" placeholder="Dein Name" style="padding: 8px; width: 80%; border-radius: 6px; border: 1px solid #aa00ff; background: #111; color: #fff; margin-bottom: 15px; text-align: center;">
+
+    <div style="display: flex; gap: 10px; justify-content: center;">
+      <button onclick="speichereHighscore()" class="btn-leicht">Speichern</button>
+      <button onclick="schliesseGameOverModal()" class="btn-abbrechen-purple">Abbrechen</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL: HIGHSCORE LISTE -->
+<div id="modal-highscore" class="modal hidden">
+  <div class="modal-inhalt" style="border: 2px solid #aa00ff; text-align: center;">
+    <h2 style="color: #ffcc00; margin-bottom: 15px;">🏆 BESTENLISTE 🏆</h2>
+    
+    <ul id="highscore-liste" style="list-style: none; padding: 0; margin-bottom: 20px; text-align: left;"></ul>
+
+    <button onclick="schliesseHighscoreModal()" class="btn-abbrechen-purple">Schließen</button>
   </div>
 </div>
