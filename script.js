@@ -703,7 +703,7 @@ function aktualisiereGameHeader() {
   if (herzenElem) herzenElem.innerText = herzStr;
 }
 
-function spawneEinzelnesItem(container, idSuffix = '') {
+function spawneEinzelnesItem(container) {
   const isJoint = Math.random() > 0.3;
   const item = document.createElement('div');
   item.className = `game-item ${isJoint ? 'joint' : 'zigarette'}`;
@@ -720,7 +720,6 @@ function spawneEinzelnesItem(container, idSuffix = '') {
   item.style.left = Math.floor(Math.random() * maxX) + 'px';
   item.style.top = Math.floor(Math.random() * maxY) + 'px';
 
-  // Klick-Logik direkt auf dem Item
   item.onmousedown = (e) => {
     e.stopPropagation();
     anzuenden(item);
@@ -737,8 +736,8 @@ function spawneItemLoop() {
   alteItems.forEach(el => el.remove());
 
   if (schwierigkeit === 'schwer') {
-    spawneEinzelnesItem(spielfeld, '-1');
-    spawneEinzelnesItem(spielfeld, '-2');
+    spawneEinzelnesItem(spielfeld);
+    spawneEinzelnesItem(spielfeld);
   } else {
     spawneEinzelnesItem(spielfeld);
   }
@@ -768,8 +767,10 @@ function anzuenden(item) {
       setTimeout(() => spielfeld.classList.remove('flash-gruen'), 350);
     }
 
-    if (score === targetScore) {
-      aktiviere420EasterEgg();
+    // Ziel erreicht? Spiel stoppen & gewinnen!
+    if (score >= targetScore) {
+      beendeClipperSpiel(false, true);
+      return;
     }
   } else {
     herzen--;
@@ -780,26 +781,14 @@ function anzuenden(item) {
     }
 
     if (herzen <= 0) {
-      beendeClipperSpiel(true);
+      beendeClipperSpiel(true, false);
       return;
     }
   }
   aktualisiereGameHeader();
 }
 
-function aktiviere420EasterEgg() {
-  document.getElementById('easter-egg-nachricht')?.classList.remove('hidden');
-  document.getElementById('joint-links')?.classList.remove('hidden');
-  document.getElementById('joint-rechts')?.classList.remove('hidden');
-
-  setTimeout(() => {
-    document.getElementById('easter-egg-nachricht')?.classList.add('hidden');
-    document.getElementById('joint-links')?.classList.add('hidden');
-    document.getElementById('joint-rechts')?.classList.add('hidden');
-  }, 600000);
-}
-
-function beendeClipperSpiel(isGameOver = false) {
+function beendeClipperSpiel(isGameOver = false, gewonnen = false) {
   clearInterval(gameTimerInterval);
   clearTimeout(spawnTimeout);
   
@@ -811,19 +800,68 @@ function beendeClipperSpiel(isGameOver = false) {
 
   document.getElementById('modal-clipper-game')?.classList.add('hidden');
 
-  if (isGameOver) {
-    const endScoreElem = document.getElementById('end-score');
-    if (endScoreElem) endScoreElem.innerText = score;
-    document.getElementById('modal-game-over')?.classList.remove('hidden');
+  const min = String(Math.floor(verstreichendeSekunden / 60)).padStart(2, '0');
+  const sec = String(verstreichendeSekunden % 60).padStart(2, '0');
+  const zeitFormatted = `${min}:${sec}`;
+
+  const titelElem = document.getElementById('game-over-titel');
+  const endScoreElem = document.getElementById('end-score');
+  const endTimeElem = document.getElementById('end-time');
+
+  if (endScoreElem) endScoreElem.innerText = score;
+  if (endTimeElem) endTimeElem.innerText = zeitFormatted;
+
+  if (gewonnen) {
+    if (titelElem) {
+      titelElem.innerText = "ZIEL ERREICHT! 🎯";
+      titelElem.style.color = "#00ff66";
+    }
+    aktiviere420EasterEgg();
+  } else if (isGameOver) {
+    if (titelElem) {
+      titelElem.innerText = "GAME OVER! ❌";
+      titelElem.style.color = "#ff0055";
+    }
   }
+
+  document.getElementById('modal-game-over')?.classList.remove('hidden');
+}
+
+function aktiviere420EasterEgg() {
+  document.getElementById('easter-egg-nachricht')?.classList.remove('hidden');
+  document.getElementById('joint-links')?.classList.remove('hidden');
+  document.getElementById('joint-rechts')?.classList.remove('hidden');
+
+  setTimeout(() => {
+    document.getElementById('easter-egg-nachricht')?.classList.add('hidden');
+    document.getElementById('joint-links')?.classList.add('hidden');
+    document.getElementById('joint-rechts')?.classList.add('hidden');
+  }, 10000);
 }
 
 function speichereHighscore() {
   const nameInput = document.getElementById('player-name');
   const name = nameInput ? nameInput.value.trim() || 'Anonym' : 'Anonym';
 
-  highscores.push({ name: `${name} (${schwierigkeit.toUpperCase()})`, score: score });
-  highscores.sort((a, b) => b.score - a.score);
+  const min = String(Math.floor(verstreichendeSekunden / 60)).padStart(2, '0');
+  const sec = String(verstreichendeSekunden % 60).padStart(2, '0');
+  const zeitFormatted = `${min}:${sec}`;
+
+  highscores.push({ 
+    name: `${name} (${schwierigkeit.toUpperCase()})`, 
+    score: score,
+    time: zeitFormatted,
+    seconds: verstreichendeSekunden
+  });
+
+  // Sortierung: Wer das Ziel erreicht hat (gleiche Punktzahl), wird nach der SCHNELLSTEN ZEIT sortiert
+  highscores.sort((a, b) => {
+    if (b.score === a.score) {
+      return a.seconds - b.seconds; // Weniger Sekunden = Besserer Platz
+    }
+    return b.score - a.score;
+  });
+
   highscores = highscores.slice(0, 10);
 
   localStorage.setItem('clipper_highscores', JSON.stringify(highscores));
@@ -833,10 +871,20 @@ function speichereHighscore() {
   oeffneHighscoreModal();
 }
 
+function schliesseGameOverModal() {
+  document.getElementById('modal-game-over')?.classList.add('hidden');
+}
+
 function oeffneHighscoreModal() {
   const liste = document.getElementById('highscore-liste');
   if (liste) {
-    liste.innerHTML = highscores.map(e => `<li><strong>${e.name}</strong>: ${e.score} Punkte</li>`).join('');
+    liste.innerHTML = highscores.map((e, index) => `
+      <li style="margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px;">
+        <strong>#${index + 1} ${e.name}</strong><br>
+        <span style="color: #00ff66;">Punkte: ${e.score}</span> | 
+        <span style="color: #ffcc00;">Zeit: ${e.time}</span>
+      </li>
+    `).join('');
   }
   document.getElementById('modal-highscore')?.classList.remove('hidden');
 }
