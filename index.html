@@ -408,10 +408,17 @@
 
 <!-- MODAL: HIGHSCORE LISTE -->
 <div id="modal-highscore" class="modal hidden">
-  <div class="modal-inhalt" style="border: 2px solid #aa00ff; text-align: center;">
+  <div class="modal-inhalt" style="border: 2px solid #aa00ff; text-align: center; max-width: 450px;">
     <h2 style="color: #ffcc00; margin-bottom: 15px;">🏆 BESTENLISTE 🏆</h2>
     
-    <ul id="highscore-liste" style="list-style: none; padding: 0; margin-bottom: 20px; text-align: left;"></ul>
+    <!-- Filter-Buttons -->
+    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 15px;">
+      <button onclick="zeigeHighscoreKategorie('leicht')" class="btn-diff btn-leicht" style="padding: 6px 10px; min-width: auto; font-size: 0.8rem;">🟢 Leicht</button>
+      <button onclick="zeigeHighscoreKategorie('normal')" class="btn-diff btn-normal" style="padding: 6px 10px; min-width: auto; font-size: 0.8rem;">🟠 Normal</button>
+      <button onclick="zeigeHighscoreKategorie('schwer')" class="btn-diff btn-schwer" style="padding: 6px 10px; min-width: auto; font-size: 0.8rem;">🔴 Schwer</button>
+    </div>
+
+    <ul id="highscore-liste" style="list-style: none; padding: 0; margin-bottom: 20px; text-align: left; max-height: 250px; overflow-y: auto;"></ul>
 
     <button onclick="schliesseHighscoreModal()" class="btn-abbrechen-purple">Schließen</button>
   </div>
