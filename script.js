@@ -767,7 +767,7 @@ function anzuenden(item) {
       setTimeout(() => spielfeld.classList.remove('flash-gruen'), 350);
     }
 
-    // Ziel erreicht? Spiel stoppen & gewinnen!
+   // Ziel erreicht? Spiel stoppen & gewinnen!
     if (score >= targetScore) {
       beendeClipperSpiel(false, true);
       return;
@@ -839,6 +839,11 @@ function aktiviere420EasterEgg() {
   }, 10000);
 }
 
+/* ====================================================
+   HIGHSCORE SPEICHERN & KATEGORIEN-FILTER
+   ==================================================== */
+let aktuellerFilter = 'leicht';
+
 function speichereHighscore() {
   const nameInput = document.getElementById('player-name');
   const name = nameInput ? nameInput.value.trim() || 'Anonym' : 'Anonym';
@@ -848,45 +853,66 @@ function speichereHighscore() {
   const zeitFormatted = `${min}:${sec}`;
 
   highscores.push({ 
-    name: `${name} (${schwierigkeit.toUpperCase()})`, 
+    name: name, 
+    schwierigkeit: schwierigkeit,
     score: score,
     time: zeitFormatted,
     seconds: verstreichendeSekunden
   });
 
-  // Sortierung: Wer das Ziel erreicht hat (gleiche Punktzahl), wird nach der SCHNELLSTEN ZEIT sortiert
+  // Sortieren: Höchste Punkte zuerst, bei Gleichstand die SCHNELLSTE Zeit
   highscores.sort((a, b) => {
     if (b.score === a.score) {
-      return a.seconds - b.seconds; // Weniger Sekunden = Besserer Platz
+      return a.seconds - b.seconds;
     }
     return b.score - a.score;
   });
-
-  highscores = highscores.slice(0, 10);
 
   localStorage.setItem('clipper_highscores', JSON.stringify(highscores));
   if (nameInput) nameInput.value = '';
   
   document.getElementById('modal-game-over')?.classList.add('hidden');
-  oeffneHighscoreModal();
+  
+  // Öffnet direkt die Bestenliste mit dem aktuellen Schwierigkeitsgrad
+  oeffneHighscoreModal(schwierigkeit);
+}
+
+function oeffneHighscoreModal(kategorie) {
+  aktuellerFilter = kategorie || schwierigkeit || 'leicht';
+  zeigeHighscoreKategorie(aktuellerFilter);
+  document.getElementById('modal-highscore')?.classList.remove('hidden');
+}
+
+function zeigeHighscoreKategorie(kategorie) {
+  aktuellerFilter = kategorie;
+  const liste = document.getElementById('highscore-liste');
+  if (!liste) return;
+
+  // Filtert nach Kategorie und nimmt die besten 10
+  const gefiltert = highscores
+    .filter(e => (e.schwierigkeit || 'leicht') === kategorie)
+    .slice(0, 10);
+
+  if (gefiltert.length === 0) {
+    liste.innerHTML = `<li style="text-align: center; color: #888; padding: 15px;">Noch keine Einträge für ${kategorie.toUpperCase()}</li>`;
+    return;
+  }
+
+  liste.innerHTML = gefiltert.map((e, index) => `
+    <li style="margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong style="color: #fff;">#${index + 1} ${e.name}</strong>
+      </div>
+      <div style="text-align: right;">
+        <span style="color: #00ff66; font-weight: bold;">${e.score} Pkt</span> | 
+        <span style="color: #ffcc00;">⏱️ ${e.time}</span>
+      </div>
+    </li>
+  `).join('');
 }
 
 function schliesseGameOverModal() {
   document.getElementById('modal-game-over')?.classList.add('hidden');
-}
-
-function oeffneHighscoreModal() {
-  const liste = document.getElementById('highscore-liste');
-  if (liste) {
-    liste.innerHTML = highscores.map((e, index) => `
-      <li style="margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px;">
-        <strong>#${index + 1} ${e.name}</strong><br>
-        <span style="color: #00ff66;">Punkte: ${e.score}</span> | 
-        <span style="color: #ffcc00;">Zeit: ${e.time}</span>
-      </li>
-    `).join('');
-  }
-  document.getElementById('modal-highscore')?.classList.remove('hidden');
 }
 
 function schliesseHighscoreModal() {
