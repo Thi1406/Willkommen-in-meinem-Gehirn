@@ -330,34 +330,42 @@
 <div id="modal-clipper-game" class="modal hidden">
   <div class="modal-inhalt game-modal-inhalt">
     
-    <!-- Schwierigkeitsgrad Auswahl (wird vor dem Start angezeigt) -->
+    <!-- Schwierigkeitsgrad Auswahl -->
     <div id="clipper-difficulty-select" style="text-align: center; padding: 20px;">
-      <h2 style="color: #aa00ff; margin-bottom: 15px;">SCHWIERIGKEITSGRAD WÄHLEN</h2>
-      <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
-        <button onclick="starteClipperSpiel('leicht')" class="btn-pokal" style="padding: 10px 15px; font-size: 1rem;">🟢 Leicht (Ziel: 420)</button>
-        <button onclick="starteClipperSpiel('normal')" class="btn-pokal" style="padding: 10px 15px; font-size: 1rem;">🟡 Normal (Ziel: 840)</button>
-        <button onclick="starteClipperSpiel('schwer')" class="btn-pokal" style="padding: 10px 15px; font-size: 1rem;">🔴 Schwer (Ziel: 1260)</button>
+      <h2 style="color: #aa00ff; margin-bottom: 20px; font-size: 1.8rem;">SCHWIERIGKEITSGRAD WÄHLEN</h2>
+      
+      <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap;">
+        <button onclick="starteClipperSpiel('leicht')" class="btn-diff btn-leicht">
+          🟢 LEICHT<br><span style="font-size: 0.8rem;">(Ziel: 420)</span>
+        </button>
+
+        <button onclick="starteClipperSpiel('normal')" class="btn-diff btn-normal">
+          🟠 NORMAL<br><span style="font-size: 0.8rem;">(Ziel: 840)</span>
+        </button>
+
+        <button onclick="starteClipperSpiel('schwer')" class="btn-diff btn-schwer">
+          🔴 SCHWER<br><span style="font-size: 0.8rem;">(Ziel: 1260)</span>
+        </button>
       </div>
-      <button onclick="beendeClipperSpiel()" class="btn-abbrechen">Abbrechen</button>
+
+      <button onclick="beendeClipperSpiel()" class="btn-abbrechen-purple">Abbrechen</button>
     </div>
 
-    <!-- Das eigentliche Spielbereich (wird erst beim Wählen sichtbar) -->
+    <!-- Das eigentliche Spielbereich -->
     <div id="clipper-game-area" class="hidden">
       <div class="game-header">
         <div class="game-herzen" id="clipper-herzen">❤️❤️❤️</div>
         <div class="game-timer" id="clipper-timer">00:00</div>
         <div class="game-score">Punkte: <span id="clipper-score">0</span></div>
-        <button onclick="beendeClipperSpiel()" class="btn-abbrechen" style="padding: 2px 8px;">X</button>
+        <button onclick="beendeClipperSpiel()" class="btn-abbrechen-purple" style="padding: 2px 10px;">X</button>
       </div>
 
       <!-- Das Spielfeld -->
       <div id="clipper-spielfeld" class="clipper-spielfeld">
-        <!-- Das Feuerzeug-Element -->
         <div id="custom-clipper-cursor">
           <img id="clipper-img" src="Clipper.png" alt="Clipper">
         </div>
 
-        <!-- 420er Easter-Egg Elemente -->
         <div id="easter-egg-nachricht" class="easter-egg-text hidden">Glückwunsch du bist breit genug</div>
         <div id="joint-links" class="riesen-joint links hidden"><img src="tüten.png" alt="Joint"></div>
         <div id="joint-rechts" class="riesen-joint rechts hidden"><img src="tüten.png" alt="Joint"></div>
