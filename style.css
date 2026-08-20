@@ -880,7 +880,7 @@ header h1 {
 }
 
 /* =======================================================
-   CLIPPER GAME STYLES (KORRIGIERT)
+   CLIPPER GAME STYLES (NEU & PRÄZISE)
    ======================================================= */
 .games-grid {
   display: flex;
@@ -937,7 +937,7 @@ header h1 {
   cursor: pointer;
 }
 
-/* Spielfeld mit Clipper als Zeiger */
+/* Spielfeld ohne Standard-Mauszeiger */
 .clipper-spielfeld {
   position: relative;
   width: 100%;
@@ -947,17 +947,28 @@ header h1 {
   border-radius: 8px;
   overflow: hidden;
   margin-top: 10px;
-  /* Standard-Mauszeiger ist dein Clipper */
-  cursor: url('Clipper.png') 16 16, auto;
+  cursor: none !important; /* Versteckt den normalen Zeiger komplett */
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Wenn gedrückt wird/angezündet wird, wechselt der Mauszeiger zum Feuer-Bild */
-.clipper-spielfeld:active {
-  cursor: url('Feuer.png') 16 16, auto !important;
+/* Der eigene Clipper-Cursor, der an der Maus klebt */
+#custom-clipper-cursor {
+  position: absolute;
+  width: 35px;
+  height: 90px;
+  pointer-events: none; /* Klicks gehen durch das Feuerzeug durch aufs Feld */
+  z-index: 999;
+  transform: translate(-50%, -10px); /* Richtet die Spitze/Flamme exakt an der Maus aus */
+  display: none;
 }
 
-/* Visuelles Treffer-Feedback (Grün bei Joint / Rot bei Zigarette) */
+#custom-clipper-cursor img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Visuelles Feedback beim Anzünden */
 .clipper-spielfeld.flash-gruen {
   border-color: #00ff00 !important;
   box-shadow: 0 0 35px #00ff00, inset 0 0 20px #00ff00 !important;
@@ -972,11 +983,22 @@ header h1 {
 .game-item {
   position: absolute;
   user-select: none;
-  cursor: pointer;
+  cursor: none !important; /* Kein Zeiger-Wechsel beim Drüberfahren! */
+}
+
+/* Präzise Hitbox: Nur die linke Seite (Spitze) schaltet das Anzünden frei */
+.anzuend-zone {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 35%; /* Nur die linken 35% des Bildes können angezündet werden */
+  height: 100%;
+  z-index: 2;
+  cursor: none !important;
 }
 
 .game-item img {
-  width: 70px;
+  width: 75px;
   height: auto;
   display: block;
   pointer-events: none;
