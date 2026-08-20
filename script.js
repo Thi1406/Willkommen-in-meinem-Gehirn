@@ -606,11 +606,12 @@ let spawnTimeout = null;
 let verstreichendeSekunden = 0;
 let aktuellesTempo = 2000;
 let itemsGefangen = 0;
-let holdTimer = null;
+let schwierigkeit = 'leicht';
+let targetScore = 420;
 let highscores = JSON.parse(localStorage.getItem('clipper_highscores')) || [];
 
 // ----------------------------------------------------
-// FEUERZEUG-STEUERUNG (Maus-Verfolgung & Flamme)
+// FEUERZEUG-STEUERUNG
 // ----------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
   const spielfeld = document.getElementById('clipper-spielfeld');
@@ -636,12 +637,10 @@ document.addEventListener('DOMContentLoaded', () => {
       customCursor.style.opacity = '0';
     });
 
-    // Flamme geht an beim Klicken
     spielfeld.addEventListener('mousedown', () => {
       if (clipperImg) clipperImg.src = 'Feuer.png';
     });
 
-    // Flamme geht aus beim Loslassen
     spielfeld.addEventListener('mouseup', () => {
       if (clipperImg) clipperImg.src = 'Clipper.png';
     });
@@ -653,18 +652,34 @@ document.addEventListener('DOMContentLoaded', () => {
 // ----------------------------------------------------
 function oeffneClipperSpiel() {
   document.getElementById('modal-clipper-game')?.classList.remove('hidden');
-  starteClipperSpiel();
+  document.getElementById('clipper-difficulty-select')?.classList.remove('hidden');
+  document.getElementById('clipper-game-area')?.classList.add('hidden');
 }
 
-function starteClipperSpiel() {
+function starteClipperSpiel(selectedDifficulty) {
+  schwierigkeit = selectedDifficulty || 'leicht';
+  
+  if (schwierigkeit === 'leicht') {
+    targetScore = 420;
+    aktuellesTempo = 2000;
+  } else if (schwierigkeit === 'normal') {
+    targetScore = 840;
+    aktuellesTempo = 1400;
+  } else if (schwierigkeit === 'schwer') {
+    targetScore = 1260;
+    aktuellesTempo = 900;
+  }
+
   score = 0;
   herzen = 3;
   verstreichendeSekunden = 0;
-  aktuellesTempo = 2000;
   itemsGefangen = 0;
-  
+
+  document.getElementById('clipper-difficulty-select')?.classList.add('hidden');
+  document.getElementById('clipper-game-area')?.classList.remove('hidden');
+
   aktualisiereGameHeader();
-  
+
   if (gameTimerInterval) clearInterval(gameTimerInterval);
   gameTimerInterval = setInterval(() => {
     verstreichendeSekunden++;
@@ -688,68 +703,52 @@ function aktualisiereGameHeader() {
   if (herzenElem) herzenElem.innerText = herzStr;
 }
 
+function spawneEinzelnesItem(container, idSuffix = '') {
+  const isJoint = Math.random() > 0.3;
+  const item = document.createElement('div');
+  item.className = `game-item ${isJoint ? 'joint' : 'zigarette'}`;
+  item.dataset.type = isJoint ? 'joint' : 'zigarette';
+
+  if (isJoint) {
+    item.innerHTML = `<img src="tüten.png" alt="Joint" style="width: 80px; height: auto;">`;
+  } else {
+    item.innerHTML = `<span style="font-size: 3.5rem; line-height: 1; display: block;">🚬</span>`;
+  }
+
+  const maxX = Math.max(10, container.clientWidth - 90);
+  const maxY = Math.max(10, container.clientHeight - 90);
+  item.style.left = Math.floor(Math.random() * maxX) + 'px';
+  item.style.top = Math.floor(Math.random() * maxY) + 'px';
+
+  // Klick-Logik direkt auf dem Item
+  item.onmousedown = (e) => {
+    e.stopPropagation();
+    anzuenden(item);
+  };
+
+  container.appendChild(item);
+}
+
 function spawneItemLoop() {
   const spielfeld = document.getElementById('clipper-spielfeld');
   if (!spielfeld || document.getElementById('modal-clipper-game').classList.contains('hidden')) return;
 
-  const altesItem = document.getElementById('aktiver-item');
-  if (altesItem) altesItem.remove();
+  const alteItems = spielfeld.querySelectorAll('.game-item');
+  alteItems.forEach(el => el.remove());
 
-  // 70% Chance für Joint, 30% Chance für Zigarette
-  const isJoint = Math.random() > 0.3;
-  const item = document.createElement('div');
-  item.id = 'aktiver-item';
-  item.className = `game-item ${isJoint ? 'joint' : 'zigarette'}`;
-  item.dataset.type = isJoint ? 'joint' : 'zigarette';
-
-  // Linke Anzünd-Zone + Bild/Emoji
-  if (isJoint) {
-    item.innerHTML = `
-      <div class="anzuend-zone"></div>
-      <img src="tüten.png" alt="Joint">
-    `;
+  if (schwierigkeit === 'schwer') {
+    spawneEinzelnesItem(spielfeld, '-1');
+    spawneEinzelnesItem(spielfeld, '-2');
   } else {
-    item.innerHTML = `
-      <div class="anzuend-zone"></div>
-      <span style="font-size: 3.5rem; line-height: 1; display: block; pointer-events: none;">🚬</span>
-    `;
+    spawneEinzelnesItem(spielfeld);
   }
 
-  const maxX = Math.max(10, spielfeld.clientWidth - 80);
-  const maxY = Math.max(10, spielfeld.clientHeight - 80);
-  item.style.left = Math.floor(Math.random() * maxX) + 'px';
-  item.style.top = Math.floor(Math.random() * maxY) + 'px';
-
-  // Nur die Anzünd-Zone (linke Spitze) reagiert auf das Feuerzeug
-  const zone = item.querySelector('.anzuend-zone');
-
-  zone.onmousedown = (e) => {
-    if (e.button !== 0) return; // Nur linke Maustaste
-    
-    item.style.transform = 'scale(0.85)';
-
-    holdTimer = setTimeout(() => {
-      anzuenden(item);
-    }, 800); // 0,8 Sekunden gedrückt halten zum Anzünden
-  };
-
-  zone.onmouseup = () => {
-    clearTimeout(holdTimer);
-    if (item) item.style.transform = 'scale(1)';
-  };
-
-  zone.onmouseleave = () => {
-    clearTimeout(holdTimer);
-    if (item) item.style.transform = 'scale(1)';
-  };
-
-  spielfeld.appendChild(item);
-
-  if (itemsGefangen > 0 && itemsGefangen % 10 === 0) {
-    aktuellesTempo = Math.max(600, aktuellesTempo - 150);
+  if (itemsGefangen > 0 && itemsGefangen % 8 === 0) {
+    const minTempo = schwierigkeit === 'schwer' ? 400 : (schwierigkeit === 'normal' ? 600 : 800);
+    aktuellesTempo = Math.max(minTempo, aktuellesTempo - 120);
   }
 
-  const zufallsDelay = aktuellesTempo + (Math.random() * 400 - 200);
+  const zufallsDelay = aktuellesTempo + (Math.random() * 300 - 150);
   spawnTimeout = setTimeout(() => {
     itemsGefangen++;
     spawneItemLoop();
@@ -764,17 +763,15 @@ function anzuenden(item) {
   if (type === 'joint') {
     score += 10;
     
-    // Kurzes GRÜNES Aufleuchten bei richtigem Treffer
     if (spielfeld) {
       spielfeld.classList.add('flash-gruen');
       setTimeout(() => spielfeld.classList.remove('flash-gruen'), 350);
     }
 
-    if (score === 420) {
+    if (score === targetScore) {
       aktiviere420EasterEgg();
     }
   } else {
-    // Kurzes ROTES Aufleuchten & Herz-Abzug bei Zigarette
     herzen--;
     
     if (spielfeld) {
@@ -799,15 +796,18 @@ function aktiviere420EasterEgg() {
     document.getElementById('easter-egg-nachricht')?.classList.add('hidden');
     document.getElementById('joint-links')?.classList.add('hidden');
     document.getElementById('joint-rechts')?.classList.add('hidden');
-  }, 600000); // 10 Minuten Aktivität
+  }, 600000);
 }
 
 function beendeClipperSpiel(isGameOver = false) {
   clearInterval(gameTimerInterval);
   clearTimeout(spawnTimeout);
   
-  const altesItem = document.getElementById('aktiver-item');
-  if (altesItem) altesItem.remove();
+  const spielfeld = document.getElementById('clipper-spielfeld');
+  if (spielfeld) {
+    const alteItems = spielfeld.querySelectorAll('.game-item');
+    alteItems.forEach(el => el.remove());
+  }
 
   document.getElementById('modal-clipper-game')?.classList.add('hidden');
 
@@ -822,7 +822,7 @@ function speichereHighscore() {
   const nameInput = document.getElementById('player-name');
   const name = nameInput ? nameInput.value.trim() || 'Anonym' : 'Anonym';
 
-  highscores.push({ name: name, score: score });
+  highscores.push({ name: `${name} (${schwierigkeit.toUpperCase()})`, score: score });
   highscores.sort((a, b) => b.score - a.score);
   highscores = highscores.slice(0, 10);
 
