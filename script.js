@@ -1,5 +1,5 @@
 // ====================================================
-// 1. SEITEN-NAVIGATION (Startseite & Unterseiten)
+// 1. SEITEN-NAVIGATION
 // ====================================================
 function zeigeBereich(bereichId) {
   document.querySelector('header')?.classList.add('hidden');
@@ -28,7 +28,7 @@ function zeigeStartseite() {
 
 
 // ====================================================
-// 2. BILDER-LINKS & GALERIE
+// 2. BILDER-GALERIE & MODALS
 // ====================================================
 const meineBilder = [
   "https://picsum.photos/300/200?random=1",
@@ -78,10 +78,6 @@ function erstelleGalerie() {
   });
 }
 
-
-// ====================================================
-// 3. BESCHREIBEN & PAINT MODALS
-// ====================================================
 function oeffneBeschreibungModal(bildId) {
   aktuellesBildId = bildId;
   document.getElementById("modal-beschreibung")?.classList.remove("hidden");
@@ -133,124 +129,11 @@ function zeigWolke(bildId) {
   wolke?.classList.toggle("hidden");
 }
 
-function initCanvas() {
-  canvas = document.getElementById('paint-canvas');
-  if (!canvas) return;
-  
-  ctx = canvas.getContext('2d');
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-
-  canvas.onmousedown = startZeichnen;
-  canvas.onmousemove = zeichnen;
-  canvas.onmouseup = stoppZeichnen;
-}
-
-function setzeWerkzeug(werkzeug, event) {
-  aktuellesWerkzeug = werkzeug;
-  document.querySelectorAll('.btn-tool').forEach(btn => btn.classList.remove('active'));
-  if (event && event.target) {
-    event.target.classList.add('active');
-  }
-}
-
-function oeffnePaintModal(bildId, bildUrl) {
-  aktuellesBildId = bildId;
-  const modal = document.getElementById('modal-paint');
-  const img = document.getElementById('paint-hintergrund-bild');
-  
-  if (img) img.src = bildUrl;
-  modal?.classList.remove('hidden');
-  document.getElementById('paint-fehler')?.classList.add('hidden');
-
-  setTimeout(initCanvas, 100);
-}
-
-function schliessePaintModal() {
-  document.getElementById('modal-paint')?.classList.add('hidden');
-  const nameInput = document.getElementById('paint-name');
-  if (nameInput) nameInput.value = '';
-  if (ctx && canvas) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-}
-
-function startZeichnen(e) {
-  isDrawing = true;
-  zeichnen(e);
-}
-
-function stoppZeichnen() {
-  isDrawing = false;
-  if (ctx) ctx.beginPath();
-}
-
-function zeichnen(e) {
-  if (!isDrawing || !ctx) return;
-
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  const farbe = document.getElementById('paint-farbe')?.value || '#000000';
-
-  ctx.strokeStyle = farbe;
-  ctx.fillStyle = farbe;
-
-  if (aktuellesWerkzeug === 'bleistift') {
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-  } else if (aktuellesWerkzeug === 'kugelschreiber') {
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-  } else if (aktuellesWerkzeug === 'spray') {
-    for (let i = 0; i < 20; i++) {
-      const offsetX = (Math.random() - 0.5) * 15;
-      const offsetY = (Math.random() - 0.5) * 15;
-      ctx.fillRect(x + offsetX, y + offsetY, 1, 1);
-    }
-  }
-}
-
-function speicherePaint() {
-  const nameInput = document.getElementById('paint-name');
-  if (!nameInput) return;
-  const name = nameInput.value.trim();
-
-  if (name === '') {
-    document.getElementById('paint-fehler')?.classList.remove('hidden');
-    return;
-  }
-
-  const karte = document.getElementById(`karte-${aktuellesBildId}`);
-  if (karte) {
-    const badge = karte.querySelector('.farbklecks');
-    const anzahlSpan = karte.querySelector('.anzahl-paintings');
-
-    badge?.classList.remove('hidden');
-    if (anzahlSpan) {
-      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0") + 1;
-    }
-  }
-
-  schliessePaintModal();
-}
-
 
 // ====================================================
-// 4. BILDER-WELT FEATURES (REITER & FREIES MALEN)
+// 3. REITER IN "BILDER" & FREIES MALEN
 // ====================================================
-let aktuelleKiKategorie = 'standard';
-let aktuellesFreiWerkzeug = 'bleistift';
 let freiCanvas, freiCtx, freiIsDrawing = false;
-let kiBearbeiteteBilder = JSON.parse(localStorage.getItem('kiBearbeiteteBilder')) || [];
 let freieGemaelde = JSON.parse(localStorage.getItem('freieGemaelde')) || [];
 
 function wechsleBilderTab(tabName) {
@@ -267,88 +150,6 @@ function wechsleBilderTab(tabName) {
   if (tabName === 'freies-malen') {
     setTimeout(initFreiesCanvas, 50);
   }
-}
-
-function aendereKiKategorie(kategorie) {
-  aktuelleKiKategorie = kategorie;
-  ladeKiBilder(kategorie);
-}
-
-function würfeleKiBilder() {
-  ladeKiBilder(aktuelleKiKategorie);
-}
-
-async function ladeKiBilder(kategorie) {
-  const grid = document.getElementById('ki-galerie-grid');
-  if (!grid) return;
-  grid.innerHTML = '';
-
-  let bildURLs = [];
-  const r = Date.now();
-
-  switch (kategorie) {
-    case 'superhelden': {
-      const heldenPool = [1, 30, 34, 38, 60, 66, 68, 69, 70, 106, 107, 149, 156, 165, 201];
-      const gemischt = heldenPool.sort(() => 0.5 - Math.random()).slice(0, 4);
-      bildURLs = gemischt.map(id => `https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/${id}.jpg`);
-      break;
-    }
-    case 'yugioh': {
-      try {
-        const res = await fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php');
-        const data = await res.json();
-        for (let i = 0; i < 4; i++) {
-          const zufallKarte = data.data[Math.floor(Math.random() * data.data.length)];
-          bildURLs.push(zufallKarte.card_images[0].image_url);
-        }
-      } catch (e) {
-        bildURLs = ['https://images.ygoprodeck.com/images/cards/46986414.jpg'];
-      }
-      break;
-    }
-    case 'katzen': {
-      for (let i = 0; i < 4; i++) {
-        bildURLs.push(`https://cataas.com/cat?t=${r}_${i}`);
-      }
-      break;
-    }
-    case 'hunde': {
-      try {
-        const res = await fetch('https://dog.ceo/api/breeds/image/random/4');
-        const data = await res.json();
-        bildURLs = data.message;
-      } catch (e) {
-        bildURLs = ['https://images.dog.ceo/breeds/retriever-golden/n02099601_100.jpg'];
-      }
-      break;
-    }
-    case 'pokemon-gen1': {
-      for (let i = 0; i < 4; i++) {
-        const pId = Math.floor(Math.random() * 151) + 1;
-        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
-      }
-      break;
-    }
-    default: {
-      for (let i = 0; i < 4; i++) {
-        bildURLs.push(`https://picsum.photos/400/300?random=${r + i}`);
-      }
-      break;
-    }
-  }
-
-  bildURLs.forEach((url, idx) => {
-    const card = document.createElement('div');
-    card.className = 'galerie-karte';
-    card.innerHTML = `
-      <img src="${url}" alt="Bild ${idx + 1}" style="width:100%; height:250px; object-fit:contain; border-radius:8px; background:#121212;">
-      <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
-        <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
-        <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
 }
 
 function initFreiesCanvas() {
@@ -368,14 +169,6 @@ function initFreiesCanvas() {
   };
 }
 
-function setzeFreiWerkzeug(werkzeug, event) {
-  aktuellesFreiWerkzeug = werkzeug;
-  document.querySelectorAll('#tab-freies-malen .btn-tool').forEach(btn => btn.classList.remove('active'));
-  if (event && event.target) {
-    event.target.classList.add('active');
-  }
-}
-
 function zeichneFreidesCanvas(e) {
   if (!freiIsDrawing || !freiCtx) return;
 
@@ -388,132 +181,18 @@ function zeichneFreidesCanvas(e) {
   freiCtx.strokeStyle = farbe;
   freiCtx.fillStyle = farbe;
 
-  if (aktuellesFreiWerkzeug === 'bleistift') {
-    freiCtx.lineWidth = groesse;
-    freiCtx.lineCap = 'round';
-    freiCtx.lineTo(x, y);
-    freiCtx.stroke();
-    freiCtx.beginPath();
-    freiCtx.moveTo(x, y);
-  } else if (aktuellesFreiWerkzeug === 'kugelschreiber') {
-    freiCtx.lineWidth = groesse * 1.5;
-    freiCtx.lineCap = 'round';
-    freiCtx.lineTo(x, y);
-    freiCtx.stroke();
-    freiCtx.beginPath();
-    freiCtx.moveTo(x, y);
-  } else if (aktuellesFreiWerkzeug === 'spray') {
-    for (let i = 0; i < 20; i++) {
-      const offsetX = (Math.random() - 0.5) * (groesse * 3);
-      const offsetY = (Math.random() - 0.5) * (groesse * 3);
-      freiCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
-    }
-  } else if (aktuellesFreiWerkzeug === 'radiergummi') {
-    freiCtx.clearRect(x - groesse, y - groesse, groesse * 2, groesse * 2);
-  }
-}
-
-function allesAusfuellenFreiCanvas() {
-  if (!freiCtx || !freiCanvas) return;
-  const farbe = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
-  freiCtx.fillStyle = farbe;
-  freiCtx.fillRect(0, 0, freiCanvas.width, freiCanvas.height);
+  freiCtx.lineWidth = groesse;
+  freiCtx.lineCap = 'round';
+  freiCtx.lineTo(x, y);
+  freiCtx.stroke();
+  freiCtx.beginPath();
+  freiCtx.moveTo(x, y);
 }
 
 function löscheFreiCanvas() {
   if (freiCtx && freiCanvas) {
     freiCtx.clearRect(0, 0, freiCanvas.width, freiCanvas.height);
   }
-}
-
-function speichereFreiesGemälde() {
-  const nameInput = document.getElementById('frei-paint-name');
-  if (!nameInput) return;
-  const name = nameInput.value.trim();
-
-  if (name === '') {
-    document.getElementById('frei-paint-fehler')?.classList.remove('hidden');
-    return;
-  }
-
-  document.getElementById('frei-paint-fehler')?.classList.add('hidden');
-  const imgData = freiCanvas.toDataURL();
-
-  const neuesWerk = {
-    id: Date.now(),
-    autor: name,
-    bildData: imgData,
-    typ: 'zeichnung',
-    emoji: '🎨',
-    farbe: '#00f3ff'
-  };
-
-  freieGemaelde.push(neuesWerk);
-  localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
-
-  nameInput.value = '';
-  löscheFreiCanvas();
-  erzeugeHintergrundBlasen();
-}
-
-
-// ====================================================
-// 5. SCHWEBENDE HINTERGRUND-BLASEN & VORSCHAU-MODAL
-// ====================================================
-function erzeugeHintergrundBlasen() {
-  const container = document.getElementById('bg-bubbles-container');
-  if (!container) return;
-  container.innerHTML = '';
-
-  const alleWerke = [...kiBearbeiteteBilder, ...freieGemaelde];
-
-  alleWerke.forEach(werk => {
-    const autorName = werk.autor || werk.name || "Künstler";
-    
-    const bubble = document.createElement('div');
-    bubble.className = 'bg-bubble';
-    
-    const top = Math.floor(Math.random() * 80) + 10;
-    const left = Math.floor(Math.random() * 80) + 10;
-    
-    bubble.style.top = `${top}%`;
-    bubble.style.left = `${left}%`;
-    bubble.style.color = werk.farbe || '#00f3ff';
-
-    bubble.innerHTML = `
-      <div class="bubble-content">
-        <span>${werk.emoji || '🎨'}</span>
-        <span>${autorName}</span>
-      </div>
-    `;
-
-    bubble.onclick = () => zeigeWerkVorschau(werk);
-    container.appendChild(bubble);
-  });
-}
-
-function zeigeWerkVorschau(werk) {
-  const modal = document.getElementById('modal-werk-vorschau');
-  const titel = document.getElementById('vorschau-titel');
-  const body = document.getElementById('vorschau-body');
-
-  if (!modal || !titel || !body) return;
-
-  const autorName = werk.autor || werk.name || "Künstler";
-  titel.innerText = `Werk von ${autorName}`;
-
-  if (werk.bildData) {
-    body.innerHTML = `<img src="${werk.bildData}" alt="Werk von ${autorName}" style="max-width:100%; border-radius:8px; border:1px solid ${werk.farbe || '#00f3ff'};">`;
-  } else if (werk.text) {
-    body.innerHTML = `<p style="font-style:italic; font-size:1.1rem; color:#fff;">"${werk.text}"</p>`;
-  }
-
-  modal.classList.remove('hidden');
-}
-
-function schliesseWerkVorschau() {
-  const modal = document.getElementById('modal-werk-vorschau');
-  modal?.classList.add('hidden');
 }
 
 
@@ -523,11 +202,6 @@ function schliesseWerkVorschau() {
 document.addEventListener('DOMContentLoaded', () => {
   zeigeStartseite();
   erstelleGalerie();
-  erzeugeHintergrundBlasen();
-});
-document.addEventListener('DOMContentLoaded', () => {
-  erstelleGalerie();
-  erzeugeHintergrundBlasen();
 });
 // ====================================================
 // 5. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
