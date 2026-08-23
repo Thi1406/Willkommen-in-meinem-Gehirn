@@ -1,5 +1,5 @@
 // ====================================================
-// 1. SEITEN-NAVIGATION
+// 1. SEITEN-NAVIGATION (Startseite & Unterseiten)
 // ====================================================
 function zeigeBereich(bereichId) {
   document.querySelector('header')?.classList.add('hidden');
@@ -13,7 +13,7 @@ function zeigeBereich(bereichId) {
     zielSeite.classList.remove('hidden');
   }
 
-  if (bereichId === 'geschichten' && typeof ladeGeschichtenUebersicht === 'function') {
+  if (bereichId === 'geschichten') {
     ladeGeschichtenUebersicht();
   }
 }
@@ -28,7 +28,7 @@ function zeigeStartseite() {
 
 
 // ====================================================
-// 2. BILDER-GALERIE & MODALS
+// 2. BILDER-LINKS & GALERIE
 // ====================================================
 const meineBilder = [
   "https://picsum.photos/300/200?random=1",
@@ -78,6 +78,13 @@ function erstelleGalerie() {
   });
 }
 
+// Initialisieren der Galerie
+erstelleGalerie();
+
+
+// ====================================================
+// 3. BESCHREIBEN & PAINT MODALS
+// ====================================================
 function oeffneBeschreibungModal(bildId) {
   aktuellesBildId = bildId;
   document.getElementById("modal-beschreibung")?.classList.remove("hidden");
@@ -86,29 +93,21 @@ function oeffneBeschreibungModal(bildId) {
 
 function schliesseBeschreibungModal() {
   document.getElementById("modal-beschreibung")?.classList.add("hidden");
-  const textElem = document.getElementById("beschreibung-text");
-  const nameElem = document.getElementById("beschreibung-name");
-  if (textElem) textElem.value = "";
-  if (nameElem) nameElem.value = "";
+  document.getElementById("beschreibung-text").value = "";
+  document.getElementById("beschreibung-name").value = "";
 }
 
 function speichereBeschreibung() {
-  const textElem = document.getElementById("beschreibung-text");
-  const nameElem = document.getElementById("beschreibung-name");
-  if (!textElem || !nameElem) return;
-
-  const text = textElem.value;
-  const name = nameElem.value.trim();
+  const text = document.getElementById("beschreibung-text").value;
+  const name = document.getElementById("beschreibung-name").value.trim();
 
   if (name === "") {
     document.getElementById("modal-fehler")?.classList.remove("hidden");
     return;
   }
 
-  const textZiel = document.getElementById(`wolke-text-${aktuellesBildId}`);
-  const autorZiel = document.getElementById(`wolke-autor-${aktuellesBildId}`);
-  if (textZiel) textZiel.innerText = `"${text}"`;
-  if (autorZiel) autorZiel.innerText = `— ${name}`;
+  document.getElementById(`wolke-text-${aktuellesBildId}`).innerText = `"${text}"`;
+  document.getElementById(`wolke-autor-${aktuellesBildId}`).innerText = `— ${name}`;
 
   const karte = document.getElementById(`karte-${aktuellesBildId}`);
   if (karte) {
@@ -129,19 +128,131 @@ function zeigWolke(bildId) {
   wolke?.classList.toggle("hidden");
 }
 
+function initCanvas() {
+  canvas = document.getElementById('paint-canvas');
+  if (!canvas) return;
+  
+  ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+
+  canvas.onmousedown = startZeichnen;
+  canvas.onmousemove = zeichnen;
+  canvas.onmouseup = stoppZeichnen;
+}
+
+function setzeWerkzeug(werkzeug, event) {
+  aktuellesWerkzeug = werkzeug;
+  document.querySelectorAll('.btn-tool').forEach(btn => btn.classList.remove('active'));
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+}
+
+function oeffnePaintModal(bildId, bildUrl) {
+  aktuellesBildId = bildId;
+  const modal = document.getElementById('modal-paint');
+  const img = document.getElementById('paint-hintergrund-bild');
+  
+  if (img) img.src = bildUrl;
+  modal?.classList.remove('hidden');
+  document.getElementById('paint-fehler')?.classList.add('hidden');
+
+  setTimeout(initCanvas, 100);
+}
+
+function schliessePaintModal() {
+  document.getElementById('modal-paint')?.classList.add('hidden');
+  const nameInput = document.getElementById('paint-name');
+  if (nameInput) nameInput.value = '';
+  if (ctx && canvas) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+function startZeichnen(e) {
+  isDrawing = true;
+  zeichnen(e);
+}
+
+function stoppZeichnen() {
+  isDrawing = false;
+  if (ctx) ctx.beginPath();
+}
+
+function zeichnen(e) {
+  if (!isDrawing || !ctx) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const farbe = document.getElementById('paint-farbe')?.value || '#000000';
+
+  ctx.strokeStyle = farbe;
+  ctx.fillStyle = farbe;
+
+  if (aktuellesWerkzeug === 'bleistift') {
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  } else if (aktuellesWerkzeug === 'kugelschreiber') {
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  } else if (aktuellesWerkzeug === 'spray') {
+    for (let i = 0; i < 20; i++) {
+      const offsetX = (Math.random() - 0.5) * 15;
+      const offsetY = (Math.random() - 0.5) * 15;
+      ctx.fillRect(x + offsetX, y + offsetY, 1, 1);
+    }
+  }
+}
+
+function speicherePaint() {
+  const name = document.getElementById('paint-name').value.trim();
+
+  if (name === '') {
+    document.getElementById('paint-fehler')?.classList.remove('hidden');
+    return;
+  }
+
+  const karte = document.getElementById(`karte-${aktuellesBildId}`);
+  if (karte) {
+    const badge = karte.querySelector('.farbklecks');
+    const anzahlSpan = karte.querySelector('.anzahl-paintings');
+
+    badge?.classList.remove('hidden');
+    if (anzahlSpan) {
+      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0") + 1;
+    }
+  }
+
+  schliessePaintModal();
+}
 
 // ====================================================
-// 3. REITER IN "BILDER" & FREIES MALEN
+// 4. BILDER-WELT FEATURES (REITER, KATEGORIEN & FREIES MALEN)
 // ====================================================
+
+let aktuelleKiKategorie = 'standard';
+let aktuellesFreiWerkzeug = 'bleistift';
 let freiCanvas, freiCtx, freiIsDrawing = false;
+let kiBearbeiteteBilder = JSON.parse(localStorage.getItem('kiBearbeiteteBilder')) || [];
 let freieGemaelde = JSON.parse(localStorage.getItem('freieGemaelde')) || [];
 
+// Reiter-Wechsel im Bilderbereich
 function wechsleBilderTab(tabName) {
   document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
 
-  if (window.event && window.event.target) {
-    window.event.target.classList.add('active');
+  if (event && event.target) {
+    event.target.classList.add('active');
   }
   
   const zielTab = document.getElementById(`tab-${tabName}`);
@@ -152,60 +263,129 @@ function wechsleBilderTab(tabName) {
   }
 }
 
-function initFreiesCanvas() {
-  freiCanvas = document.getElementById('frei-paint-canvas');
-  if (!freiCanvas) return;
-
-  freiCtx = freiCanvas.getContext('2d');
-
-  freiCanvas.onmousedown = (e) => {
-    freiIsDrawing = true;
-    zeichneFreidesCanvas(e);
-  };
-  freiCanvas.onmousemove = zeichneFreidesCanvas;
-  freiCanvas.onmouseup = () => {
-    freiIsDrawing = false;
-    if (freiCtx) freiCtx.beginPath();
-  };
+// Dropdown & Würfel
+function aendereKiKategorie(kategorie) {
+  aktuelleKiKategorie = kategorie;
+  ladeKiBilder(kategorie);
 }
 
-function zeichneFreidesCanvas(e) {
-  if (!freiIsDrawing || !freiCtx) return;
-
-  const rect = freiCanvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  const farbe = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
-  const groesse = document.getElementById('frei-paint-groesse')?.value || 3;
-
-  freiCtx.strokeStyle = farbe;
-  freiCtx.fillStyle = farbe;
-
-  freiCtx.lineWidth = groesse;
-  freiCtx.lineCap = 'round';
-  freiCtx.lineTo(x, y);
-  freiCtx.stroke();
-  freiCtx.beginPath();
-  freiCtx.moveTo(x, y);
+function würfeleKiBilder() {
+  ladeKiBilder(aktuelleKiKategorie);
 }
 
-function löscheFreiCanvas() {
-  if (freiCtx && freiCanvas) {
-    freiCtx.clearRect(0, 0, freiCanvas.width, freiCanvas.height);
+// Sichere, API-basierte Bild-Generator Funktion
+async function ladeKiBilder(kategorie) {
+  const grid = document.getElementById('ki-galerie-grid');
+  if (!grid) return;
+  grid.innerHTML = ''; // Galerie leeren
+
+  let bildURLs = [];
+  const r = Date.now(); // Eindeutiger Zeitstempel für den Würfel
+
+  switch (kategorie) {
+    case 'superhelden': {
+      const heldenPool = [
+        1, 30, 34, 38, 60, 66, 68, 69, 70, 106, 
+        107, 149, 156, 165, 201, 204, 213, 222, 225, 233, 
+        234, 263, 265, 303, 309, 310, 332, 346, 370, 388, 
+        400, 405, 414, 490, 527, 575, 620, 644, 659, 687
+      ];
+      
+      const gemischt = heldenPool.sort(() => 0.5 - Math.random()).slice(0, 4);
+      bildURLs = gemischt.map(id => `https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/${id}.jpg`);
+      break;
+    }
+
+    case 'yugioh': {
+      try {
+        const res = await fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php');
+        const data = await res.json();
+        for (let i = 0; i < 4; i++) {
+          const zufallKarte = data.data[Math.floor(Math.random() * data.data.length)];
+          bildURLs.push(zufallKarte.card_images[0].image_url);
+        }
+      } catch (e) {
+        bildURLs = [
+          'https://images.ygoprodeck.com/images/cards/46986414.jpg',
+          'https://images.ygoprodeck.com/images/cards/74677422.jpg',
+          'https://images.ygoprodeck.com/images/cards/23771716.jpg',
+          'https://images.ygoprodeck.com/images/cards/11901678.jpg'
+        ];
+      }
+      break;
+    }
+
+    case 'katzen': {
+      for (let i = 0; i < 4; i++) {
+        bildURLs.push(`https://cataas.com/cat?t=${r}_${i}`);
+      }
+      break;
+    }
+
+    case 'hunde': {
+      try {
+        const res = await fetch('https://dog.ceo/api/breeds/image/random/4');
+        const data = await res.json();
+        bildURLs = data.message;
+      } catch (e) {
+        for (let i = 0; i < 4; i++) {
+          bildURLs.push(`https://images.dog.ceo/breeds/retriever-golden/n02099601_100.jpg`);
+        }
+      }
+      break;
+    }
+
+    case 'pokemon-gen1': {
+      for (let i = 0; i < 4; i++) {
+        const pId = Math.floor(Math.random() * 151) + 1;
+        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
+      }
+      break;
+    }
+
+    case 'pokemon-gen2': {
+      for (let i = 0; i < 4; i++) {
+        const pId = Math.floor(Math.random() * 100) + 152;
+        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
+      }
+      break;
+    }
+
+    case 'pokemon-gen3': {
+      for (let i = 0; i < 4; i++) {
+        const pId = Math.floor(Math.random() * 135) + 252;
+        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
+      }
+      break;
+    }
+
+    case 'standard':
+    default: {
+      for (let i = 0; i < 4; i++) {
+        bildURLs.push(`https://picsum.photos/400/300?random=${r + i}`);
+      }
+      break;
+    }
   }
+
+  // Galerie im DOM befüllen
+  bildURLs.forEach((url, idx) => {
+    const card = document.createElement('div');
+    card.className = 'galerie-karte';
+    card.innerHTML = `
+      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:contain; border-radius:8px; background:#121212;">
+      <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
+        <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
+        <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
 }
 
-
-// ====================================================
-// INITIALISIERUNG BEIM SEITENSTART
-// ====================================================
-document.addEventListener('DOMContentLoaded', () => {
-  zeigeStartseite();
-  erstelleGalerie();
-});
 // ====================================================
 // 5. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
-// ====================================================
+// =======================================
 const geschichtenDaten = {
   demenz: {
     titel: "Der kalte Gang",
@@ -393,7 +573,7 @@ Ich erwachte beim Duft von warmem Essen. Bavin 787 lag auf meinem Leib, doch mei
 
 function ladeGeschichtenUebersicht() {
   const container = document.getElementById('geschichten-grid');
-  if (!container) return;
+  if (!container || typeof geschichtenDaten === 'undefined') return;
   container.innerHTML = '';
 
   Object.keys(geschichtenDaten).forEach(key => {
@@ -415,8 +595,9 @@ function ladeGeschichtenUebersicht() {
     container.appendChild(karte);
   });
 }
+
 // ====================================================
-// CLIPPER CATCHER GAME LOGIK
+// 6. CLIPPER CATCHER GAME LOGIK
 // ====================================================
 let score = 0;
 let herzen = 3;
@@ -586,7 +767,6 @@ function anzuenden(item) {
       setTimeout(() => spielfeld.classList.remove('flash-gruen'), 350);
     }
 
-   // Ziel erreicht? Spiel stoppen & gewinnen!
     if (score >= targetScore) {
       beendeClipperSpiel(false, true);
       return;
@@ -658,9 +838,9 @@ function aktiviere420EasterEgg() {
   }, 10000);
 }
 
-/* ====================================================
-   HIGHSCORE SPEICHERN & KATEGORIEN-FILTER
-   ==================================================== */
+// ----------------------------------------------------
+// HIGHSCORE SPEICHERN & KATEGORIEN-FILTER
+// ----------------------------------------------------
 let aktuellerFilter = 'leicht';
 
 function speichereHighscore() {
@@ -679,7 +859,6 @@ function speichereHighscore() {
     seconds: verstreichendeSekunden
   });
 
-  // Sortieren: Höchste Punkte zuerst, bei Gleichstand die SCHNELLSTE Zeit
   highscores.sort((a, b) => {
     if (b.score === a.score) {
       return a.seconds - b.seconds;
@@ -691,8 +870,6 @@ function speichereHighscore() {
   if (nameInput) nameInput.value = '';
   
   document.getElementById('modal-game-over')?.classList.add('hidden');
-  
-  // Öffnet direkt die Bestenliste mit dem aktuellen Schwierigkeitsgrad
   oeffneHighscoreModal(schwierigkeit);
 }
 
@@ -707,7 +884,6 @@ function zeigeHighscoreKategorie(kategorie) {
   const liste = document.getElementById('highscore-liste');
   if (!liste) return;
 
-  // Filtert nach Kategorie und nimmt die besten 10
   const gefiltert = highscores
     .filter(e => (e.schwierigkeit || 'leicht') === kategorie)
     .slice(0, 10);
