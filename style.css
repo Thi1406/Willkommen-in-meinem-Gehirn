@@ -589,6 +589,104 @@ header h1 {
 }
 
 /* =======================================================
+   NEU: ERWEITERUNGEN FÜR BILDER-WELT & FREIES MALEN
+   ======================================================= */
+.bilder-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.btn-tab {
+  background: #111;
+  border: 1px solid #00f3ff !important;
+  color: #fff;
+  padding: 8px 16px !important;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-tab.active, .btn-tab:hover {
+  background: #00f3ff !important;
+  color: #000 !important;
+  box-shadow: 0 0 10px #00f3ff;
+}
+
+.ki-steuerung {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.ki-select {
+  background: #0a0a10;
+  color: #00f3ff;
+  border: 1px solid #00f3ff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+}
+
+.btn-wuerfel {
+  background: #111 !important;
+  border: 1px solid #b026ff !important;
+  color: #b026ff !important;
+  margin-bottom: 0 !important;
+}
+
+.btn-wuerfel:hover {
+  background: #b026ff !important;
+  color: #fff !important;
+  box-shadow: 0 0 10px #b026ff;
+}
+
+.frei-canvas-container {
+  border: 2px solid #00f3ff;
+  border-radius: 8px;
+  background: #0a0a10;
+  width: 100%;
+  max-width: 600px;
+  height: 400px;
+  margin: 15px auto;
+  position: relative;
+}
+
+#frei-paint-canvas {
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+.user-werke-liste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.btn-neon-user {
+  background: rgba(0, 243, 255, 0.1) !important;
+  border: 1px solid #00f3ff !important;
+  color: #00f3ff !important;
+  padding: 5px 10px !important;
+  font-size: 0.8rem;
+  border-radius: 20px;
+  margin-bottom: 0 !important;
+  box-shadow: 0 0 5px rgba(0, 243, 255, 0.4);
+}
+
+.btn-neon-user:hover {
+  background: #00f3ff !important;
+  color: #000 !important;
+}
+
+/* =======================================================
    GESCHICHTEN LAYOUT, KARTEN & MODAL-SCROLLBAR
    ======================================================= */
 .geschichten-grid {
