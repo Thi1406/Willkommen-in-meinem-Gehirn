@@ -1,64 +1,365 @@
 /* =======================================================
-   BASIS & LAYOUT (Dunkles Design & Startseite)
+   SCHRIFTART: Cinzel & Grund-Styling
+   ======================================================= */
+body, h1, h2, h3, p, button, .geschichte-text-box, .geschichte-karte h3, #geschichte-titel {
+  font-family: 'Cinzel', serif !important;
+}
+
+.geschichte-text-box {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  letter-spacing: 0.5px;
+}
+
+/* =======================================================
+   GRUNDDESIGN
    ======================================================= */
 body {
-  background-color: #121212;
+  background-color: #000000;
   color: #ffffff;
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* Kacheln für die 3 Startkacheln */
-.navigation-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.nav-karte {
-  background-color: #111111;
-  border: 2px solid #00f3ff;
-  border-radius: 12px;
-  padding: 25px;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
-  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 140px;
-}
-
-.nav-karte:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 0 25px rgba(0, 243, 255, 0.8);
-  border-color: #ffffff;
-  background-color: #1a1a24;
-}
-
-.nav-karte h2, .nav-karte h3 {
-  margin: 0 0 10px 0;
-  color: #00f3ff;
-  font-size: 1.3rem;
-}
-
-.nav-karte p {
+  min-height: 100vh;
   margin: 0;
-  color: #cccccc;
-  font-size: 0.9rem;
+  padding: 40px 20px;
+  box-sizing: border-box;
 }
 
+header { 
+  text-align: center; 
+  margin-bottom: 50px; 
+}
+
+header h1 { 
+  font-size: 2.5rem; 
+  letter-spacing: 2px; 
+}
+
+.navigation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  width: 100%;
+  max-width: 1000px;
+}
+
+.card {
+  background-color: #111111;
+  border: 3px solid #333;
+  border-radius: 12px;
+  height: 250px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover { 
+  transform: translateY(-5px); 
+}
+
+.card-title {
+  position: absolute;
+  top: 50%; 
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.8rem;
+  font-weight: bold;
+  z-index: 10;
+  pointer-events: none;
+  background-color: rgba(17, 17, 17, 0.8);
+  padding: 5px 15px;
+  border-radius: 5px;
+}
+
+.card-bilder { border-color: #00ff00; }
+.card-bilder:hover { box-shadow: 0 0 20px rgba(0, 255, 0, 0.4); }
+.card-geschichten { border-color: #0088ff; }
+.card-geschichten:hover { box-shadow: 0 0 20px rgba(0, 136, 255, 0.4); }
+.card-games { border-color: #aa00ff; }
+.card-games:hover { box-shadow: 0 0 20px rgba(170, 0, 255, 0.4); }
+
+/* =======================================================
+   ANIMATION 1: CHOREOGRAFIE DER LÄUFER (BILDER)
+   ======================================================= */
+.runner {
+  position: absolute;
+  width: 20px;
+  height: 45px;
+  bottom: 20px;
+}
+
+.runner .head { 
+  width: 12px; 
+  height: 12px; 
+  border: 2px solid #fff; 
+  border-radius: 50%; 
+  position: absolute; 
+  left: 4px; 
+  top: 0; 
+  background: #111;
+  box-sizing: border-box;
+}
+
+.runner .eye { position: absolute; width: 1.5px; height: 3px; background: #fff; top: 2px; }
+.runner .eye.l { left: 2px; }
+.runner .eye.r { left: 6px; }
+
+.runner .torso { width: 2px; height: 16px; position: absolute; top: 12px; left: 9px; }
+
+/* NATÜRLICHE GLIEDMASSEN */
+.runner .arm-l, .runner .arm-r { 
+  width: 11px; 
+  height: 2px; 
+  position: absolute; 
+  top: 13px; 
+  left: 10px; 
+  transform-origin: left center;
+}
+.runner .arm-l { animation: armLaufTakt 0.6s infinite alternate ease-in-out; }
+.runner .arm-r { animation: armLaufTakt 0.6s infinite alternate-reverse ease-in-out; }
+
+.runner .leg-l, .runner .leg-r { 
+  width: 2px; 
+  height: 15px; 
+  position: absolute; 
+  top: 28px; 
+  left: 9px;
+  transform-origin: top center; 
+}
+.runner .leg-l { animation: beinLaufTakt 0.6s infinite alternate ease-in-out; }
+.runner .leg-r { animation: beinLaufTakt 0.6s infinite alternate-reverse ease-in-out; }
+
+@keyframes armLaufTakt { from { transform: rotate(65deg); } to { transform: rotate(115deg); } }
+@keyframes beinLaufTakt { from { transform: rotate(25deg); } to { transform: rotate(-25deg); } }
+
+/* TIMINGS FÜR DAS VERSATZTE REINLAUFEN */
+.r1 { animation: wegLinksNachRechts1 16s infinite linear; animation-delay: 0s; }
+.r2 { animation: wegLinksNachRechts2 16s infinite linear; animation-delay: 0.4s; }
+.r3 { animation: wegLinksNachRechts3 16s infinite linear; animation-delay: 0.8s; }
+.r4 { animation: wegLinksNachRechts4 16s infinite linear; animation-delay: 1.2s; }
+.r5 { animation: wegLinksNachRechts5 16s infinite linear; animation-delay: 1.6s; }
+
+/* TIMELINES: GRUPPENJUBEL & RÜCKWEG */
+@keyframes wegLinksNachRechts1 {
+  0% { left: -40px; transform: scaleX(1); }
+  10% { left: 160px; transform: scaleX(1); }
+  28% { left: 160px; transform: scaleX(1); }  
+  29% { transform: scaleX(1) translateY(-2px); }
+  30%, 33% { transform: scaleX(1) translateY(-5px); }
+  35% { transform: scaleX(1) translateY(0); }
+  38% { left: 160px; transform: scaleX(1); }
+  48% { left: 340px; transform: scaleX(1); }
+  53% { left: 340px; transform: scaleX(-1); }
+  58% { left: 100px; transform: scaleX(-1); }
+  78% { left: 100px; transform: scaleX(-1); } 
+  79% { transform: scaleX(-1) translateY(-2px); }
+  80%, 83% { transform: scaleX(-1) translateY(-5px); }
+  85% { transform: scaleX(-1) translateY(0); }
+  92% { left: 100px; transform: scaleX(-1); } 
+  100% { left: -40px; transform: scaleX(-1); }
+}
+
+@keyframes wegLinksNachRechts2 {
+  0% { left: -40px; transform: scaleX(1); }
+  12% { left: 145px; transform: scaleX(1); }
+  28% { left: 145px; transform: scaleX(1); }
+  29% { transform: scaleX(1) translateY(-2px); }
+  30%, 33% { transform: scaleX(1) translateY(-5px); }
+  35% { transform: scaleX(1) translateY(0); }
+  40% { left: 145px; transform: scaleX(1); }
+  50% { left: 340px; transform: scaleX(1); }
+  53% { left: 340px; transform: scaleX(-1); }
+  60% { left: 115px; transform: scaleX(-1); }
+  78% { left: 115px; transform: scaleX(-1); }
+  79% { transform: scaleX(-1) translateY(-2px); }
+  80%, 83% { transform: scaleX(-1) translateY(-5px); }
+  85% { transform: scaleX(-1) translateY(0); }
+  90% { left: 115px; transform: scaleX(-1); }
+  98% { left: -40px; transform: scaleX(-1); }
+}
+
+@keyframes wegLinksNachRechts3 {
+  0% { left: -40px; transform: scaleX(1); }
+  14% { left: 130px; transform: scaleX(1); }
+  28% { left: 130px; transform: scaleX(1); }
+  29% { transform: scaleX(1) translateY(-2px); }
+  30%, 33% { transform: scaleX(1) translateY(-5px); }
+  35% { transform: scaleX(1) translateY(0); }
+  42% { left: 130px; transform: scaleX(1); }
+  52% { left: 340px; transform: scaleX(1); }
+  53% { left: 340px; transform: scaleX(-1); }
+  62% { left: 130px; transform: scaleX(-1); }
+  78% { left: 130px; transform: scaleX(-1); }
+  79% { transform: scaleX(-1) translateY(-2px); }
+  80%, 83% { transform: scaleX(-1) translateY(-5px); }
+  85% { transform: scaleX(-1) translateY(0); }
+  88% { left: 130px; transform: scaleX(-1); }
+  96% { left: -40px; transform: scaleX(-1); }
+}
+
+@keyframes wegLinksNachRechts4 {
+  0% { left: -40px; transform: scaleX(1); }
+  16% { left: 115px; transform: scaleX(1); }
+  28% { left: 115px; transform: scaleX(1); }
+  29% { transform: scaleX(1) translateY(-2px); }
+  30%, 33% { transform: scaleX(1) translateY(-5px); }
+  35% { transform: scaleX(1) translateY(0); }
+  44% { left: 115px; transform: scaleX(1); }
+  54% { left: 340px; transform: scaleX(1); }
+  55% { left: 340px; transform: scaleX(-1); }
+  64% { left: 145px; transform: scaleX(-1); }
+  78% { left: 145px; transform: scaleX(-1); }
+  79% { transform: scaleX(-1) translateY(-2px); }
+  80%, 83% { transform: scaleX(-1) translateY(-5px); }
+  85% { transform: scaleX(-1) translateY(0); }
+  86% { left: 145px; transform: scaleX(-1); }
+  94% { left: -40px; transform: scaleX(-1); }
+}
+
+@keyframes wegLinksNachRechts5 {
+  0% { left: -40px; transform: scaleX(1); }
+  18% { left: 100px; transform: scaleX(1); }
+  28% { left: 100px; transform: scaleX(1); }
+  29% { transform: scaleX(1) translateY(-2px); }
+  30%, 33% { transform: scaleX(1) translateY(-5px); }
+  35% { transform: scaleX(1) translateY(0); }
+  46% { left: 100px; transform: scaleX(1); }
+  56% { left: 340px; transform: scaleX(1); }
+  57% { left: 340px; transform: scaleX(-1); }
+  66% { left: 160px; transform: scaleX(-1); }
+  78% { left: 160px; transform: scaleX(-1); }
+  79% { transform: scaleX(-1) translateY(-2px); }
+  80%, 83% { transform: scaleX(-1) translateY(-5px); }
+  85% { transform: scaleX(-1) translateY(0); }
+  85.5% { left: 160px; transform: scaleX(-1); }
+  92% { left: -40px; transform: scaleX(-1); }
+}
+
+.runner .arm-l { animation: armLaufTakt 0.6s infinite alternate ease-in-out, armJubelChoreoL 16s infinite linear; }
+.runner .arm-r { animation: armLaufTakt 0.6s infinite alternate-reverse ease-in-out, armJubelChoreoR 16s infinite linear; }
+
+@keyframes armJubelChoreoL {
+  0%, 28% { transform: none; }
+  29%, 34% { transform: rotate(-75deg); }
+  35%, 78% { transform: none; }
+  79%, 84% { transform: rotate(-75deg); }
+  85%, 100% { transform: none; }
+}
+
+@keyframes armJubelChoreoR {
+  0%, 28% { transform: none; }
+  29%, 34% { transform: rotate(-95deg); }
+  35%, 78% { transform: none; }
+  79%, 84% { transform: rotate(-95deg); }
+  85%, 100% { transform: none; }
+}
+
+/* LÄUFER FARBEN */
+.rot .head { border-color: #ff3333; } 
+.rot .torso, .rot .leg-l, .rot .leg-r, .rot .eye, .rot .arm-l, .rot .arm-r { background-color: #ff3333 !important; }
+.hellblau .head { border-color: #33ccff; } 
+.hellblau .torso, .hellblau .leg-l, .hellblau .leg-r, .hellblau .eye, .hellblau .arm-l, .hellblau .arm-r { background-color: #33ccff !important; }
+.gruen .head { border-color: #00ff00; } 
+.gruen .torso, .gruen .leg-l, .gruen .leg-r, .gruen .eye, .gruen .arm-l, .gruen .arm-r { background-color: #00ff00 !important; }
+.tuerkis .head { border-color: #00f5d4; } 
+.tuerkis .torso, .tuerkis .leg-l, .tuerkis .leg-r, .tuerkis .eye, .tuerkis .arm-l, .tuerkis .arm-r { background-color: #00f5d4 !important; }
+.orange .head { border-color: #ff9f1c; } 
+.orange .torso, .orange .leg-l, .orange .leg-r, .orange .eye, .orange .arm-l, .orange .arm-r { background-color: #ff9f1c !important; }
+
+/* =======================================================
+   ANIMATION 2: GESCHICHTEN
+   ======================================================= */
+.letter { position: absolute; color: #0088ff; font-family: 'Georgia', serif; font-size: 1.6rem; font-weight: bold; opacity: 0; animation: buchstabeFading 5s infinite ease-in-out; }
+.b1 { left: 15%; top: 20%; animation-delay: 0s; }
+.b2 { left: 75%; top: 30%; animation-delay: 0.8s; color: #3399ff; }
+.b3 { left: 30%; top: 70%; animation-delay: 1.5s; }
+.b4 { left: 80%; top: 75%; animation-delay: 2.2s; }
+.b5 { left: 50%; top: 15%; animation-delay: 2.8s; }
+.b6 { left: 20%; top: 45%; animation-delay: 3.5s; color: #3399ff; }
+.b7 { left: 65%; top: 60%; animation-delay: 4.1s; }
+.b8 { left: 45%; top: 80%; animation-delay: 4.7s; }
+
+@keyframes buchstabeFading {
+  0% { opacity: 0; transform: translateY(10px) scale(0.7); }
+  30% { opacity: 0.7; transform: translateY(-10px) scale(1); }
+  70% { opacity: 0.7; transform: translateY(-20px) scale(1); }
+  100% { opacity: 0; transform: translateY(-35px) scale(0.7); }
+}
+
+/* =======================================================
+   ANIMATION 3: GAMES (FLIEGER & LASER)
+   ======================================================= */
+.paperplane { position: absolute; font-size: 2.2rem; font-weight: bold; }
+.bullet { position: absolute; width: 5px; height: 5px; background-color: #ffffff; border-radius: 50%; top: 14px; opacity: 0; }
+
+.plane-rot { color: #ff3333; animation: geschwungenRot 14s infinite linear; }
+.plane-blau { color: #3333ff; animation: geschwungenBlau 14s infinite linear; }
+
+@keyframes geschwungenRot {
+  0% { left: -40px; top: 180px; transform: rotate(-30deg); }
+  15% { left: 100px; top: 40px; transform: rotate(10deg); }
+  30% { left: 200px; top: 150px; transform: rotate(-20deg); }
+  45% { left: 350px; top: 20px; transform: rotate(-10deg); }
+  48% { left: 350px; top: 20px; transform: scaleX(-1) rotate(0deg); }
+  55% { left: 280px; top: 190px; transform: scaleX(-1) rotate(-35deg); }
+  70% { left: 180px; top: 80px; transform: scaleX(-1) rotate(10deg); }
+  85% { left: 50px; top: 160px; transform: scaleX(-1) rotate(-15deg); }
+  95% { left: -50px; top: 120px; transform: scaleX(-1) rotate(0deg); }
+  100% { left: -40px; top: 180px; transform: scaleX(1) rotate(-30deg); }
+}
+
+@keyframes geschwungenBlau {
+  0% { left: -120px; top: 210px; transform: rotate(-15deg); }
+  18% { left: 60px; top: 120px; transform: rotate(-40deg); }
+  32% { left: 160px; top: 50px; transform: rotate(20deg); }
+  45% { left: 270px; top: 180px; transform: rotate(-30deg); }
+  49% { left: 350px; top: 150px; transform: rotate(0deg); }
+  52% { left: 350px; top: 150px; transform: scaleX(-1) rotate(0deg); }
+  60% { left: 240px; top: 90px; transform: scaleX(-1) rotate(30deg); }
+  75% { left: 130px; top: 200px; transform: scaleX(-1) rotate(-20deg); }
+  90% { left: -50px; top: 80px; transform: scaleX(-1) rotate(10deg); }
+  100% { left: -120px; top: 210px; transform: scaleX(1) rotate(-15deg); }
+}
+
+.b-rot-1 { animation: laserVorwaertsRot1 14s infinite linear; }
+.b-rot-2 { animation: laserVorwaertsRot2 14s infinite linear; }
+
+@keyframes laserVorwaertsRot1 {
+  0%, 55% { opacity: 0; left: 0; }
+  56% { opacity: 1; left: 0; }
+  60% { opacity: 1; left: 150px; }
+  61% { opacity: 0; left: 150px; }
+  100% { opacity: 0; }
+}
+
+@keyframes laserVorwaertsRot2 {
+  0%, 70% { opacity: 0; left: 0; }
+  71% { opacity: 1; left: 0; }
+  75% { opacity: 1; left: 150px; }
+  76% { opacity: 0; left: 150px; }
+  100% { opacity: 0; }
+}
+
+.b-blau-1 { animation: laserVorwaertsBlau1 14s infinite linear; }
+.b-blau-2 { animation: laserVorwaertsBlau2 14s infinite linear; }
+
+@keyframes laserVorwaertsBlau1 {
+  5% { opacity: 0; left: 0; }
+  6% { opacity: 1; left: 0; }
+  11% { opacity: 1; left: 150px; }
+  12% { opacity: 0; left: 150px; }
+  100% { opacity: 0; }
+}
+
+@keyframes laserVorwaertsBlau2 {
+  20% { opacity: 0; left: 0; }
+  21% { opacity: 1; left: 0; }
+  26% { opacity: 1; left: 150px; }
+  27% { opacity: 0; left: 150px; }
+  100% { opacity: 0; }
+}
 
 /* =======================================================
    UNTERSEITEN & GALERIE
@@ -84,6 +385,8 @@ body {
 }
 
 .unterseite button:hover { background: #555; }
+
+.hidden { display: none !important; }
 
 .galerie-grid {
   display: flex;
@@ -283,120 +586,6 @@ body {
   top: 0; left: 0;
   width: 100%; height: 100%;
   cursor: crosshair;
-}
-
-/* =======================================================
-   HINTERGRUND-BLASEN & BEITRAGS-MODAL
-   ======================================================= */
-
-/* Container für die floatenden Blasen ganz hinten */
-#bg-bubbles-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Die bunten Punkte/Blasen */
-.bg-bubble {
-  position: absolute;
-  pointer-events: auto;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 5px 10px;
-  white-space: nowrap;
-}
-
-.bg-bubble:hover {
-  transform: scale(1.3);
-  z-index: 100;
-  box-shadow: 0 0 15px currentColor;
-}
-
-/* Name und Emoji in der Blase */
-.bubble-content {
-  font-size: 0.85rem;
-  font-weight: bold;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-/* Modal für die Großansicht */
-.preview-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  position: relative;
-}
-
-.info-icon-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.info-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 1px solid #ffcc00;
-  color: #ffcc00;
-  font-weight: bold;
-  cursor: help;
-  font-size: 0.85rem;
-}
-
-/* Tooltip beim Drüberfahren übers Ausrufezeichen */
-.info-icon-wrapper .tooltip-text {
-  visibility: hidden;
-  width: 220px;
-  background-color: #111;
-  color: #fff;
-  text-align: center;
-  border: 1px solid #ffcc00;
-  border-radius: 6px;
-  padding: 8px;
-  position: absolute;
-  z-index: 99;
-  top: 130%;
-  right: 0;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  font-size: 0.75rem;
-  box-shadow: 0 0 10px rgba(0,0,0,0.8);
-  pointer-events: none;
-}
-
-.info-icon-wrapper:hover .tooltip-text {
-  visibility: visible;
-  opacity: 1;
-}
-
-.btn-close-x {
-  background: transparent;
-  border: none;
-  color: #ff0055;
-  font-size: 1.5rem;
-  font-weight: bold;
-  cursor: pointer;
-  line-height: 1;
-}
-.btn-close-x:hover {
-  color: #ff5588;
 }
 
 /* =======================================================
@@ -689,8 +878,9 @@ body {
   font-size: 0.85rem;
   margin-bottom: 3px;
 }
+
 /* =======================================================
-   CLIPPER GAME STYLES (NEU & PRÄZISE)
+   CLIPPER GAME STYLES (NEU & PRÄZISE MIT FEUERZEUG-CURSOR)
    ======================================================= */
 .games-grid {
   display: flex;
@@ -757,22 +947,22 @@ body {
   border-radius: 8px;
   overflow: hidden;
   margin-top: 10px;
-  cursor: none !important; /* Versteckt den normalen Zeiger komplett */
+  cursor: none !important; /* Versteckt den normalen Mauszeiger komplett */
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Der eigene Clipper-Cursor, der an der Maus klebt */
+/* Der eigene Clipper-Cursor mit brennender Flamme oben an der Spitze */
 #custom-clipper-cursor {
   position: absolute;
   width: 35px;
   height: 90px;
-  pointer-events: none !important; /* WICHTIG: Klicks gehen durch das Feuerzeug durch aufs Spielfeld */
+  pointer-events: none !important; /* Klicks gehen durch das Feuerzeug durch aufs Feld */
   z-index: 999;
-  transform: translate(-50%, -10px); /* Richtet die Spitze/Flamme exakt an der Maus aus */
-  display: block; /* Direkt sichtbar */
+  transform: translate(-50%, -10px); /* Richtet die Flamme direkt am Mauspunkt aus */
+  display: block;
   top: 0;
   left: 0;
-  opacity: 0; /* Wird erst eingeblendet, wenn die Maus das Feld betritt */
+  opacity: 0;
   transition: opacity 0.15s ease;
 }
 
@@ -797,15 +987,15 @@ body {
 .game-item {
   position: absolute;
   user-select: none;
-  cursor: none !important; /* Kein Zeiger-Wechsel beim Drüberfahren! */
+  cursor: none !important;
 }
 
-/* Präzise Hitbox: Nur die linke Seite (Spitze) schaltet das Anzünden frei */
+/* Präzise Hitbox: Nur die Spitze/Glutseite schaltet das Anzünden frei */
 .anzuend-zone {
   position: absolute;
   left: 0;
   top: 0;
-  width: 35%; /* Nur die linken 35% des Bildes können angezündet werden */
+  width: 35%; /* Nur die linken 35% der Glut lösen das Anzünden aus */
   height: 100%;
   z-index: 2;
   cursor: none !important;
@@ -818,7 +1008,7 @@ body {
   pointer-events: none;
 }
 
-/* Dezenter Leuchteffekt für den Verwechslungseffekt */
+/* Dezenter Leuchteffekt */
 .game-item.joint img {
   filter: drop-shadow(0 0 4px rgba(0, 255, 0, 0.4));
 }
