@@ -93,21 +93,29 @@ function oeffneBeschreibungModal(bildId) {
 
 function schliesseBeschreibungModal() {
   document.getElementById("modal-beschreibung")?.classList.add("hidden");
-  document.getElementById("beschreibung-text").value = "";
-  document.getElementById("beschreibung-name").value = "";
+  const textElem = document.getElementById("beschreibung-text");
+  const nameElem = document.getElementById("beschreibung-name");
+  if (textElem) textElem.value = "";
+  if (nameElem) nameElem.value = "";
 }
 
 function speichereBeschreibung() {
-  const text = document.getElementById("beschreibung-text").value;
-  const name = document.getElementById("beschreibung-name").value.trim();
+  const textElem = document.getElementById("beschreibung-text");
+  const nameElem = document.getElementById("beschreibung-name");
+  if (!textElem || !nameElem) return;
+
+  const text = textElem.value;
+  const name = nameElem.value.trim();
 
   if (name === "") {
     document.getElementById("modal-fehler")?.classList.remove("hidden");
     return;
   }
 
-  document.getElementById(`wolke-text-${aktuellesBildId}`).innerText = `"${text}"`;
-  document.getElementById(`wolke-autor-${aktuellesBildId}`).innerText = `— ${name}`;
+  const textZiel = document.getElementById(`wolke-text-${aktuellesBildId}`);
+  const autorZiel = document.getElementById(`wolke-autor-${aktuellesBildId}`);
+  if (textZiel) textZiel.innerText = `"${text}"`;
+  if (autorZiel) autorZiel.innerText = `— ${name}`;
 
   const karte = document.getElementById(`karte-${aktuellesBildId}`);
   if (karte) {
@@ -215,7 +223,9 @@ function zeichnen(e) {
 }
 
 function speicherePaint() {
-  const name = document.getElementById('paint-name').value.trim();
+  const nameInput = document.getElementById('paint-name');
+  if (!nameInput) return;
+  const name = nameInput.value.trim();
 
   if (name === '') {
     document.getElementById('paint-fehler')?.classList.remove('hidden');
@@ -251,8 +261,8 @@ function wechsleBilderTab(tabName) {
   document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
 
-  if (event && event.target) {
-    event.target.classList.add('active');
+  if (window.event && window.event.target) {
+    window.event.target.classList.add('active');
   }
   
   const zielTab = document.getElementById(`tab-${tabName}`);
@@ -284,15 +294,12 @@ async function ladeKiBilder(kategorie) {
 
   switch (kategorie) {
     case 'superhelden': {
-      // Exakt 40 geprüfte, funktionierende Helden-IDs aus der Superhero-API
       const heldenPool = [
         1, 30, 34, 38, 60, 66, 68, 69, 70, 106, 
         107, 149, 156, 165, 201, 204, 213, 222, 225, 233, 
         234, 263, 265, 303, 309, 310, 332, 346, 370, 388, 
         400, 405, 414, 490, 527, 575, 620, 644, 659, 687
       ];
-      
-      // 4 zufällige aus den 40 ziehen
       const gemischt = heldenPool.sort(() => 0.5 - Math.random()).slice(0, 4);
       bildURLs = gemischt.map(id => `https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/${id}.jpg`);
       break;
@@ -384,6 +391,176 @@ async function ladeKiBilder(kategorie) {
     grid.appendChild(card);
   });
 }
+
+// FREIES MALEN LOGIK
+function initFreiesCanvas() {
+  freiCanvas = document.getElementById('frei-paint-canvas');
+  if (!freiCanvas) return;
+
+  freiCtx = freiCanvas.getContext('2d');
+
+  freiCanvas.onmousedown = (e) => {
+    freiIsDrawing = true;
+    zeichneFreidesCanvas(e);
+  };
+  freiCanvas.onmousemove = zeichneFreidesCanvas;
+  freiCanvas.onmouseup = () => {
+    freiIsDrawing = false;
+    if (freiCtx) freiCtx.beginPath();
+  };
+}
+
+function setzeFreiWerkzeug(werkzeug, event) {
+  aktuellesFreiWerkzeug = werkzeug;
+  document.querySelectorAll('#tab-freies-malen .btn-tool').forEach(btn => btn.classList.remove('active'));
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+}
+
+function zeichneFreidesCanvas(e) {
+  if (!freiIsDrawing || !freiCtx) return;
+
+  const rect = freiCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const farbe = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
+  const groesse = document.getElementById('frei-paint-groesse')?.value || 3;
+
+  freiCtx.strokeStyle = farbe;
+  freiCtx.fillStyle = farbe;
+
+  if (aktuellesFreiWerkzeug === 'bleistift') {
+    freiCtx.lineWidth = groesse;
+    freiCtx.lineCap = 'round';
+    freiCtx.lineTo(x, y);
+    freiCtx.stroke();
+    freiCtx.beginPath();
+    freiCtx.moveTo(x, y);
+  } else if (aktuellesFreiWerkzeug === 'kugelschreiber') {
+    freiCtx.lineWidth = groesse * 1.5;
+    freiCtx.lineCap = 'round';
+    freiCtx.lineTo(x, y);
+    freiCtx.stroke();
+    freiCtx.beginPath();
+    freiCtx.moveTo(x, y);
+  } else if (aktuellesFreiWerkzeug === 'spray') {
+    for (let i = 0; i < 20; i++) {
+      const offsetX = (Math.random() - 0.5) * (groesse * 3);
+      const offsetY = (Math.random() - 0.5) * (groesse * 3);
+      freiCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
+    }
+  } else if (aktuellesFreiWerkzeug === 'radiergummi') {
+    freiCtx.clearRect(x - groesse, y - groesse, groesse * 2, groesse * 2);
+  }
+}
+
+function allesAusfuellenFreiCanvas() {
+  if (!freiCtx || !freiCanvas) return;
+  const farbe = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
+  freiCtx.fillStyle = farbe;
+  freiCtx.fillRect(0, 0, freiCanvas.width, freiCanvas.height);
+}
+
+function löscheFreiCanvas() {
+  if (freiCtx && freiCanvas) {
+    freiCtx.clearRect(0, 0, freiCanvas.width, freiCanvas.height);
+  }
+}
+
+function speichereFreiesGemälde() {
+  const nameInput = document.getElementById('frei-paint-name');
+  if (!nameInput) return;
+  const name = nameInput.value.trim();
+
+  if (name === '') {
+    document.getElementById('frei-paint-fehler')?.classList.remove('hidden');
+    return;
+  }
+
+  document.getElementById('frei-paint-fehler')?.classList.add('hidden');
+  const imgData = freiCanvas.toDataURL();
+
+  const neuesWerk = {
+    id: Date.now(),
+    autor: name,
+    bildData: imgData,
+    typ: 'zeichnung',
+    emoji: '🎨',
+    farbe: '#00f3ff'
+  };
+
+  freieGemaelde.push(neuesWerk);
+  localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
+
+  nameInput.value = '';
+  löscheFreiCanvas();
+  erzeugeHintergrundBlasen();
+}
+
+
+// ====================================================
+// 5. SCHWEBENDE HINTERGRUND-BLASEN & VORSCHAU-MODAL
+// ====================================================
+
+function erzeugeHintergrundBlasen() {
+  const container = document.getElementById('bg-bubbles-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const alleWerke = [...kiBearbeiteteBilder, ...freieGemaelde];
+
+  alleWerke.forEach(werk => {
+    const bubble = document.createElement('div');
+    bubble.className = 'bg-bubble';
+    
+    // Zufällige Positionierung auf dem Bildschirm
+    const top = Math.floor(Math.random() * 80) + 10;
+    const left = Math.floor(Math.random() * 80) + 10;
+    
+    bubble.style.top = `${top}%`;
+    bubble.style.left = `${left}%`;
+    bubble.style.color = werk.farbe || '#00f3ff';
+
+    bubble.innerHTML = `
+      <div class="bubble-content">
+        <span>${werk.emoji || '🎨'}</span>
+        <span>${werk.autor}</span>
+      </div>
+    `;
+
+    bubble.onclick = () => zeigeWerkVorschau(werk);
+    container.appendChild(bubble);
+  });
+}
+
+function zeigeWerkVorschau(werk) {
+  const modal = document.getElementById('modal-werk-vorschau');
+  const titel = document.getElementById('vorschau-titel');
+  const body = document.getElementById('vorschau-body');
+
+  if (!modal || !titel || !body) return;
+
+  titel.innerText = `Werk von ${werk.autor}`;
+
+  if (werk.bildData) {
+    body.innerHTML = `<img src="${werk.bildData}" alt="Werk von ${werk.autor}" style="max-width:100%; border-radius:8px; border:1px solid ${werk.farbe || '#00f3ff'};">`;
+  } else if (werk.text) {
+    body.innerHTML = `<p style="font-style:italic; font-size:1.1rem; color:#fff;">"${werk.text}"</p>`;
+  }
+
+  modal.classList.remove('hidden');
+}
+
+function schliesseWerkVorschau() {
+  const modal = document.getElementById('modal-werk-vorschau');
+  modal?.classList.add('hidden');
+}
+
+// Initialer Aufruf beim Laden der Seite
+document.addEventListener('DOMContentLoaded', () => {
+  erzeugeHintergrundBlasen();
+});
 // ====================================================
 // 5. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
 // ====================================================
