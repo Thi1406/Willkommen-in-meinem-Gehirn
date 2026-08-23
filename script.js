@@ -13,7 +13,7 @@ function zeigeBereich(bereichId) {
     zielSeite.classList.remove('hidden');
   }
 
-  if (bereichId === 'geschichten') {
+  if (bereichId === 'geschichten' && typeof ladeGeschichtenUebersicht === 'function') {
     ladeGeschichtenUebersicht();
   }
 }
@@ -77,9 +77,6 @@ function erstelleGalerie() {
     galerieGrid.innerHTML += karteHtml;
   });
 }
-
-// Initialisieren der Galerie
-erstelleGalerie();
 
 
 // ====================================================
@@ -246,17 +243,16 @@ function speicherePaint() {
   schliessePaintModal();
 }
 
-// ====================================================
-// 4. BILDER-WELT FEATURES (REITER, KATEGORIEN & FREIES MALEN)
-// ====================================================
 
+// ====================================================
+// 4. BILDER-WELT FEATURES (REITER & FREIES MALEN)
+// ====================================================
 let aktuelleKiKategorie = 'standard';
 let aktuellesFreiWerkzeug = 'bleistift';
 let freiCanvas, freiCtx, freiIsDrawing = false;
 let kiBearbeiteteBilder = JSON.parse(localStorage.getItem('kiBearbeiteteBilder')) || [];
 let freieGemaelde = JSON.parse(localStorage.getItem('freieGemaelde')) || [];
 
-// Reiter-Wechsel im Bilderbereich
 function wechsleBilderTab(tabName) {
   document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
@@ -273,7 +269,6 @@ function wechsleBilderTab(tabName) {
   }
 }
 
-// Dropdown & Würfel
 function aendereKiKategorie(kategorie) {
   aktuelleKiKategorie = kategorie;
   ladeKiBilder(kategorie);
@@ -283,28 +278,21 @@ function würfeleKiBilder() {
   ladeKiBilder(aktuelleKiKategorie);
 }
 
-// Sichere, API-basierte Bild-Generator Funktion
 async function ladeKiBilder(kategorie) {
   const grid = document.getElementById('ki-galerie-grid');
   if (!grid) return;
-  grid.innerHTML = ''; // Galerie leeren
+  grid.innerHTML = '';
 
   let bildURLs = [];
-  const r = Date.now(); // Eindeutiger Zeitstempel für den Würfel
+  const r = Date.now();
 
   switch (kategorie) {
     case 'superhelden': {
-      const heldenPool = [
-        1, 30, 34, 38, 60, 66, 68, 69, 70, 106, 
-        107, 149, 156, 165, 201, 204, 213, 222, 225, 233, 
-        234, 263, 265, 303, 309, 310, 332, 346, 370, 388, 
-        400, 405, 414, 490, 527, 575, 620, 644, 659, 687
-      ];
+      const heldenPool = [1, 30, 34, 38, 60, 66, 68, 69, 70, 106, 107, 149, 156, 165, 201];
       const gemischt = heldenPool.sort(() => 0.5 - Math.random()).slice(0, 4);
       bildURLs = gemischt.map(id => `https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/${id}.jpg`);
       break;
     }
-
     case 'yugioh': {
       try {
         const res = await fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php');
@@ -314,36 +302,26 @@ async function ladeKiBilder(kategorie) {
           bildURLs.push(zufallKarte.card_images[0].image_url);
         }
       } catch (e) {
-        bildURLs = [
-          'https://images.ygoprodeck.com/images/cards/46986414.jpg',
-          'https://images.ygoprodeck.com/images/cards/74677422.jpg',
-          'https://images.ygoprodeck.com/images/cards/23771716.jpg',
-          'https://images.ygoprodeck.com/images/cards/11901678.jpg'
-        ];
+        bildURLs = ['https://images.ygoprodeck.com/images/cards/46986414.jpg'];
       }
       break;
     }
-
     case 'katzen': {
       for (let i = 0; i < 4; i++) {
         bildURLs.push(`https://cataas.com/cat?t=${r}_${i}`);
       }
       break;
     }
-
     case 'hunde': {
       try {
         const res = await fetch('https://dog.ceo/api/breeds/image/random/4');
         const data = await res.json();
         bildURLs = data.message;
       } catch (e) {
-        for (let i = 0; i < 4; i++) {
-          bildURLs.push(`https://images.dog.ceo/breeds/retriever-golden/n02099601_100.jpg`);
-        }
+        bildURLs = ['https://images.dog.ceo/breeds/retriever-golden/n02099601_100.jpg'];
       }
       break;
     }
-
     case 'pokemon-gen1': {
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 151) + 1;
@@ -351,24 +329,6 @@ async function ladeKiBilder(kategorie) {
       }
       break;
     }
-
-    case 'pokemon-gen2': {
-      for (let i = 0; i < 4; i++) {
-        const pId = Math.floor(Math.random() * 100) + 152;
-        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
-      }
-      break;
-    }
-
-    case 'pokemon-gen3': {
-      for (let i = 0; i < 4; i++) {
-        const pId = Math.floor(Math.random() * 135) + 252;
-        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
-      }
-      break;
-    }
-
-    case 'standard':
     default: {
       for (let i = 0; i < 4; i++) {
         bildURLs.push(`https://picsum.photos/400/300?random=${r + i}`);
@@ -377,12 +337,11 @@ async function ladeKiBilder(kategorie) {
     }
   }
 
-  // Galerie im DOM befüllen
   bildURLs.forEach((url, idx) => {
     const card = document.createElement('div');
     card.className = 'galerie-karte';
     card.innerHTML = `
-      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:contain; border-radius:8px; background:#121212;">
+      <img src="${url}" alt="Bild ${idx + 1}" style="width:100%; height:250px; object-fit:contain; border-radius:8px; background:#121212;">
       <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
         <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
         <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
@@ -392,7 +351,6 @@ async function ladeKiBilder(kategorie) {
   });
 }
 
-// FREIES MALEN LOGIK
 function initFreiesCanvas() {
   freiCanvas = document.getElementById('frei-paint-canvas');
   if (!freiCanvas) return;
@@ -502,7 +460,6 @@ function speichereFreiesGemälde() {
 // ====================================================
 // 5. SCHWEBENDE HINTERGRUND-BLASEN & VORSCHAU-MODAL
 // ====================================================
-
 function erzeugeHintergrundBlasen() {
   const container = document.getElementById('bg-bubbles-container');
   if (!container) return;
@@ -511,10 +468,11 @@ function erzeugeHintergrundBlasen() {
   const alleWerke = [...kiBearbeiteteBilder, ...freieGemaelde];
 
   alleWerke.forEach(werk => {
+    const autorName = werk.autor || werk.name || "Künstler";
+    
     const bubble = document.createElement('div');
     bubble.className = 'bg-bubble';
     
-    // Zufällige Positionierung auf dem Bildschirm
     const top = Math.floor(Math.random() * 80) + 10;
     const left = Math.floor(Math.random() * 80) + 10;
     
@@ -525,7 +483,7 @@ function erzeugeHintergrundBlasen() {
     bubble.innerHTML = `
       <div class="bubble-content">
         <span>${werk.emoji || '🎨'}</span>
-        <span>${werk.autor}</span>
+        <span>${autorName}</span>
       </div>
     `;
 
@@ -541,10 +499,11 @@ function zeigeWerkVorschau(werk) {
 
   if (!modal || !titel || !body) return;
 
-  titel.innerText = `Werk von ${werk.autor}`;
+  const autorName = werk.autor || werk.name || "Künstler";
+  titel.innerText = `Werk von ${autorName}`;
 
   if (werk.bildData) {
-    body.innerHTML = `<img src="${werk.bildData}" alt="Werk von ${werk.autor}" style="max-width:100%; border-radius:8px; border:1px solid ${werk.farbe || '#00f3ff'};">`;
+    body.innerHTML = `<img src="${werk.bildData}" alt="Werk von ${autorName}" style="max-width:100%; border-radius:8px; border:1px solid ${werk.farbe || '#00f3ff'};">`;
   } else if (werk.text) {
     body.innerHTML = `<p style="font-style:italic; font-size:1.1rem; color:#fff;">"${werk.text}"</p>`;
   }
@@ -557,8 +516,12 @@ function schliesseWerkVorschau() {
   modal?.classList.add('hidden');
 }
 
-// Initialer Aufruf beim Laden der Seite
+
+// ====================================================
+// INITIALISIERUNG BEIM SEITENSTART
+// ====================================================
 document.addEventListener('DOMContentLoaded', () => {
+  erstelleGalerie();
   erzeugeHintergrundBlasen();
 });
 // ====================================================
