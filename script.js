@@ -521,6 +521,11 @@ function schliesseWerkVorschau() {
 // INITIALISIERUNG BEIM SEITENSTART
 // ====================================================
 document.addEventListener('DOMContentLoaded', () => {
+  zeigeStartseite();
+  erstelleGalerie();
+  erzeugeHintergrundBlasen();
+});
+document.addEventListener('DOMContentLoaded', () => {
   erstelleGalerie();
   erzeugeHintergrundBlasen();
 });
