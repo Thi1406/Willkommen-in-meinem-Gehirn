@@ -12,6 +12,10 @@
     <script src="script.js" defer></script>
 </head>
 <body>
+
+<!-- Container für die zufälligen Hintergrund-Blasen -->
+<div id="bg-bubbles-container"></div>
+
 <header>
   <h1>Willkommen in meinem Hirn</h1>
   <p>Wähle einen Bereich aus, um mehr zu sehen:</p>
@@ -104,15 +108,15 @@
     <div class="filter-box">
       <label for="ki-kategorie">Kategorie wählen:</label>
       <select id="ki-kategorie-select" onchange="aendereKiKategorie(this.value)">
-  <option value="standard">Standard</option>
-  <option value="superhelden">🦸‍♂️ Superhelden & Comics</option>
-  <option value="yugioh">🐉 Yu-Gi-Oh! Monster</option>
-  <option value="katzen">🐱 Katzen</option>
-  <option value="hunde">🐶 Hunde</option>
-  <option value="pokemon-gen1">🔴 Pokémon Gen 1</option>
-  <option value="pokemon-gen2">🔵 Pokémon Gen 2</option>
-  <option value="pokemon-gen3">🟢 Pokémon Gen 3</option>
-</select>
+        <option value="standard">Standard</option>
+        <option value="superhelden">🦸‍♂️ Superhelden & Comics</option>
+        <option value="yugioh">🐉 Yu-Gi-Oh! Monster</option>
+        <option value="katzen">🐱 Katzen</option>
+        <option value="hunde">🐶 Hunde</option>
+        <option value="pokemon-gen1">🔴 Pokémon Gen 1</option>
+        <option value="pokemon-gen2">🔵 Pokémon Gen 2</option>
+        <option value="pokemon-gen3">🟢 Pokémon Gen 3</option>
+      </select>
     </div>
 
     <!-- Das Raster für die 4 KI-Bilder -->
@@ -148,16 +152,16 @@
         <input type="color" id="frei-paint-farbe" value="#00f3ff">
         
         <div class="werkzeug-leiste">
-  <button class="btn-tool active" onclick="setzeFreiWerkzeug('bleistift', event)">✏️ Bleistift</button>
-  <button class="btn-tool" onclick="setzeFreiWerkzeug('kugelschreiber', event)">🖊️ Kugelschreiber</button>
-  <button class="btn-tool" onclick="setzeFreiWerkzeug('spray', event)">💨 Spraydose</button>
-  <button class="btn-tool" onclick="setzeFreiWerkzeug('radiergummi', event)">🧽 Radiergummi</button>
-  <button class="btn-tool" onclick="allesAusfuellenFreiCanvas()">🪣 Alles Ausfüllen</button>
-  <button class="btn-tool" onclick="löscheFreiCanvas()">🗑️ Leeren</button>
-  <input type="color" id="frei-paint-farbe" value="#00f3ff">
-  <input type="range" id="frei-paint-groesse" min="1" max="30" value="5">
-</div>
-<canvas id="frei-paint-canvas" width="600" height="400" style="border:2px solid #00f3ff; background:#111; cursor:crosshair;"></canvas>
+          <button class="btn-tool active" onclick="setzeFreiWerkzeug('bleistift', event)">✏️ Bleistift</button>
+          <button class="btn-tool" onclick="setzeFreiWerkzeug('kugelschreiber', event)">🖊️ Kugelschreiber</button>
+          <button class="btn-tool" onclick="setzeFreiWerkzeug('spray', event)">💨 Spraydose</button>
+          <button class="btn-tool" onclick="setzeFreiWerkzeug('radiergummi', event)">🧽 Radiergummi</button>
+          <button class="btn-tool" onclick="allesAusfuellenFreiCanvas()">🪣 Alles Ausfüllen</button>
+          <button class="btn-tool" onclick="löscheFreiCanvas()">🗑️ Leeren</button>
+          <input type="color" id="frei-paint-farbe" value="#00f3ff">
+          <input type="range" id="frei-paint-groesse" min="1" max="30" value="5">
+        </div>
+        <canvas id="frei-paint-canvas" width="600" height="400" style="border:2px solid #00f3ff; background:#111; cursor:crosshair;"></canvas>
 
         <label>Strichstärke:</label>
         <input type="range" id="frei-paint-groesse" min="1" max="20" value="3">
@@ -185,6 +189,31 @@
     </div>
   </div>
 </section>
+
+<!-- MODAL FÜR GROSSANSICHT DES GESPEICHERTEN WERKS -->
+<div id="modal-werk-vorschau" class="modal hidden">
+  <div class="modal-inhalt" style="border: 2px solid #aa00ff; max-width: 500px; text-align: center;">
+    
+    <div class="preview-modal-header">
+      <!-- Info Ausrufezeichen mit Hover-Text -->
+      <div class="info-icon-wrapper">
+        <span class="info-icon">!</span>
+        <span class="tooltip-text">Alle Bilder, die weniger als 2 Bewertungen bekommen haben, werden nach einer Woche gelöscht.</span>
+      </div>
+
+      <h3 id="vorschau-titel" style="color: #ffcc00; margin: 0;"></h3>
+
+      <!-- X-Button zum Schließen -->
+      <button onclick="schliesseWerkVorschau()" class="btn-close-x">&times;</button>
+    </div>
+
+    <!-- Inhalt: Bild oder Beschreibung -->
+    <div id="vorschau-body" style="margin-top: 15px;"></div>
+  </div>
+</div>
+
+</body>
+</html>
 
 <!-- UNTERSEITE: GESCHICHTEN -->
 <section id="unterseite-geschichten" class="unterseite hidden">
