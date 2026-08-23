@@ -215,13 +215,15 @@ function zeichnen(e) {
 }
 
 function speicherePaint() {
-  const name = document.getElementById('paint-name').value.trim();
+  const nameInput = document.getElementById('paint-name');
+  const name = nameInput ? nameInput.value.trim() : '';
 
   if (name === '') {
     document.getElementById('paint-fehler')?.classList.remove('hidden');
     return;
   }
 
+  // 1. Badge / Farbklecks bei klassischer Galerie hochzählen
   const karte = document.getElementById(`karte-${aktuellesBildId}`);
   if (karte) {
     const badge = karte.querySelector('.farbklecks');
@@ -233,8 +235,32 @@ function speicherePaint() {
     }
   }
 
+  // 2. Im KI-Bereich als bearbeitetes Werk eintragen
+  kiBearbeiteteBilder.push({
+    bildId: aktuellesBildId,
+    autor: name,
+    zeit: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  });
+  localStorage.setItem('kiBearbeiteteBilder', JSON.stringify(kiBearbeiteteBilder));
+  rendereKiUserListe();
+
   schliessePaintModal();
 }
+
+function rendereKiUserListe() {
+  const liste = document.getElementById('ki-user-liste');
+  if (!liste) return;
+  liste.innerHTML = '';
+
+  kiBearbeiteteBilder.forEach((werk) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-neon-user';
+    btn.innerText = `🎨 ${werk.autor} (${werk.zeit})`;
+    btn.onclick = () => alert(`Werk von ${werk.autor} für Bild #${werk.bildId}`);
+    liste.appendChild(btn);
+  });
+}
+
 
 // ====================================================
 // 4. BILDER-WELT FEATURES (REITER, KATEGORIEN & FREIES MALEN)
@@ -248,8 +274,8 @@ let freieGemaelde = JSON.parse(localStorage.getItem('freieGemaelde')) || [];
 
 // Reiter-Wechsel im Bilderbereich
 function wechsleBilderTab(tabName) {
-  document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+  document.querySelectorAll('.bilder-tabs .btn-tab').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('#unterseite-bilder .tab-content').forEach(tab => tab.classList.add('hidden'));
 
   if (event && event.target) {
     event.target.classList.add('active');
@@ -283,16 +309,66 @@ async function ladeKiBilder(kategorie) {
   const r = Date.now(); // Eindeutiger Zeitstempel für den Würfel
 
   switch (kategorie) {
-    case 'superhelden': {
-      const heldenPool = [
-        1, 30, 34, 38, 60, 66, 68, 69, 70, 106, 
-        107, 149, 156, 165, 201, 204, 213, 222, 225, 233, 
-        234, 263, 265, 303, 309, 310, 332, 346, 370, 388, 
-        400, 405, 414, 490, 527, 575, 620, 644, 659, 687
-      ];
-      
-      const gemischt = heldenPool.sort(() => 0.5 - Math.random()).slice(0, 4);
-      bildURLs = gemischt.map(id => `https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/${id}.jpg`);
+    case 'digimon-gen1': {
+      try {
+        // IDs von bekannten Digimon Gen 1 (Adventure)
+        const digiIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+        const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
+        for (let id of gemischt) {
+          const res = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
+          const data = await res.json();
+          bildURLs.push(data.images[0].href);
+        }
+      } catch (e) {
+        bildURLs = [
+          'https://digi-api.com/images/digimon/w/Agumon.png',
+          'https://digi-api.com/images/digimon/w/Gabumon.png',
+          'https://digi-api.com/images/digimon/w/Patamon.png',
+          'https://digi-api.com/images/digimon/w/Gatomon.png'
+        ];
+      }
+      break;
+    }
+
+    case 'digimon-gen2': {
+      try {
+        // IDs von bekannten Digimon Gen 2 (02)
+        const digiIds = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
+        const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
+        for (let id of gemischt) {
+          const res = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
+          const data = await res.json();
+          bildURLs.push(data.images[0].href);
+        }
+      } catch (e) {
+        bildURLs = [
+          'https://digi-api.com/images/digimon/w/Veemon.png',
+          'https://digi-api.com/images/digimon/w/Hawkmon.png',
+          'https://digi-api.com/images/digimon/w/Armadillomon.png',
+          'https://digi-api.com/images/digimon/w/Wormmon.png'
+        ];
+      }
+      break;
+    }
+
+    case 'digimon-gen3': {
+      try {
+        // IDs von bekannten Digimon Gen 3 (Tamers)
+        const digiIds = [26, 27, 28, 29, 30, 31, 32, 33, 34, 35];
+        const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
+        for (let id of gemischt) {
+          const res = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
+          const data = await res.json();
+          bildURLs.push(data.images[0].href);
+        }
+      } catch (e) {
+        bildURLs = [
+          'https://digi-api.com/images/digimon/w/Guilmon.png',
+          'https://digi-api.com/images/digimon/w/Terriermon.png',
+          'https://digi-api.com/images/digimon/w/Renamon.png',
+          'https://digi-api.com/images/digimon/w/Impmon.png'
+        ];
+      }
       break;
     }
 
@@ -380,6 +456,132 @@ async function ladeKiBilder(kategorie) {
       </div>
     `;
     grid.appendChild(card);
+  });
+}
+
+// Initial beim Laden ausführen
+ladeKiBilder('standard');
+rendereKiUserListe();
+
+
+// ====================================================
+// 5. FREIES MALEN SYSTEM (Canvas `frei-paint-canvas`)
+// ====================================================
+function initFreiesCanvas() {
+  freiCanvas = document.getElementById('frei-paint-canvas');
+  if (!freiCanvas) return;
+
+  freiCtx = freiCanvas.getContext('2d');
+
+  // Canvas-Interaktionen
+  freiCanvas.onmousedown = (e) => {
+    freiIsDrawing = true;
+    zeugeFreiMalen(e);
+  };
+  freiCanvas.onmousemove = zeugeFreiMalen;
+  freiCanvas.onmouseup = () => {
+    freiIsDrawing = false;
+    if (freiCtx) freiCtx.beginPath();
+  };
+
+  rendereFreiUserListe();
+}
+
+function setzeFreiWerkzeug(werkzeug, event) {
+  aktuellesFreiWerkzeug = werkzeug;
+  const toolBtns = document.querySelectorAll('.freies-malen-container .btn-tool');
+  toolBtns.forEach(btn => btn.classList.remove('active'));
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+}
+
+function zeugeFreiMalen(e) {
+  if (!freiIsDrawing || !freiCtx) return;
+
+  const rect = freiCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  const farbe = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
+  const groesse = document.getElementById('frei-paint-groesse')?.value || 5;
+
+  freiCtx.strokeStyle = farbe;
+  freiCtx.fillStyle = farbe;
+  freiCtx.lineWidth = groesse;
+
+  if (aktuellesFreiWerkzeug === 'radiergummi') {
+    freiCtx.clearRect(x - groesse / 2, y - groesse / 2, groesse * 2, groesse * 2);
+    return;
+  }
+
+  if (aktuellesFreiWerkzeug === 'bleistift' || aktuellesFreiWerkzeug === 'kugelschreiber') {
+    freiCtx.lineCap = 'round';
+    freiCtx.lineTo(x, y);
+    freiCtx.stroke();
+    freiCtx.beginPath();
+    freiCtx.moveTo(x, y);
+  } else if (aktuellesFreiWerkzeug === 'spray') {
+    for (let i = 0; i < 15; i++) {
+      const offsetX = (Math.random() - 0.5) * (groesse * 3);
+      const offsetY = (Math.random() - 0.5) * (groesse * 3);
+      freiCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
+    }
+  }
+}
+
+function allesAusfuellenFreiCanvas() {
+  if (!freiCtx || !freiCanvas) return;
+  const farbe = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
+  freiCtx.fillStyle = farbe;
+  freiCtx.fillRect(0, 0, freiCanvas.width, freiCanvas.height);
+}
+
+function löscheFreiCanvas() {
+  if (!freiCtx || !freiCanvas) return;
+  freiCtx.clearRect(0, 0, freiCanvas.width, freiCanvas.height);
+}
+
+function speichereFreiesGemälde() {
+  const nameInput = document.getElementById('frei-paint-name');
+  const name = nameInput ? nameInput.value.trim() : '';
+
+  if (name === '') {
+    document.getElementById('frei-paint-fehler')?.classList.remove('hidden');
+    return;
+  }
+
+  document.getElementById('frei-paint-fehler')?.classList.add('hidden');
+
+  const gemaeldeData = {
+    autor: name,
+    bildData: freiCanvas.toDataURL(),
+    zeit: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  };
+
+  freieGemaelde.push(gemaeldeData);
+  localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
+
+  nameInput.value = '';
+  löscheFreiCanvas();
+  rendereFreiUserListe();
+  alert('Dein Kunstwerk wurde erfolgreich gespeichert!');
+}
+
+function rendereFreiUserListe() {
+  const liste = document.getElementById('frei-user-liste');
+  if (!liste) return;
+  liste.innerHTML = '';
+
+  freieGemaelde.forEach((werk) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-neon-user';
+    btn.innerText = `🎨 ${werk.autor} (${werk.zeit})`;
+    btn.onclick = () => {
+      const win = window.open('');
+      win.document.write(`<img src="${werk.bildData}" alt="Werk von ${werk.autor}"/>`);
+    };
+    liste.appendChild(btn);
   });
 }
 
