@@ -65,7 +65,6 @@ function erstelleGalerie() {
   const galerieGrid = document.getElementById("galerie-grid");
   if (!galerieGrid) return;
   
-  // Performance-Optimierung: Sammeln im String statt mehrmals innerHTML +=
   let gesamtHtml = "";
 
   meineBilder.forEach((bildUrl, index) => {
@@ -593,7 +592,6 @@ function rendereFreiUserListe() {
     liste.appendChild(btn);
   });
 }
-
 // ====================================================
 // 5. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
 // =======================================
@@ -805,6 +803,32 @@ function ladeGeschichtenUebersicht() {
     `;
     container.appendChild(karte);
   });
+}
+
+function oeffneGeschichteModal(key) {
+  if (typeof geschichtenDaten === 'undefined' || !geschichtenDaten[key]) return;
+  
+  const geschichte = geschichtenDaten[key];
+  const modal = document.getElementById('modal-geschichte');
+  const titelElem = document.getElementById('geschichte-titel');
+  const inhaltElem = document.getElementById('geschichte-inhalt');
+
+  if (titelElem) titelElem.innerText = geschichte.titel;
+  if (inhaltElem) inhaltElem.innerHTML = geschichte.inhalt;
+
+  // Klick-Zähler erhöhen
+  let klicks = Number(localStorage.getItem(`klicks-${key}`)) || 0;
+  klicks++;
+  localStorage.setItem(`klicks-${key}`, klicks);
+
+  const klickElem = document.getElementById(`klicks-${key}`);
+  if (klickElem) klickElem.innerText = klicks;
+
+  modal?.classList.remove('hidden');
+}
+
+function schliesseGeschichteModal() {
+  document.getElementById('modal-geschichte')?.classList.add('hidden');
 }
 
 
