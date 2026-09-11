@@ -11,7 +11,7 @@ function ladeLokalDaten(key, standardWert) {
   }
 }
 
-// Global definierte Datenstrukturen aus LocalStorage
+// Global definierte Datenstrukturen aus LocalStorage (NUR EINMAL DEKLARIERT)
 let kiBearbeiteteBilder = ladeLokalDaten('kiBearbeiteteBilder', []);
 let freieGemaelde = ladeLokalDaten('freieGemaelde', []);
 let highscores = ladeLokalDaten('clipper_highscores', []);
@@ -59,6 +59,7 @@ function zeigeStartseite() {
 
 // Funktion für die Unter-Reiter in der Bilderwelt (KI-Spaß, Freies Malen, KI-Studio)
 function wechsleBilderTab(tabName, evt) {
+  // Alle Tabs deaktivieren
   document.querySelectorAll('.bilder-tabs .btn-tab, .tab-button').forEach(btn => btn.classList.remove('active'));
   document.querySelectorAll('#unterseite-bilder .tab-content, .tab-content').forEach(tab => {
     if (tab.id.startsWith('tab-')) {
@@ -66,15 +67,19 @@ function wechsleBilderTab(tabName, evt) {
     }
   });
 
-  if (evt && evt.target) {
-    evt.target.classList.add('active');
-  }
+  // Aktiven Button hervorheben (currentTarget stellt sicher, dass der Button getroffen wird)
+  if (evt) {
+    const btn = evt.currentTarget || evt.target;
+    btn.classList.add('active');
+  }  
   
+  // Ziel-Tab einblenden
   const zielTab = document.getElementById(`tab-${tabName}`);
   if (zielTab) {
     zielTab.classList.remove('hidden');
   }
 
+  // Canvas-Initialisierung je nach Tab
   if (tabName === 'freies-malen') {
     setTimeout(() => { if (typeof initFreiesCanvas === 'function') initFreiesCanvas(); }, 50);
   } else if (tabName === 'ki-studio') {
@@ -202,8 +207,9 @@ function initCanvas() {
 function setzeWerkzeug(werkzeug, evt) {
   aktuellesWerkzeug = werkzeug;
   document.querySelectorAll('.btn-tool').forEach(btn => btn.classList.remove('active'));
-  if (evt && evt.target) {
-    evt.target.classList.add('active');
+  if (evt) {
+    const btn = evt.currentTarget || evt.target;
+    btn.classList.add('active');
   }
 }
 
@@ -292,9 +298,11 @@ function speicherePaint() {
   // Bild in LocalStorage speichern
   kiBearbeiteteBilder.push({
     id: Date.now(),
-    kuenstler: name,
+    bildId: aktuellesBildId,
+    autor: name,
     bildData: kombiniertesBildDataUrl,
-    datum: new Date().toLocaleDateString('de-DE')
+    datum: new Date().toLocaleDateString('de-DE'),
+    zeit: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   });
   localStorage.setItem('kiBearbeiteteBilder', JSON.stringify(kiBearbeiteteBilder));
 
@@ -310,20 +318,7 @@ function speicherePaint() {
     }
   }
 
-  schliessePaintModal();
-}
-  // Erstelle Bilddaten zur Vorschau
-  const meinedata = canvas ? canvas.toDataURL() : '';
-
-  kiBearbeiteteBilder.push({
-    bildId: aktuellesBildId,
-    autor: name,
-    bildData: meinedata,
-    zeit: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  });
-  localStorage.setItem('kiBearbeiteteBilder', JSON.stringify(kiBearbeiteteBilder));
   rendereKiUserListe();
-
   schliessePaintModal();
 }
 
@@ -335,49 +330,47 @@ function rendereKiUserListe() {
   kiBearbeiteteBilder.forEach((werk) => {
     const btn = document.createElement('button');
     btn.className = 'btn-neon-user';
-    btn.innerText = `🎨 ${werk.autor} (${werk.zeit})`;
-    // Korrektur: Das gespeicherte Werk kann jetzt in einem extra Fenster geöffnet/angeschaut werden
+    btn.innerText = `🎨 ${werk.autor} (${werk.zeit || ''})`;
     btn.onclick = () => {
       if (werk.bildData) {
         const win = window.open('');
         if (win) {
-          win.document.write(`<h3>Werk von ${werk.autor} (Bild #${werk.bildId})</h3><img src="${werk.bildData}" alt="Werk von ${werk.autor}" style="max-width:100%; border-radius:8px;"/>`);
+          win.document.write(`<h3>Werk von ${werk.autor} (Bild #${werk.bildId || ''})</h3><img src="${werk.bildData}" alt="Werk von ${werk.autor}" style="max-width:100%; border-radius:8px;"/>`);
         }
       } else {
-        alert(`Werk von ${werk.autor} für Bild #${werk.bildId}`);
+        alert(`Werk von ${werk.autor} für Bild #${werk.bildId || ''}`);
       }
     };
     liste.appendChild(btn);
   });
 }
 
-// ====================================================
-// GLOBAL DATED VARS
-// ====================================================
-let freieGemaelde = JSON.parse(localStorage.getItem('freieGemaelde')) || [];
+function rendereFreiUserListe() {
+  const liste = document.getElementById('frei-user-liste');
+  if (!liste) return;
+  liste.innerHTML = '';
+
+  freieGemaelde.forEach((werk) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-neon-user';
+    btn.innerText = `🖼️ ${werk.autor} (${werk.zeit || ''})`;
+    btn.onclick = () => {
+      if (werk.bildData) {
+        const win = window.open('');
+        if (win) {
+          win.document.write(`<h3>Freies Gemälde von ${werk.autor}</h3><img src="${werk.bildData}" alt="Gemälde von ${werk.autor}" style="max-width:100%; border-radius:8px;"/>`);
+        }
+      }
+    };
+    liste.appendChild(btn);
+  });
+}
+
 
 // ====================================================
 // 5. BILDER-WELT FEATURES (KI-SPAß)
 // ====================================================
 let aktuelleKiKategorie = 'standard';
-
-function wechsleBilderTab(tabName, evt) {
-  document.querySelectorAll('.bilder-tabs .btn-tab').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('#unterseite-bilder .tab-content').forEach(tab => tab.classList.add('hidden'));
-
-  if (evt && evt.target) {
-    evt.target.classList.add('active');
-  }
-  
-  const zielTab = document.getElementById(`tab-${tabName}`);
-  if (zielTab) zielTab.classList.remove('hidden');
-
-  if (tabName === 'freies-malen') {
-    setTimeout(initFreiesCanvas, 50);
-  } else if (tabName === 'ki-studio') {
-    setTimeout(initStudioCanvas, 50);
-  }
-}
 
 function aendereKiKategorie(kategorie) {
   aktuelleKiKategorie = kategorie;
@@ -555,55 +548,49 @@ function speichereKiGemälde(hintergrundUrl) {
     return;
   }
 
-  const canvas = document.getElementById('ki-paint-canvas') || document.getElementById('paint-canvas');
-  if (!canvas) return;
+  const canvasEl = document.getElementById('ki-paint-canvas') || document.getElementById('paint-canvas');
+  if (!canvasEl) return;
 
   const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = canvas.width || 800;
-  tempCanvas.height = canvas.height || 500;
+  tempCanvas.width = canvasEl.width || 800;
+  tempCanvas.height = canvasEl.height || 500;
   const tempCtx = tempCanvas.getContext('2d');
 
-  const bgImg = new Image();
-  bgImg.crossOrigin = "anonymous";
-  bgImg.onload = function() {
-    // 1. Hintergrund zeichnen
-    tempCtx.drawImage(bgImg, 0, 0, tempCanvas.width, tempCanvas.height);
-    // 2. Gemalte Striche drüberlegen
-    tempCtx.drawImage(canvas, 0, 0);
+  const speicherFunktion = (bgData) => {
+    if (bgData) {
+      tempCtx.drawImage(bgData, 0, 0, tempCanvas.width, tempCanvas.height);
+    } else {
+      tempCtx.fillStyle = '#ffffff';
+      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    }
+    tempCtx.drawImage(canvasEl, 0, 0);
 
-    const kombiniertesBild = tempCanvas.toDataURL('image/png');
-
-    const gemaeldeData = {
-      autor: name,
-      bildData: kombiniertesBild,
-      zeit: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    freieGemaelde.push(gemaeldeData);
-    localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
-
-    if (nameInput) nameInput.value = '';
-    alert('Dein fertig bearbeitetes Bild wurde mit Hintergrund gespeichert!');
-    rendereFreiUserListe();
-  };
-
-  if (hintergrundUrl) {
-    bgImg.src = hintergrundUrl;
-  } else {
-    // Falls kein Hintergrund-URL vorhanden ist, weiß füllen
-    tempCtx.fillStyle = '#ffffff';
-    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-    tempCtx.drawImage(canvas, 0, 0);
-    
     const gemaeldeData = {
       autor: name,
       bildData: tempCanvas.toDataURL('image/png'),
       zeit: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
+
     freieGemaelde.push(gemaeldeData);
     localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
+
     if (nameInput) nameInput.value = '';
+    alert('Dein fertig bearbeitetes Bild wurde erfolgreich gespeichert!');
     rendereFreiUserListe();
+  };
+
+  if (hintergrundUrl) {
+    const bgImg = new Image();
+    bgImg.crossOrigin = "anonymous";
+    bgImg.onload = function() {
+      speicherFunktion(bgImg);
+    };
+    bgImg.onerror = function() {
+      speicherFunktion(null);
+    };
+    bgImg.src = hintergrundUrl;
+  } else {
+    speicherFunktion(null);
   }
 }
 
