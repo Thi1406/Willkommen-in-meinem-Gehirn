@@ -1,5 +1,24 @@
 // ====================================================
-// 1. SEITEN-NAVIGATION (Startseite & Unterseiten)
+// 1. HELFER-FUNKTIONEN (Sicheres LocalStorage)
+// ====================================================
+function ladeLokalDaten(key, standardWert) {
+  try {
+    const daten = localStorage.getItem(key);
+    return daten ? JSON.parse(daten) : standardWert;
+  } catch (e) {
+    console.error(`Fehler beim Laden von ${key} aus LocalStorage:`, e);
+    return standardWert;
+  }
+}
+
+// Global definierte Datenstrukturen aus LocalStorage
+let kiBearbeiteteBilder = ladeLokalDaten('kiBearbeiteteBilder', []);
+let freieGemaelde = ladeLokalDaten('freieGemaelde', []);
+let highscores = ladeLokalDaten('clipper_highscores', []);
+
+
+// ====================================================
+// 2. SEITEN-NAVIGATION
 // ====================================================
 function zeigeBereich(bereichId) {
   document.querySelector('header')?.classList.add('hidden');
@@ -28,7 +47,7 @@ function zeigeStartseite() {
 
 
 // ====================================================
-// 2. BILDER-LINKS & GALERIE
+// 3. BILDER-LINKS & GALERIE
 // ====================================================
 const meineBilder = [
   "https://picsum.photos/300/200?random=1",
@@ -46,12 +65,13 @@ function erstelleGalerie() {
   const galerieGrid = document.getElementById("galerie-grid");
   if (!galerieGrid) return;
   
-  galerieGrid.innerHTML = "";
+  // Performance-Optimierung: Sammeln im String statt mehrmals innerHTML +=
+  let gesamtHtml = "";
 
   meineBilder.forEach((bildUrl, index) => {
     const id = index + 1;
 
-    const karteHtml = `
+    gesamtHtml += `
       <div class="bild-karte" id="karte-${id}">
         <div class="bild-container">
           <img src="${bildUrl}" alt="Bild ${id}">
@@ -73,17 +93,14 @@ function erstelleGalerie() {
         </div>
       </div>
     `;
-
-    galerieGrid.innerHTML += karteHtml;
   });
-}
 
-// Initialisieren der Galerie
-erstelleGalerie();
+  galerieGrid.innerHTML = gesamtHtml;
+}
 
 
 // ====================================================
-// 3. BESCHREIBEN & PAINT MODALS
+// 4. BESCHREIBEN & PAINT MODALS
 // ====================================================
 function oeffneBeschreibungModal(bildId) {
   aktuellesBildId = bildId;
@@ -93,21 +110,25 @@ function oeffneBeschreibungModal(bildId) {
 
 function schliesseBeschreibungModal() {
   document.getElementById("modal-beschreibung")?.classList.add("hidden");
-  document.getElementById("beschreibung-text").value = "";
-  document.getElementById("beschreibung-name").value = "";
+  const txt = document.getElementById("beschreibung-text");
+  const name = document.getElementById("beschreibung-name");
+  if (txt) txt.value = "";
+  if (name) name.value = "";
 }
 
 function speichereBeschreibung() {
-  const text = document.getElementById("beschreibung-text").value;
-  const name = document.getElementById("beschreibung-name").value.trim();
+  const text = document.getElementById("beschreibung-text")?.value || "";
+  const name = document.getElementById("beschreibung-name")?.value.trim() || "";
 
   if (name === "") {
     document.getElementById("modal-fehler")?.classList.remove("hidden");
     return;
   }
 
-  document.getElementById(`wolke-text-${aktuellesBildId}`).innerText = `"${text}"`;
-  document.getElementById(`wolke-autor-${aktuellesBildId}`).innerText = `— ${name}`;
+  const wolkeText = document.getElementById(`wolke-text-${aktuellesBildId}`);
+  const wolkeAutor = document.getElementById(`wolke-autor-${aktuellesBildId}`);
+  if (wolkeText) wolkeText.innerText = `"${text}"`;
+  if (wolkeAutor) wolkeAutor.innerText = `— ${name}`;
 
   const karte = document.getElementById(`karte-${aktuellesBildId}`);
   if (karte) {
@@ -116,7 +137,7 @@ function speichereBeschreibung() {
     
     badge?.classList.remove("hidden");
     if (anzahlSpan) {
-      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0") + 1;
+      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0", 10) + 1;
     }
   }
 
@@ -139,13 +160,14 @@ function initCanvas() {
   canvas.onmousedown = startZeichnen;
   canvas.onmousemove = zeichnen;
   canvas.onmouseup = stoppZeichnen;
+  canvas.onmouseleave = stoppZeichnen;
 }
 
-function setzeWerkzeug(werkzeug, event) {
+function setzeWerkzeug(werkzeug, evt) {
   aktuellesWerkzeug = werkzeug;
   document.querySelectorAll('.btn-tool').forEach(btn => btn.classList.remove('active'));
-  if (event && event.target) {
-    event.target.classList.add('active');
+  if (evt && evt.target) {
+    evt.target.classList.add('active');
   }
 }
 
@@ -172,7 +194,10 @@ function schliessePaintModal() {
 
 function startZeichnen(e) {
   isDrawing = true;
-  zeichnen(e);
+  if (!ctx) return;
+  const rect = canvas.getBoundingClientRect();
+  ctx.beginPath();
+  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
 }
 
 function stoppZeichnen() {
@@ -191,20 +216,11 @@ function zeichnen(e) {
   ctx.strokeStyle = farbe;
   ctx.fillStyle = farbe;
 
-  if (aktuellesWerkzeug === 'bleistift') {
-    ctx.lineWidth = 2;
+  if (aktuellesWerkzeug === 'bleistift' || aktuellesWerkzeug === 'kugelschreiber') {
+    ctx.lineWidth = aktuellesWerkzeug === 'bleistift' ? 2 : 4;
     ctx.lineCap = 'round';
     ctx.lineTo(x, y);
     ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-  } else if (aktuellesWerkzeug === 'kugelschreiber') {
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
   } else if (aktuellesWerkzeug === 'spray') {
     for (let i = 0; i < 20; i++) {
       const offsetX = (Math.random() - 0.5) * 15;
@@ -223,7 +239,6 @@ function speicherePaint() {
     return;
   }
 
-  // 1. Badge / Farbklecks bei klassischer Galerie hochzählen
   const karte = document.getElementById(`karte-${aktuellesBildId}`);
   if (karte) {
     const badge = karte.querySelector('.farbklecks');
@@ -231,11 +246,10 @@ function speicherePaint() {
 
     badge?.classList.remove('hidden');
     if (anzahlSpan) {
-      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0") + 1;
+      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0", 10) + 1;
     }
   }
 
-  // 2. Im KI-Bereich als bearbeitetes Werk eintragen
   kiBearbeiteteBilder.push({
     bildId: aktuellesBildId,
     autor: name,
@@ -263,22 +277,16 @@ function rendereKiUserListe() {
 
 
 // ====================================================
-// 4. BILDER-WELT FEATURES (REITER, KATEGORIEN & FREIES MALEN)
+// 5. BILDER-WELT FEATURES
 // ====================================================
-
 let aktuelleKiKategorie = 'standard';
-let aktuellesFreiWerkzeug = 'bleistift';
-let freiCanvas, freiCtx, freiIsDrawing = false;
-let kiBearbeiteteBilder = JSON.parse(localStorage.getItem('kiBearbeiteteBilder')) || [];
-let freieGemaelde = JSON.parse(localStorage.getItem('freieGemaelde')) || [];
 
-// Reiter-Wechsel im Bilderbereich
-function wechsleBilderTab(tabName) {
+function wechsleBilderTab(tabName, evt) {
   document.querySelectorAll('.bilder-tabs .btn-tab').forEach(btn => btn.classList.remove('active'));
   document.querySelectorAll('#unterseite-bilder .tab-content').forEach(tab => tab.classList.add('hidden'));
 
-  if (event && event.target) {
-    event.target.classList.add('active');
+  if (evt && evt.target) {
+    evt.target.classList.add('active');
   }
   
   const zielTab = document.getElementById(`tab-${tabName}`);
@@ -289,7 +297,6 @@ function wechsleBilderTab(tabName) {
   }
 }
 
-// Dropdown & Würfel
 function aendereKiKategorie(kategorie) {
   aktuelleKiKategorie = kategorie;
   ladeKiBilder(kategorie);
@@ -299,19 +306,17 @@ function würfeleKiBilder() {
   ladeKiBilder(aktuelleKiKategorie);
 }
 
-// Sichere, API-basierte Bild-Generator Funktion
 async function ladeKiBilder(kategorie) {
   const grid = document.getElementById('ki-galerie-grid');
   if (!grid) return;
-  grid.innerHTML = ''; // Galerie leeren
+  grid.innerHTML = ''; 
 
   let bildURLs = [];
-  const r = Date.now(); // Eindeutiger Zeitstempel für den Würfel
+  const r = Date.now();
 
   switch (kategorie) {
     case 'digimon-gen1': {
       try {
-        // IDs von bekannten Digimon Gen 1 (Adventure)
         const digiIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
         const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
         for (let id of gemischt) {
@@ -332,7 +337,6 @@ async function ladeKiBilder(kategorie) {
 
     case 'digimon-gen2': {
       try {
-        // IDs von bekannten Digimon Gen 2 (02)
         const digiIds = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
         const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
         for (let id of gemischt) {
@@ -353,7 +357,6 @@ async function ladeKiBilder(kategorie) {
 
     case 'digimon-gen3': {
       try {
-        // IDs von bekannten Digimon Gen 3 (Tamers)
         const digiIds = [26, 27, 28, 29, 30, 31, 32, 33, 34, 35];
         const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
         for (let id of gemischt) {
@@ -444,7 +447,6 @@ async function ladeKiBilder(kategorie) {
     }
   }
 
-  // Galerie im DOM befüllen
   bildURLs.forEach((url, idx) => {
     const card = document.createElement('div');
     card.className = 'galerie-karte';
@@ -459,27 +461,34 @@ async function ladeKiBilder(kategorie) {
   });
 }
 
-// Initial beim Laden ausführen
-ladeKiBilder('standard');
-rendereKiUserListe();
-
 
 // ====================================================
-// 5. FREIES MALEN SYSTEM (Canvas `frei-paint-canvas`)
+// 6. FREIES MALEN SYSTEM
 // ====================================================
+let aktuellesFreiWerkzeug = 'bleistift';
+let freiCanvas, freiCtx, freiIsDrawing = false;
+
 function initFreiesCanvas() {
   freiCanvas = document.getElementById('frei-paint-canvas');
   if (!freiCanvas) return;
 
   freiCtx = freiCanvas.getContext('2d');
 
-  // Canvas-Interaktionen
   freiCanvas.onmousedown = (e) => {
     freiIsDrawing = true;
-    zeugeFreiMalen(e);
+    const rect = freiCanvas.getBoundingClientRect();
+    freiCtx.beginPath();
+    freiCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
   };
+  
   freiCanvas.onmousemove = zeugeFreiMalen;
+  
   freiCanvas.onmouseup = () => {
+    freiIsDrawing = false;
+    if (freiCtx) freiCtx.beginPath();
+  };
+
+  freiCanvas.onmouseleave = () => {
     freiIsDrawing = false;
     if (freiCtx) freiCtx.beginPath();
   };
@@ -487,12 +496,12 @@ function initFreiesCanvas() {
   rendereFreiUserListe();
 }
 
-function setzeFreiWerkzeug(werkzeug, event) {
+function setzeFreiWerkzeug(werkzeug, evt) {
   aktuellesFreiWerkzeug = werkzeug;
   const toolBtns = document.querySelectorAll('.freies-malen-container .btn-tool');
   toolBtns.forEach(btn => btn.classList.remove('active'));
-  if (event && event.target) {
-    event.target.classList.add('active');
+  if (evt && evt.target) {
+    evt.target.classList.add('active');
   }
 }
 
@@ -519,8 +528,6 @@ function zeugeFreiMalen(e) {
     freiCtx.lineCap = 'round';
     freiCtx.lineTo(x, y);
     freiCtx.stroke();
-    freiCtx.beginPath();
-    freiCtx.moveTo(x, y);
   } else if (aktuellesFreiWerkzeug === 'spray') {
     for (let i = 0; i < 15; i++) {
       const offsetX = (Math.random() - 0.5) * (groesse * 3);
@@ -579,7 +586,9 @@ function rendereFreiUserListe() {
     btn.innerText = `🎨 ${werk.autor} (${werk.zeit})`;
     btn.onclick = () => {
       const win = window.open('');
-      win.document.write(`<img src="${werk.bildData}" alt="Werk von ${werk.autor}"/>`);
+      if (win) {
+        win.document.write(`<img src="${werk.bildData}" alt="Werk von ${werk.autor}"/>`);
+      }
     };
     liste.appendChild(btn);
   });
@@ -798,8 +807,9 @@ function ladeGeschichtenUebersicht() {
   });
 }
 
+
 // ====================================================
-// 6. CLIPPER CATCHER GAME LOGIK
+// 8. CLIPPER CATCHER GAME LOGIK
 // ====================================================
 let score = 0;
 let herzen = 3;
@@ -810,48 +820,7 @@ let aktuellesTempo = 2000;
 let itemsGefangen = 0;
 let schwierigkeit = 'leicht';
 let targetScore = 420;
-let highscores = JSON.parse(localStorage.getItem('clipper_highscores')) || [];
 
-// ----------------------------------------------------
-// FEUERZEUG-STEUERUNG
-// ----------------------------------------------------
-document.addEventListener('DOMContentLoaded', () => {
-  const spielfeld = document.getElementById('clipper-spielfeld');
-  const customCursor = document.getElementById('custom-clipper-cursor');
-  const clipperImg = document.getElementById('clipper-img');
-
-  if (spielfeld && customCursor) {
-    spielfeld.addEventListener('mousemove', (e) => {
-      const rect = spielfeld.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      customCursor.style.left = x + 'px';
-      customCursor.style.top = y + 'px';
-      customCursor.style.opacity = '1';
-    });
-
-    spielfeld.addEventListener('mouseenter', () => {
-      customCursor.style.opacity = '1';
-    });
-
-    spielfeld.addEventListener('mouseleave', () => {
-      customCursor.style.opacity = '0';
-    });
-
-    spielfeld.addEventListener('mousedown', () => {
-      if (clipperImg) clipperImg.src = 'Feuer.png';
-    });
-
-    spielfeld.addEventListener('mouseup', () => {
-      if (clipperImg) clipperImg.src = 'Clipper.png';
-    });
-  }
-});
-
-// ----------------------------------------------------
-// SPIEL-STEUERUNG
-// ----------------------------------------------------
 function oeffneClipperSpiel() {
   document.getElementById('modal-clipper-game')?.classList.remove('hidden');
   document.getElementById('clipper-difficulty-select')?.classList.remove('hidden');
@@ -932,7 +901,9 @@ function spawneEinzelnesItem(container) {
 
 function spawneItemLoop() {
   const spielfeld = document.getElementById('clipper-spielfeld');
-  if (!spielfeld || document.getElementById('modal-clipper-game').classList.contains('hidden')) return;
+  const modal = document.getElementById('modal-clipper-game');
+  
+  if (!spielfeld || (modal && modal.classList.contains('hidden'))) return;
 
   const alteItems = spielfeld.querySelectorAll('.game-item');
   alteItems.forEach(el => el.remove());
@@ -1040,9 +1011,10 @@ function aktiviere420EasterEgg() {
   }, 10000);
 }
 
-// ----------------------------------------------------
-// HIGHSCORE SPEICHERN & KATEGORIEN-FILTER
-// ----------------------------------------------------
+
+// ====================================================
+// 9. HIGHSCORE SPEICHERN & FILTER
+// ====================================================
 let aktuellerFilter = 'leicht';
 
 function speichereHighscore() {
@@ -1115,3 +1087,47 @@ function schliesseGameOverModal() {
 function schliesseHighscoreModal() {
   document.getElementById('modal-highscore')?.classList.add('hidden');
 }
+
+
+// ====================================================
+// 10. INITIALISIERUNG BEIM LADEN DER SEITE
+// ====================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Galerie & KI-Bilder initialisieren
+  erstelleGalerie();
+  ladeKiBilder('standard');
+  rendereKiUserListe();
+
+  // Custom Cursor für das Clipper-Spiel
+  const spielfeld = document.getElementById('clipper-spielfeld');
+  const customCursor = document.getElementById('custom-clipper-cursor');
+  const clipperImg = document.getElementById('clipper-img');
+
+  if (spielfeld && customCursor) {
+    spielfeld.addEventListener('mousemove', (e) => {
+      const rect = spielfeld.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      customCursor.style.left = x + 'px';
+      customCursor.style.top = y + 'px';
+      customCursor.style.opacity = '1';
+    });
+
+    spielfeld.addEventListener('mouseenter', () => {
+      customCursor.style.opacity = '1';
+    });
+
+    spielfeld.addEventListener('mouseleave', () => {
+      customCursor.style.opacity = '0';
+    });
+
+    spielfeld.addEventListener('mousedown', () => {
+      if (clipperImg) clipperImg.src = 'Feuer.png';
+    });
+
+    spielfeld.addEventListener('mouseup', () => {
+      if (clipperImg) clipperImg.src = 'Clipper.png';
+    });
+  }
+});
