@@ -18,22 +18,34 @@ let highscores = ladeLokalDaten('clipper_highscores', []);
 
 
 // ====================================================
-// 2. SEITEN-NAVIGATION
+// 2. SEITEN-NAVIGATION & UNTER-REITER
 // ====================================================
 function zeigeBereich(bereichId) {
+  // Header und Haupt-Grid ausblenden
   document.querySelector('header')?.classList.add('hidden');
   document.querySelector('.navigation-grid')?.classList.add('hidden');
   
+  // Alle Unterseiten verbergen
   const alleUnterseiten = document.querySelectorAll('.unterseite');
   alleUnterseiten.forEach(seite => seite.classList.add('hidden'));
   
+  // Gewählte Unterseite anzeigen
   const zielSeite = document.getElementById('unterseite-' + bereichId);
   if (zielSeite) {
     zielSeite.classList.remove('hidden');
   }
 
+  // Spezial-Initialisierungen je nach Seite
   if (bereichId === 'geschichten') {
-    ladeGeschichtenUebersicht();
+    if (typeof ladeGeschichtenUebersicht === 'function') {
+      ladeGeschichtenUebersicht();
+    }
+  } else if (bereichId === 'bilder') {
+    // Malflächen beim Öffnen der Bilderwelt neu berechnen/initialisieren
+    setTimeout(() => {
+      if (typeof initFreiesCanvas === 'function') initFreiesCanvas();
+      if (typeof initStudioCanvas === 'function') initStudioCanvas();
+    }, 100);
   }
 }
 
@@ -43,6 +55,31 @@ function zeigeStartseite() {
   
   document.querySelector('header')?.classList.remove('hidden');
   document.querySelector('.navigation-grid')?.classList.remove('hidden');
+}
+
+// Funktion für die Unter-Reiter in der Bilderwelt (KI-Spaß, Freies Malen, KI-Studio)
+function wechsleBilderTab(tabName, evt) {
+  document.querySelectorAll('.bilder-tabs .btn-tab, .tab-button').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('#unterseite-bilder .tab-content, .tab-content').forEach(tab => {
+    if (tab.id.startsWith('tab-')) {
+      tab.classList.add('hidden');
+    }
+  });
+
+  if (evt && evt.target) {
+    evt.target.classList.add('active');
+  }
+  
+  const zielTab = document.getElementById(`tab-${tabName}`);
+  if (zielTab) {
+    zielTab.classList.remove('hidden');
+  }
+
+  if (tabName === 'freies-malen') {
+    setTimeout(() => { if (typeof initFreiesCanvas === 'function') initFreiesCanvas(); }, 50);
+  } else if (tabName === 'ki-studio') {
+    setTimeout(() => { if (typeof initStudioCanvas === 'function') initStudioCanvas(); }, 50);
+  }
 }
 
 
@@ -153,7 +190,6 @@ function initCanvas() {
   if (!canvas) return;
   
   ctx = canvas.getContext('2d');
-  // Korrektur: Sicherstellen, dass das Canvas eine nutzbare Mindestgröße erhält
   canvas.width = canvas.offsetWidth || 600;
   canvas.height = canvas.offsetHeight || 400;
 
@@ -239,6 +275,30 @@ function speicherePaint() {
     return;
   }
 
+  // Kombiniere Originalbild und Zeichnung auf ein Hilfs-Canvas
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = canvas.width;
+  tempCanvas.height = canvas.height;
+  const tempCtx = tempCanvas.getContext('2d');
+
+  const img = document.getElementById('paint-hintergrund-bild');
+  if (img && img.complete) {
+    tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+  }
+  tempCtx.drawImage(canvas, 0, 0);
+
+  const kombiniertesBildDataUrl = tempCanvas.toDataURL('image/png');
+
+  // Bild in LocalStorage speichern
+  kiBearbeiteteBilder.push({
+    id: Date.now(),
+    kuenstler: name,
+    bildData: kombiniertesBildDataUrl,
+    datum: new Date().toLocaleDateString('de-DE')
+  });
+  localStorage.setItem('kiBearbeiteteBilder', JSON.stringify(kiBearbeiteteBilder));
+
+  // Counter auf der Karte erhöhen
   const karte = document.getElementById(`karte-${aktuellesBildId}`);
   if (karte) {
     const badge = karte.querySelector('.farbklecks');
@@ -250,6 +310,8 @@ function speicherePaint() {
     }
   }
 
+  schliessePaintModal();
+}
   // Erstelle Bilddaten zur Vorschau
   const meinedata = canvas ? canvas.toDataURL() : '';
 
