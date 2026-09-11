@@ -184,34 +184,39 @@
     </div>
   </div>
 
-  <!-- REITER 4: NEU -> KI-STUDIO & ANALYSE -->
+  <!-- REITER 4: KI-STUDIO & ANALYSE -->
   <div id="tab-ki-studio" class="tab-content hidden">
     <h3>KI-Studio & Bild-Analyse</h3>
-    <p>Zeichne etwas auf die Leinwand oder lade ein eigenes Bild hoch, um es von der KI analysieren zu lassen!</p>
+    <p>Zeichne etwas auf die Leinwand oder lade ein eigenes Bild hoch, um es zu bearbeiten oder analysieren zu lassen!</p>
 
     <div class="freies-malen-container">
       <div class="paint-tools">
-        <label for="ki-studio-farbe">Farbe:</label>
-        <input type="color" id="ki-studio-farbe" value="#ff007f">
+        <label for="studio-paint-farbe">Farbe:</label>
+        <input type="color" id="studio-paint-farbe" value="#ff007f">
         
-        <label for="ki-studio-groesse">Strichstärke:</label>
-        <input type="range" id="ki-studio-groesse" min="1" max="30" value="5">
+        <label for="studio-paint-groesse">Strichstärke:</label>
+        <input type="range" id="studio-paint-groesse" min="1" max="30" value="5">
 
         <div class="werkzeug-leiste">
-          <button class="btn-tool active" onclick="setzeKiStudioWerkzeug('bleistift', event)">✏️ Stift</button>
-          <button class="btn-tool" onclick="setzeKiStudioWerkzeug('radiergummi', event)">🧽 Radiergummi</button>
-          <button class="btn-tool" onclick="löscheKiStudioCanvas()">🗑️ Leeren</button>
+          <button class="btn-tool active" onclick="setzeStudioWerkzeug('bleistift', event)">✏️ Stift</button>
+          <button class="btn-tool" onclick="setzeStudioWerkzeug('kugelschreiber', event)">🖊️ Kugelschreiber</button>
+          <button class="btn-tool" onclick="setzeStudioWerkzeug('spray', event)">💨 Spraydose</button>
           
           <label for="ki-image-upload" class="btn-tool" style="cursor: pointer; display: inline-block;">📁 Bild hochladen</label>
-          <input type="file" id="ki-image-upload" accept="image/*" style="display: none;" onchange="ladeBildInKiCanvas(event)">
+          <input type="file" id="ki-image-upload" accept="image/*" style="display: none;" onchange="ladeStudioBildHoch(event)">
         </div>
       </div>
 
       <div class="canvas-container freies-canvas-box">
-        <canvas id="ki-studio-canvas" width="800" height="500"></canvas>
+        <canvas id="studio-paint-canvas" width="800" height="500"></canvas>
       </div>
 
-      <!-- KI Aktion Buttons -->
+      <!-- Speichern & KI Aktion Buttons -->
+      <div class="frei-paint-speichern-box" style="margin-top: 15px;">
+        <input type="text" id="studio-paint-name" placeholder="Dein Name (Pflichtfeld)*" required>
+        <button onclick="speichereStudioBild()">Bild Speichern</button>
+      </div>
+
       <div class="modal-buttons" style="margin-top: 15px; justify-content: center; gap: 15px;">
         <button onclick="analysiereKiBild('analyse')" class="btn-diff btn-leicht">🤖 KI (Analyse)</button>
         <button onclick="analysiereKiBild('tipp')" class="btn-diff btn-normal">💡 Tipp</button>
@@ -219,7 +224,6 @@
       </div>
     </div>
   </div>
-
 </section>
 
 <!-- UNTERSEITE: GESCHICHTEN -->
