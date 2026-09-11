@@ -85,7 +85,7 @@
   </div>
 </main>
 
-<!-- UNTERSEITE: BILDER (MIT 3 REITER-SUBNAVI) -->
+<!-- UNTERSEITE: BILDER (MIT REITER-SUBNAVI) -->
 <section id="unterseite-bilder" class="unterseite hidden">
   <button onclick="zeigeStartseite()">← Zurück</button>
   <h2>Bilderwelt</h2>
@@ -95,6 +95,7 @@
     <button class="btn-tab active" onclick="wechsleBilderTab('ki-spass')">KI-Spaß</button>
     <button class="btn-tab" onclick="wechsleBilderTab('meine-werke')">Meine Werke</button>
     <button class="btn-tab" onclick="wechsleBilderTab('freies-malen')">Freies Malen</button>
+    <button class="btn-tab" onclick="wechsleBilderTab('ki-studio')">KI-Studio & Analyse</button>
   </div>
 
   <!-- REITER 1: KI-SPAß -->
@@ -125,7 +126,7 @@
     <div class="bearbeitete-werke-bereich">
       <h4>Bearbeitete Werke der Besucher:</h4>
       <div id="ki-user-liste" class="neon-button-grid">
-        <!-- Hier werden die Neon-Cyan Namensbuttons per JS eingefügt -->
+        <!-- Hier werden die Namensbuttons per JS eingefügt -->
       </div>
     </div>
   </div>
@@ -182,9 +183,44 @@
       </div>
     </div>
   </div>
+
+  <!-- REITER 4: NEU -> KI-STUDIO & ANALYSE -->
+  <div id="tab-ki-studio" class="tab-content hidden">
+    <h3>KI-Studio & Bild-Analyse</h3>
+    <p>Zeichne etwas auf die Leinwand oder lade ein eigenes Bild hoch, um es von der KI analysieren zu lassen!</p>
+
+    <div class="freies-malen-container">
+      <div class="paint-tools">
+        <label for="ki-studio-farbe">Farbe:</label>
+        <input type="color" id="ki-studio-farbe" value="#ff007f">
+        
+        <label for="ki-studio-groesse">Strichstärke:</label>
+        <input type="range" id="ki-studio-groesse" min="1" max="30" value="5">
+
+        <div class="werkzeug-leiste">
+          <button class="btn-tool active" onclick="setzeKiStudioWerkzeug('bleistift', event)">✏️ Stift</button>
+          <button class="btn-tool" onclick="setzeKiStudioWerkzeug('radiergummi', event)">🧽 Radiergummi</button>
+          <button class="btn-tool" onclick="löscheKiStudioCanvas()">🗑️ Leeren</button>
+          
+          <label for="ki-image-upload" class="btn-tool" style="cursor: pointer; display: inline-block;">📁 Bild hochladen</label>
+          <input type="file" id="ki-image-upload" accept="image/*" style="display: none;" onchange="ladeBildInKiCanvas(event)">
+        </div>
+      </div>
+
+      <div class="canvas-container freies-canvas-box">
+        <canvas id="ki-studio-canvas" width="800" height="500"></canvas>
+      </div>
+
+      <!-- KI Aktion Buttons -->
+      <div class="modal-buttons" style="margin-top: 15px; justify-content: center; gap: 15px;">
+        <button onclick="analysiereKiBild('analyse')" class="btn-diff btn-leicht">🤖 KI (Analyse)</button>
+        <button onclick="analysiereKiBild('tipp')" class="btn-diff btn-normal">💡 Tipp</button>
+        <button onclick="analysiereKiBild('prompt')" class="btn-diff btn-schwer">✍️ Prompt</button>
+      </div>
+    </div>
+  </div>
+
 </section>
-</body>
-</html>
 
 <!-- UNTERSEITE: GESCHICHTEN -->
 <section id="unterseite-geschichten" class="unterseite hidden">
@@ -218,6 +254,21 @@
 </section>
 
 <!-- ==================== MODALS ==================== -->
+
+<!-- MODAL: KI-STUDIO ERGEBNIS / RÜCKMELDUNG -->
+<div id="modal-ki-output" class="modal hidden">
+  <div class="modal-inhalt" style="border: 2px solid #00f3ff; max-width: 550px; text-align: left;">
+    <h3 id="ki-output-titel" style="color: #00f3ff; margin-bottom: 15px;">KI Analyse</h3>
+    
+    <div id="ki-output-text" style="color: #fff; font-size: 1rem; line-height: 1.6; max-height: 300px; overflow-y: auto; background: #111; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+      <!-- Hier landet die Antwort der KI -->
+    </div>
+
+    <div class="modal-buttons" style="justify-content: flex-end;">
+      <button onclick="schliesseKiOutputModal()" class="btn-abbrechen">✕ Schließen</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL / LESEFENSTER FÜR EINE GESCHICHTE -->
 <div id="modal-geschichte" class="modal hidden" onclick="schliesseGeschichteModal(event)">
@@ -275,12 +326,12 @@
   </div>
 </div>
 
-<!-- MODAL: PAINT (KI-BILD BEARBEITEN) -->
+<!-- MODAL: PAINT (KI-BILD BEARBEITEN UND VORSCHAUEN) -->
 <div id="modal-paint" class="modal hidden">
   <div class="modal-inhalt paint-inhalt">
-    <h3>Bild bearbeiten & bemalen</h3>
+    <h3 id="paint-modal-header-title">Bild bearbeiten & bemalen</h3>
     
-    <div class="paint-tools">
+    <div class="paint-tools" id="paint-modal-werkzeugleiste">
       <label for="paint-farbe">Farbe:</label>
       <input type="color" id="paint-farbe" value="#00f3ff">
       
@@ -295,12 +346,14 @@
       <canvas id="paint-canvas"></canvas>
     </div>
 
-    <input type="text" id="paint-name" placeholder="Dein Name (Pflichtfeld)*" required>
-    <p id="paint-fehler" class="fehler-text hidden">Bitte gib deinen Namen ein!</p>
+    <div id="paint-modal-speicher-bereich">
+      <input type="text" id="paint-name" placeholder="Dein Name (Pflichtfeld)*" required>
+      <p id="paint-fehler" class="fehler-text hidden">Bitte gib deinen Namen ein!</p>
+    </div>
 
     <div class="modal-buttons">
-      <button onclick="speicherePaint()">Speichern</button>
-      <button onclick="schliessePaintModal()" class="btn-abbrechen">Abbrechen</button>
+      <button id="paint-modal-btn-speichern" onclick="speicherePaint()">Speichern</button>
+      <button onclick="schliessePaintModal()" class="btn-abbrechen">Schließen</button>
     </div>
   </div>
 </div>
