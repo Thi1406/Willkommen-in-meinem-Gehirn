@@ -1,5 +1,5 @@
 // ====================================================
-// 1. HELFER-FUNKTIONEN (Sicheres LocalStorage)
+// 1. HELFER-FUNKTIONEN (Sicheres LocalStorage & Escaping)
 // ====================================================
 function ladeLokalDaten(key, standardWert) {
   try {
@@ -11,7 +11,17 @@ function ladeLokalDaten(key, standardWert) {
   }
 }
 
-// Global definierte Datenstrukturen aus LocalStorage (NUR EINMAL DEKLARIERT)
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Global definierte Datenstrukturen aus LocalStorage
 let kiBearbeiteteBilder = ladeLokalDaten('kiBearbeiteteBilder', []);
 let freieGemaelde = ladeLokalDaten('freieGemaelde', []);
 let highscores = ladeLokalDaten('clipper_highscores', []);
@@ -21,27 +31,22 @@ let highscores = ladeLokalDaten('clipper_highscores', []);
 // 2. SEITEN-NAVIGATION & UNTER-REITER
 // ====================================================
 function zeigeBereich(bereichId) {
-  // Header und Haupt-Grid ausblenden
   document.querySelector('header')?.classList.add('hidden');
   document.querySelector('.navigation-grid')?.classList.add('hidden');
-  
-  // Alle Unterseiten verbergen
+
   const alleUnterseiten = document.querySelectorAll('.unterseite');
   alleUnterseiten.forEach(seite => seite.classList.add('hidden'));
-  
-  // Gewählte Unterseite anzeigen
+
   const zielSeite = document.getElementById('unterseite-' + bereichId);
   if (zielSeite) {
     zielSeite.classList.remove('hidden');
   }
 
-  // Spezial-Initialisierungen je nach Seite
   if (bereichId === 'geschichten') {
     if (typeof ladeGeschichtenUebersicht === 'function') {
       ladeGeschichtenUebersicht();
     }
   } else if (bereichId === 'bilder') {
-    // Malflächen beim Öffnen der Bilderwelt neu berechnen/initialisieren
     setTimeout(() => {
       if (typeof initFreiesCanvas === 'function') initFreiesCanvas();
       if (typeof initStudioCanvas === 'function') initStudioCanvas();
@@ -52,14 +57,12 @@ function zeigeBereich(bereichId) {
 function zeigeStartseite() {
   const alleUnterseiten = document.querySelectorAll('.unterseite');
   alleUnterseiten.forEach(seite => seite.classList.add('hidden'));
-  
+
   document.querySelector('header')?.classList.remove('hidden');
   document.querySelector('.navigation-grid')?.classList.remove('hidden');
 }
 
-// Funktion für die Unter-Reiter in der Bilderwelt (KI-Spaß, Freies Malen, KI-Studio)
 function wechsleBilderTab(tabName, evt) {
-  // Alle Tabs deaktivieren
   document.querySelectorAll('.bilder-tabs .btn-tab, .tab-button').forEach(btn => btn.classList.remove('active'));
   document.querySelectorAll('#unterseite-bilder .tab-content, .tab-content').forEach(tab => {
     if (tab.id.startsWith('tab-')) {
@@ -67,19 +70,16 @@ function wechsleBilderTab(tabName, evt) {
     }
   });
 
-  // Aktiven Button hervorheben (currentTarget stellt sicher, dass der Button getroffen wird)
   if (evt) {
     const btn = evt.currentTarget || evt.target;
     btn.classList.add('active');
-  }  
-  
-  // Ziel-Tab einblenden
+  }
+
   const zielTab = document.getElementById(`tab-${tabName}`);
   if (zielTab) {
     zielTab.classList.remove('hidden');
   }
 
-  // Canvas-Initialisierung je nach Tab
   if (tabName === 'freies-malen') {
     setTimeout(() => { if (typeof initFreiesCanvas === 'function') initFreiesCanvas(); }, 50);
   } else if (tabName === 'ki-studio') {
@@ -106,7 +106,7 @@ let canvas, ctx;
 function erstelleGalerie() {
   const galerieGrid = document.getElementById("galerie-grid");
   if (!galerieGrid) return;
-  
+
   let gesamtHtml = "";
 
   meineBilder.forEach((bildUrl, index) => {
@@ -190,18 +190,36 @@ function zeigWolke(bildId) {
   wolke?.classList.toggle("hidden");
 }
 
+function holeKoordinaten(e, targetCanvas) {
+  const rect = targetCanvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: clientX - rect.left,
+    y: clientY - rect.top
+  };
+}
+
 function initCanvas() {
   canvas = document.getElementById('paint-canvas');
   if (!canvas) return;
-  
+
   ctx = canvas.getContext('2d');
   canvas.width = canvas.offsetWidth || 600;
   canvas.height = canvas.offsetHeight || 400;
 
-  canvas.onmousedown = startZeichnen;
-  canvas.onmousemove = zeichnen;
-  canvas.onmouseup = stoppZeichnen;
-  canvas.onmouseleave = stoppZeichnen;
+  const startFn = (e) => startZeichnen(e);
+  const moveFn = (e) => zeichnen(e);
+  const stopFn = () => stoppZeichnen();
+
+  canvas.onmousedown = startFn;
+  canvas.onmousemove = moveFn;
+  canvas.onmouseup = stopFn;
+  canvas.onmouseleave = stopFn;
+
+  canvas.ontouchstart = (e) => { e.preventDefault(); startFn(e); };
+  canvas.ontouchmove = (e) => { e.preventDefault(); moveFn(e); };
+  canvas.ontouchend = stopFn;
 }
 
 function setzeWerkzeug(werkzeug, evt) {
@@ -217,7 +235,7 @@ function oeffnePaintModal(bildId, bildUrl) {
   aktuellesBildId = bildId;
   const modal = document.getElementById('modal-paint');
   const img = document.getElementById('paint-hintergrund-bild');
-  
+
   if (img) img.src = bildUrl;
   modal?.classList.remove('hidden');
   document.getElementById('paint-fehler')?.classList.add('hidden');
@@ -236,10 +254,10 @@ function schliessePaintModal() {
 
 function startZeichnen(e) {
   isDrawing = true;
-  if (!ctx) return;
-  const rect = canvas.getBoundingClientRect();
+  if (!ctx || !canvas) return;
+  const pos = holeKoordinaten(e, canvas);
   ctx.beginPath();
-  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  ctx.moveTo(pos.x, pos.y);
 }
 
 function stoppZeichnen() {
@@ -248,11 +266,9 @@ function stoppZeichnen() {
 }
 
 function zeichnen(e) {
-  if (!isDrawing || !ctx) return;
+  if (!isDrawing || !ctx || !canvas) return;
 
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const pos = holeKoordinaten(e, canvas);
   const farbe = document.getElementById('paint-farbe')?.value || '#000000';
 
   ctx.strokeStyle = farbe;
@@ -261,13 +277,13 @@ function zeichnen(e) {
   if (aktuellesWerkzeug === 'bleistift' || aktuellesWerkzeug === 'kugelschreiber') {
     ctx.lineWidth = aktuellesWerkzeug === 'bleistift' ? 2 : 4;
     ctx.lineCap = 'round';
-    ctx.lineTo(x, y);
+    ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
   } else if (aktuellesWerkzeug === 'spray') {
     for (let i = 0; i < 20; i++) {
       const offsetX = (Math.random() - 0.5) * 15;
       const offsetY = (Math.random() - 0.5) * 15;
-      ctx.fillRect(x + offsetX, y + offsetY, 1, 1);
+      ctx.fillRect(pos.x + offsetX, pos.y + offsetY, 1, 1);
     }
   }
 }
@@ -281,7 +297,6 @@ function speicherePaint() {
     return;
   }
 
-  // Kombiniere Originalbild und Zeichnung auf ein Hilfs-Canvas
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = canvas.width;
   tempCanvas.height = canvas.height;
@@ -295,7 +310,6 @@ function speicherePaint() {
 
   const kombiniertesBildDataUrl = tempCanvas.toDataURL('image/png');
 
-  // Bild in LocalStorage speichern
   kiBearbeiteteBilder.push({
     id: Date.now(),
     bildId: aktuellesBildId,
@@ -306,7 +320,6 @@ function speicherePaint() {
   });
   localStorage.setItem('kiBearbeiteteBilder', JSON.stringify(kiBearbeiteteBilder));
 
-  // Counter auf der Karte erhöhen
   const karte = document.getElementById(`karte-${aktuellesBildId}`);
   if (karte) {
     const badge = karte.querySelector('.farbklecks');
@@ -322,6 +335,31 @@ function speicherePaint() {
   schliessePaintModal();
 }
 
+function oeffneBildInNeuemFenster(titel, autor, bildData) {
+  const win = window.open('');
+  if (win) {
+    win.document.write(`
+      <!DOCTYPE html>
+      <html lang="de">
+      <head>
+        <meta charset="UTF-8">
+        <title>${escapeHtml(titel)}</title>
+        <style>
+          body { background:#111; color:#fff; text-align:center; font-family:sans-serif; padding:20px; }
+          img { max-width:90%; border:2px solid #00f3ff; border-radius:8px; margin-top:15px; }
+        </style>
+      </head>
+      <body>
+        <h3>${escapeHtml(titel)}</h3>
+        <p>Erstellt von: <strong>${escapeHtml(autor)}</strong></p>
+        <img src="${bildData}" alt="Werk von ${escapeHtml(autor)}"/>
+      </body>
+      </html>
+    `);
+    win.document.close();
+  }
+}
+
 function rendereKiUserListe() {
   const liste = document.getElementById('ki-user-liste');
   if (!liste) return;
@@ -333,10 +371,7 @@ function rendereKiUserListe() {
     btn.innerText = `🎨 ${werk.autor} (${werk.zeit || ''})`;
     btn.onclick = () => {
       if (werk.bildData) {
-        const win = window.open('');
-        if (win) {
-          win.document.write(`<h3>Werk von ${werk.autor} (Bild #${werk.bildId || ''})</h3><img src="${werk.bildData}" alt="Werk von ${werk.autor}" style="max-width:100%; border-radius:8px;"/>`);
-        }
+        oeffneBildInNeuemFenster(`Werk zu Bild #${werk.bildId || ''}`, werk.autor, werk.bildData);
       } else {
         alert(`Werk von ${werk.autor} für Bild #${werk.bildId || ''}`);
       }
@@ -356,10 +391,7 @@ function rendereFreiUserListe() {
     btn.innerText = `🖼️ ${werk.autor} (${werk.zeit || ''})`;
     btn.onclick = () => {
       if (werk.bildData) {
-        const win = window.open('');
-        if (win) {
-          win.document.write(`<h3>Freies Gemälde von ${werk.autor}</h3><img src="${werk.bildData}" alt="Gemälde von ${werk.autor}" style="max-width:100%; border-radius:8px;"/>`);
-        }
+        oeffneBildInNeuemFenster(`Freies Gemälde`, werk.autor, werk.bildData);
       }
     };
     liste.appendChild(btn);
@@ -536,9 +568,6 @@ async function ladeKiBilder(kategorie) {
   });
 }
 
-// ====================================================
-// KI-SPAß: SPEICHERN MIT HINTERGRUND
-// ====================================================
 function speichereKiGemälde(hintergrundUrl) {
   const nameInput = document.getElementById('ki-paint-name');
   const name = nameInput ? nameInput.value.trim() : '';
@@ -594,8 +623,9 @@ function speichereKiGemälde(hintergrundUrl) {
   }
 }
 
+
 // ====================================================
-// 6. FREIES MALEN SYSTEM (GARANTIERT SICHTBAR)
+// 6. FREIES MALEN SYSTEM (TOUCH- & MOUSE-READY)
 // ====================================================
 let aktuellesFreiWerkzeug = 'bleistift';
 let freiCanvas, freiCtx, freiIsDrawing = false;
@@ -604,34 +634,36 @@ function initFreiesCanvas() {
   freiCanvas = document.getElementById('frei-paint-canvas');
   if (!freiCanvas) return;
 
-  // Feste Breite/Höhe erzwingen
   freiCanvas.width = freiCanvas.offsetWidth || 800;
   freiCanvas.height = 450;
 
   freiCtx = freiCanvas.getContext('2d');
   
-  // Dunkler Hintergrund, damit der Malbereich klar abgegrenzt ist
   freiCtx.fillStyle = '#111111';
   freiCtx.fillRect(0, 0, freiCanvas.width, freiCanvas.height);
 
-  freiCanvas.onmousedown = (e) => {
+  const startFn = (e) => {
     freiIsDrawing = true;
-    const rect = freiCanvas.getBoundingClientRect();
+    const pos = holeKoordinaten(e, freiCanvas);
     freiCtx.beginPath();
-    freiCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    freiCtx.moveTo(pos.x, pos.y);
   };
-  
-  freiCanvas.onmousemove = zeugeFreiMalen;
-  
-  freiCanvas.onmouseup = () => {
+
+  const moveFn = (e) => zeugeFreiMalen(e);
+
+  const stopFn = () => {
     freiIsDrawing = false;
     if (freiCtx) freiCtx.beginPath();
   };
 
-  freiCanvas.onmouseleave = () => {
-    freiIsDrawing = false;
-    if (freiCtx) freiCtx.beginPath();
-  };
+  freiCanvas.onmousedown = startFn;
+  freiCanvas.onmousemove = moveFn;
+  freiCanvas.onmouseup = stopFn;
+  freiCanvas.onmouseleave = stopFn;
+
+  freiCanvas.ontouchstart = (e) => { e.preventDefault(); startFn(e); };
+  freiCanvas.ontouchmove = (e) => { e.preventDefault(); moveFn(e); };
+  freiCanvas.ontouchend = stopFn;
 
   rendereFreiUserListe();
 }
@@ -646,14 +678,12 @@ function setzeFreiWerkzeug(werkzeug, evt) {
 }
 
 function zeugeFreiMalen(e) {
-  if (!freiIsDrawing || !freiCtx) return;
+  if (!freiIsDrawing || !freiCtx || !freiCanvas) return;
 
-  const rect = freiCanvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const pos = holeKoordinaten(e, freiCanvas);
 
   const farbe = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
-  const groesse = document.getElementById('frei-paint-groesse')?.value || 5;
+  const groesse = parseFloat(document.getElementById('frei-paint-groesse')?.value) || 5;
 
   freiCtx.strokeStyle = farbe;
   freiCtx.fillStyle = farbe;
@@ -661,19 +691,19 @@ function zeugeFreiMalen(e) {
 
   if (aktuellesFreiWerkzeug === 'radiergummi') {
     freiCtx.fillStyle = '#111111';
-    freiCtx.fillRect(x - groesse / 2, y - groesse / 2, groesse * 2, groesse * 2);
+    freiCtx.fillRect(pos.x - groesse / 2, pos.y - groesse / 2, groesse * 2, groesse * 2);
     return;
   }
 
   if (aktuellesFreiWerkzeug === 'bleistift' || aktuellesFreiWerkzeug === 'kugelschreiber') {
     freiCtx.lineCap = 'round';
-    freiCtx.lineTo(x, y);
+    freiCtx.lineTo(pos.x, pos.y);
     freiCtx.stroke();
   } else if (aktuellesFreiWerkzeug === 'spray') {
     for (let i = 0; i < 15; i++) {
       const offsetX = (Math.random() - 0.5) * (groesse * 3);
       const offsetY = (Math.random() - 0.5) * (groesse * 3);
-      freiCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
+      freiCtx.fillRect(pos.x + offsetX, pos.y + offsetY, 1, 1);
     }
   }
 }
@@ -717,29 +747,6 @@ function speichereFreiesGemälde() {
   alert('Dein Kunstwerk wurde erfolgreich gespeichert!');
 }
 
-function rendereFreiUserListe() {
-  const liste = document.getElementById('frei-user-liste');
-  if (!liste) return;
-  liste.innerHTML = '';
-
-  freieGemaelde.forEach((werk) => {
-    const btn = document.createElement('button');
-    btn.className = 'btn-neon-user';
-    btn.innerText = `🎨 ${werk.autor} (${werk.zeit})`;
-    btn.onclick = () => {
-      const win = window.open('');
-      if (win) {
-        win.document.write(`
-          <body style="background:#111; color:#fff; text-align:center; font-family:sans-serif; padding:20px;">
-            <h3>Kunstwerk von ${werk.autor}</h3>
-            <img src="${werk.bildData}" alt="Werk von ${werk.autor}" style="max-width:90%; border:2px solid #00f3ff; border-radius:8px;"/>
-          </body>
-        `);
-      }
-    };
-    liste.appendChild(btn);
-  });
-}
 
 // ====================================================
 // 6b. KI-STUDIO & ANALYSE (BILD HOCHLADEN & MALEN)
@@ -755,30 +762,33 @@ function initStudioCanvas() {
   studioCanvas.height = 450;
   studioCtx = studioCanvas.getContext('2d');
 
-  // Dunkler Standardhintergrund
   if (!studioCanvas.dataset.hasImage) {
     studioCtx.fillStyle = '#111111';
     studioCtx.fillRect(0, 0, studioCanvas.width, studioCanvas.height);
   }
 
-  studioCanvas.onmousedown = (e) => {
+  const startFn = (e) => {
     studioIsDrawing = true;
-    const rect = studioCanvas.getBoundingClientRect();
+    const pos = holeKoordinaten(e, studioCanvas);
     studioCtx.beginPath();
-    studioCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    studioCtx.moveTo(pos.x, pos.y);
   };
 
-  studioCanvas.onmousemove = zeichneStudioCanvas;
+  const moveFn = (e) => zeichneStudioCanvas(e);
 
-  studioCanvas.onmouseup = () => {
+  const stopFn = () => {
     studioIsDrawing = false;
     if (studioCtx) studioCtx.beginPath();
   };
 
-  studioCanvas.onmouseleave = () => {
-    studioIsDrawing = false;
-    if (studioCtx) studioCtx.beginPath();
-  };
+  studioCanvas.onmousedown = startFn;
+  studioCanvas.onmousemove = moveFn;
+  studioCanvas.onmouseup = stopFn;
+  studioCanvas.onmouseleave = stopFn;
+
+  studioCanvas.ontouchstart = (e) => { e.preventDefault(); startFn(e); };
+  studioCanvas.ontouchmove = (e) => { e.preventDefault(); moveFn(e); };
+  studioCanvas.ontouchend = stopFn;
 }
 
 function ladeStudioBildHoch(event) {
@@ -801,7 +811,6 @@ function ladeStudioBildHoch(event) {
   reader.readAsDataURL(file);
 }
 
-// Auch verknüpft mit deinem alternativen HTML-Funktionsnamen:
 function ladeBildInKiCanvas(event) {
   ladeStudioBildHoch(event);
 }
@@ -820,17 +829,15 @@ function setzeKiStudioWerkzeug(werkzeug, evt) {
 }
 
 function zeichneStudioCanvas(e) {
-  if (!studioIsDrawing || !studioCtx) return;
+  if (!studioIsDrawing || !studioCtx || !studioCanvas) return;
 
-  const rect = studioCanvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const pos = holeKoordinaten(e, studioCanvas);
 
   const farbeInput = document.getElementById('studio-paint-farbe') || document.getElementById('ki-studio-farbe');
   const groesseInput = document.getElementById('studio-paint-groesse') || document.getElementById('ki-studio-groesse');
 
   const farbe = farbeInput?.value || '#ff007f';
-  const groesse = groesseInput?.value || 5;
+  const groesse = parseFloat(groesseInput?.value) || 5;
 
   studioCtx.strokeStyle = farbe;
   studioCtx.fillStyle = farbe;
@@ -838,19 +845,19 @@ function zeichneStudioCanvas(e) {
 
   if (aktuellesStudioWerkzeug === 'radiergummi') {
     studioCtx.fillStyle = '#111111';
-    studioCtx.fillRect(x - groesse / 2, y - groesse / 2, groesse * 2, groesse * 2);
+    studioCtx.fillRect(pos.x - groesse / 2, pos.y - groesse / 2, groesse * 2, groesse * 2);
     return;
   }
 
   if (aktuellesStudioWerkzeug === 'bleistift' || aktuellesStudioWerkzeug === 'kugelschreiber') {
     studioCtx.lineCap = 'round';
-    studioCtx.lineTo(x, y);
+    studioCtx.lineTo(pos.x, pos.y);
     studioCtx.stroke();
   } else if (aktuellesStudioWerkzeug === 'spray') {
     for (let i = 0; i < 15; i++) {
       const offsetX = (Math.random() - 0.5) * (groesse * 3);
       const offsetY = (Math.random() - 0.5) * (groesse * 3);
-      studioCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
+      studioCtx.fillRect(pos.x + offsetX, pos.y + offsetY, 1, 1);
     }
   }
 }
@@ -885,7 +892,6 @@ function speichereStudioBild() {
   rendereFreiUserListe();
 }
 
-// Initialer Start beim Laden der Seite
 window.addEventListener('DOMContentLoaded', () => {
   initFreiesCanvas();
   initStudioCanvas();
