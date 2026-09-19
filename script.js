@@ -1,5 +1,5 @@
 // ====================================================
-// 1. HELFER-FUNKTIONEN (Sicheres LocalStorage & Escaping)
+// 1. HELFER-FUNKTIONEN (Sicheres LocalStorage)
 // ====================================================
 function ladeLokalDaten(key, standardWert) {
   try {
@@ -11,63 +11,40 @@ function ladeLokalDaten(key, standardWert) {
   }
 }
 
-function escapeHtml(text) {
-  if (!text) return '';
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-// Global definierte Datenstrukturen aus LocalStorage
+// Global definierte Datenstrukturen aus LocalStorage (NUR EINMAL DEKLARIERT)
 let kiBearbeiteteBilder = ladeLokalDaten('kiBearbeiteteBilder', []);
 let freieGemaelde = ladeLokalDaten('freieGemaelde', []);
 let highscores = ladeLokalDaten('clipper_highscores', []);
 
-// Standard-Geschichten für die App
-const geschichtenDaten = {
-  story1: {
-    titel: "Der verlorene Funke",
-    klasse: "karte-fantasy",
-    vorschau: "Ein kleiner Roboter sucht im Nebel nach seiner vergessenen Energiequelle.",
-    inhalt: "In einer Welt aus Altmetall und leisem Summen wachte der kleine Roboter 404 auf. Sein Akku blinkte rot. Doch weit im Norden sah er ein blaues Leuchten..."
-  },
-  story2: {
-    titel: "Schatten über Bremen",
-    klasse: "karte-krimi",
-    vorschau: "Rätselhafte Vorkommnisse an der Weser halten die Stadt in Atem.",
-    inhalt: "Der Regen peitschte gegen die Fensterscheiben im Viertel. Hauptkommissar Hansen zog an seiner Zigarette und blickte auf die alte Karte der Weser..."
-  }
-};
-
-let aktuellesStoryKey = null;
 
 // ====================================================
 // 2. SEITEN-NAVIGATION & UNTER-REITER
 // ====================================================
 function zeigeBereich(bereichId) {
+  // Header und Haupt-Grid ausblenden
   document.querySelector('header')?.classList.add('hidden');
   document.querySelector('.navigation-grid')?.classList.add('hidden');
-
+  
+  // Alle Unterseiten verbergen
   const alleUnterseiten = document.querySelectorAll('.unterseite');
   alleUnterseiten.forEach(seite => seite.classList.add('hidden'));
-
+  
+  // Gewählte Unterseite anzeigen
   const zielSeite = document.getElementById('unterseite-' + bereichId);
   if (zielSeite) {
     zielSeite.classList.remove('hidden');
   }
 
+  // Spezial-Initialisierungen je nach Seite
   if (bereichId === 'geschichten') {
-    ladeGeschichtenUebersicht();
-  } else if (bereichId === 'bilder') {
-    if (typeof ladeKiBilder === 'function') {
-      ladeKiBilder(aktuelleKiKategorie);
+    if (typeof ladeGeschichtenUebersicht === 'function') {
+      ladeGeschichtenUebersicht();
     }
+  } else if (bereichId === 'bilder') {
+    // Malflächen beim Öffnen der Bilderwelt neu berechnen/initialisieren
     setTimeout(() => {
-      initFreiesCanvas();
-      initStudioCanvas();
+      if (typeof initFreiesCanvas === 'function') initFreiesCanvas();
+      if (typeof initStudioCanvas === 'function') initStudioCanvas();
     }, 100);
   }
 }
@@ -75,50 +52,97 @@ function zeigeBereich(bereichId) {
 function zeigeStartseite() {
   const alleUnterseiten = document.querySelectorAll('.unterseite');
   alleUnterseiten.forEach(seite => seite.classList.add('hidden'));
-
+  
   document.querySelector('header')?.classList.remove('hidden');
   document.querySelector('.navigation-grid')?.classList.remove('hidden');
 }
 
+// Funktion für die Unter-Reiter in der Bilderwelt (KI-Spaß, Freies Malen, KI-Studio)
 function wechsleBilderTab(tabName, evt) {
-  document.querySelectorAll('.bilder-tabs .btn-tab').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('#unterseite-bilder .tab-content').forEach(tab => tab.classList.add('hidden'));
+  // Alle Tabs deaktivieren
+  document.querySelectorAll('.bilder-tabs .btn-tab, .tab-button').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('#unterseite-bilder .tab-content, .tab-content').forEach(tab => {
+    if (tab.id.startsWith('tab-')) {
+      tab.classList.add('hidden');
+    }
+  });
 
+  // Aktiven Button hervorheben (currentTarget stellt sicher, dass der Button getroffen wird)
   if (evt) {
     const btn = evt.currentTarget || evt.target;
     btn.classList.add('active');
-  }
-
+  }  
+  
+  // Ziel-Tab einblenden
   const zielTab = document.getElementById(`tab-${tabName}`);
   if (zielTab) {
     zielTab.classList.remove('hidden');
   }
 
+  // Canvas-Initialisierung je nach Tab
   if (tabName === 'freies-malen') {
-    setTimeout(initFreiesCanvas, 50);
+    setTimeout(() => { if (typeof initFreiesCanvas === 'function') initFreiesCanvas(); }, 50);
   } else if (tabName === 'ki-studio') {
-    setTimeout(initStudioCanvas, 50);
+    setTimeout(() => { if (typeof initStudioCanvas === 'function') initStudioCanvas(); }, 50);
   }
 }
 
+
 // ====================================================
-// 3. BESCHREIBEN & PAINT MODALS (GALERIE & KI)
+// 3. BILDER-LINKS & GALERIE
 // ====================================================
+const meineBilder = [
+  "https://picsum.photos/300/200?random=1",
+  "https://picsum.photos/300/200?random=2",
+  "https://picsum.photos/300/200?random=3",
+  "https://picsum.photos/300/200?random=4"
+];
+
 let aktuellesBildId = null;
 let isDrawing = false;
 let aktuellesWerkzeug = 'bleistift';
 let canvas, ctx;
 
-function holeKoordinaten(e, targetCanvas) {
-  const rect = targetCanvas.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  return {
-    x: clientX - rect.left,
-    y: clientY - rect.top
-  };
+function erstelleGalerie() {
+  const galerieGrid = document.getElementById("galerie-grid");
+  if (!galerieGrid) return;
+  
+  let gesamtHtml = "";
+
+  meineBilder.forEach((bildUrl, index) => {
+    const id = index + 1;
+
+    gesamtHtml += `
+      <div class="bild-karte" id="karte-${id}">
+        <div class="bild-container">
+          <img src="${bildUrl}" alt="Bild ${id}">
+          
+          <div class="badges-container">
+            <div class="badge sprechblase hidden" onclick="zeigWolke(${id})">💬 <span class="anzahl-beschreibungen">0</span></div>
+            <div class="badge farbklecks hidden">🎨 <span class="anzahl-paintings">0</span></div>
+          </div>
+
+          <div class="beschreibung-wolke hidden" id="wolke-${id}">
+            <p id="wolke-text-${id}"></p>
+            <small id="wolke-autor-${id}"></small>
+          </div>
+        </div>
+
+        <div class="button-gruppe">
+          <button class="btn-aktion btn-beschreiben" onclick="oeffneBeschreibungModal(${id})">Beschreiben</button>
+          <button class="btn-aktion btn-bearbeiten" onclick="oeffnePaintModal(${id}, '${bildUrl}')">Bearbeiten</button>
+        </div>
+      </div>
+    `;
+  });
+
+  galerieGrid.innerHTML = gesamtHtml;
 }
 
+
+// ====================================================
+// 4. BESCHREIBEN & PAINT MODALS
+// ====================================================
 function oeffneBeschreibungModal(bildId) {
   aktuellesBildId = bildId;
   document.getElementById("modal-beschreibung")?.classList.remove("hidden");
@@ -142,35 +166,47 @@ function speichereBeschreibung() {
     return;
   }
 
-  alert(`Beschreibung gespeichert von ${name}!`);
+  const wolkeText = document.getElementById(`wolke-text-${aktuellesBildId}`);
+  const wolkeAutor = document.getElementById(`wolke-autor-${aktuellesBildId}`);
+  if (wolkeText) wolkeText.innerText = `"${text}"`;
+  if (wolkeAutor) wolkeAutor.innerText = `— ${name}`;
+
+  const karte = document.getElementById(`karte-${aktuellesBildId}`);
+  if (karte) {
+    const badge = karte.querySelector(".sprechblase");
+    const anzahlSpan = karte.querySelector(".anzahl-beschreibungen");
+    
+    badge?.classList.remove("hidden");
+    if (anzahlSpan) {
+      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0", 10) + 1;
+    }
+  }
+
   schliesseBeschreibungModal();
+}
+
+function zeigWolke(bildId) {
+  const wolke = document.getElementById(`wolke-${bildId}`);
+  wolke?.classList.toggle("hidden");
 }
 
 function initCanvas() {
   canvas = document.getElementById('paint-canvas');
   if (!canvas) return;
-
+  
   ctx = canvas.getContext('2d');
   canvas.width = canvas.offsetWidth || 600;
   canvas.height = canvas.offsetHeight || 400;
 
-  const startFn = (e) => startZeichnen(e);
-  const moveFn = (e) => zeichnen(e);
-  const stopFn = () => stoppZeichnen();
-
-  canvas.onmousedown = startFn;
-  canvas.onmousemove = moveFn;
-  canvas.onmouseup = stopFn;
-  canvas.onmouseleave = stopFn;
-
-  canvas.ontouchstart = (e) => { e.preventDefault(); startFn(e); };
-  canvas.ontouchmove = (e) => { e.preventDefault(); moveFn(e); };
-  canvas.ontouchend = stopFn;
+  canvas.onmousedown = startZeichnen;
+  canvas.onmousemove = zeichnen;
+  canvas.onmouseup = stoppZeichnen;
+  canvas.onmouseleave = stoppZeichnen;
 }
 
 function setzeWerkzeug(werkzeug, evt) {
   aktuellesWerkzeug = werkzeug;
-  document.querySelectorAll('#paint-modal-werkzeugleiste .btn-tool').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.btn-tool').forEach(btn => btn.classList.remove('active'));
   if (evt) {
     const btn = evt.currentTarget || evt.target;
     btn.classList.add('active');
@@ -181,7 +217,7 @@ function oeffnePaintModal(bildId, bildUrl) {
   aktuellesBildId = bildId;
   const modal = document.getElementById('modal-paint');
   const img = document.getElementById('paint-hintergrund-bild');
-
+  
   if (img) img.src = bildUrl;
   modal?.classList.remove('hidden');
   document.getElementById('paint-fehler')?.classList.add('hidden');
@@ -200,10 +236,10 @@ function schliessePaintModal() {
 
 function startZeichnen(e) {
   isDrawing = true;
-  if (!ctx || !canvas) return;
-  const pos = holeKoordinaten(e, canvas);
+  if (!ctx) return;
+  const rect = canvas.getBoundingClientRect();
   ctx.beginPath();
-  ctx.moveTo(pos.x, pos.y);
+  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
 }
 
 function stoppZeichnen() {
@@ -212,9 +248,11 @@ function stoppZeichnen() {
 }
 
 function zeichnen(e) {
-  if (!isDrawing || !ctx || !canvas) return;
+  if (!isDrawing || !ctx) return;
 
-  const pos = holeKoordinaten(e, canvas);
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
   const farbe = document.getElementById('paint-farbe')?.value || '#000000';
 
   ctx.strokeStyle = farbe;
@@ -223,13 +261,13 @@ function zeichnen(e) {
   if (aktuellesWerkzeug === 'bleistift' || aktuellesWerkzeug === 'kugelschreiber') {
     ctx.lineWidth = aktuellesWerkzeug === 'bleistift' ? 2 : 4;
     ctx.lineCap = 'round';
-    ctx.lineTo(pos.x, pos.y);
+    ctx.lineTo(x, y);
     ctx.stroke();
   } else if (aktuellesWerkzeug === 'spray') {
     for (let i = 0; i < 20; i++) {
       const offsetX = (Math.random() - 0.5) * 15;
       const offsetY = (Math.random() - 0.5) * 15;
-      ctx.fillRect(pos.x + offsetX, pos.y + offsetY, 1, 1);
+      ctx.fillRect(x + offsetX, y + offsetY, 1, 1);
     }
   }
 }
@@ -243,6 +281,7 @@ function speicherePaint() {
     return;
   }
 
+  // Kombiniere Originalbild und Zeichnung auf ein Hilfs-Canvas
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = canvas.width;
   tempCanvas.height = canvas.height;
@@ -256,6 +295,7 @@ function speicherePaint() {
 
   const kombiniertesBildDataUrl = tempCanvas.toDataURL('image/png');
 
+  // Bild in LocalStorage speichern
   kiBearbeiteteBilder.push({
     id: Date.now(),
     bildId: aktuellesBildId,
@@ -266,33 +306,20 @@ function speicherePaint() {
   });
   localStorage.setItem('kiBearbeiteteBilder', JSON.stringify(kiBearbeiteteBilder));
 
+  // Counter auf der Karte erhöhen
+  const karte = document.getElementById(`karte-${aktuellesBildId}`);
+  if (karte) {
+    const badge = karte.querySelector('.farbklecks');
+    const anzahlSpan = karte.querySelector('.anzahl-paintings');
+
+    badge?.classList.remove('hidden');
+    if (anzahlSpan) {
+      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0", 10) + 1;
+    }
+  }
+
   rendereKiUserListe();
   schliessePaintModal();
-}
-
-function oeffneBildInNeuemFenster(titel, autor, bildData) {
-  const win = window.open('');
-  if (win) {
-    win.document.write(`
-      <!DOCTYPE html>
-      <html lang="de">
-      <head>
-        <meta charset="UTF-8">
-        <title>${escapeHtml(titel)}</title>
-        <style>
-          body { background:#111; color:#fff; text-align:center; font-family:sans-serif; padding:20px; }
-          img { max-width:90%; border:2px solid #00f3ff; border-radius:8px; margin-top:15px; }
-        </style>
-      </head>
-      <body>
-        <h3>${escapeHtml(titel)}</h3>
-        <p>Erstellt von: <strong>${escapeHtml(autor)}</strong></p>
-        <img src="${bildData}" alt="Werk von ${escapeHtml(autor)}"/>
-      </body>
-      </html>
-    `);
-    win.document.close();
-  }
 }
 
 function rendereKiUserListe() {
@@ -306,7 +333,12 @@ function rendereKiUserListe() {
     btn.innerText = `🎨 ${werk.autor} (${werk.zeit || ''})`;
     btn.onclick = () => {
       if (werk.bildData) {
-        oeffneBildInNeuemFenster(`Werk zu Bild #${werk.bildId || ''}`, werk.autor, werk.bildData);
+        const win = window.open('');
+        if (win) {
+          win.document.write(`<h3>Werk von ${werk.autor} (Bild #${werk.bildId || ''})</h3><img src="${werk.bildData}" alt="Werk von ${werk.autor}" style="max-width:100%; border-radius:8px;"/>`);
+        }
+      } else {
+        alert(`Werk von ${werk.autor} für Bild #${werk.bildId || ''}`);
       }
     };
     liste.appendChild(btn);
@@ -324,15 +356,19 @@ function rendereFreiUserListe() {
     btn.innerText = `🖼️ ${werk.autor} (${werk.zeit || ''})`;
     btn.onclick = () => {
       if (werk.bildData) {
-        oeffneBildInNeuemFenster(`Freies Gemälde`, werk.autor, werk.bildData);
+        const win = window.open('');
+        if (win) {
+          win.document.write(`<h3>Freies Gemälde von ${werk.autor}</h3><img src="${werk.bildData}" alt="Gemälde von ${werk.autor}" style="max-width:100%; border-radius:8px;"/>`);
+        }
       }
     };
     liste.appendChild(btn);
   });
 }
 
+
 // ====================================================
-// 4. KI-SPAß GALERIE
+// 5. BILDER-WELT FEATURES (KI-SPAß)
 // ====================================================
 let aktuelleKiKategorie = 'standard';
 
@@ -354,36 +390,143 @@ async function ladeKiBilder(kategorie) {
   const r = Date.now();
 
   switch (kategorie) {
-    case 'katzen':
-      for (let i = 0; i < 4; i++) bildURLs.push(`https://cataas.com/cat?t=${r}_${i}`);
+    case 'digimon-gen1': {
+      try {
+        const digiIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+        const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
+        for (let id of gemischt) {
+          const res = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
+          const data = await res.json();
+          bildURLs.push(data.images[0].href);
+        }
+      } catch (e) {
+        bildURLs = [
+          'https://digi-api.com/images/digimon/w/Agumon.png',
+          'https://digi-api.com/images/digimon/w/Gabumon.png',
+          'https://digi-api.com/images/digimon/w/Patamon.png',
+          'https://digi-api.com/images/digimon/w/Gatomon.png'
+        ];
+      }
       break;
-    case 'hunde':
+    }
+
+    case 'digimon-gen2': {
+      try {
+        const digiIds = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
+        const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
+        for (let id of gemischt) {
+          const res = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
+          const data = await res.json();
+          bildURLs.push(data.images[0].href);
+        }
+      } catch (e) {
+        bildURLs = [
+          'https://digi-api.com/images/digimon/w/Veemon.png',
+          'https://digi-api.com/images/digimon/w/Hawkmon.png',
+          'https://digi-api.com/images/digimon/w/Armadillomon.png',
+          'https://digi-api.com/images/digimon/w/Wormmon.png'
+        ];
+      }
+      break;
+    }
+
+    case 'digimon-gen3': {
+      try {
+        const digiIds = [26, 27, 28, 29, 30, 31, 32, 33, 34, 35];
+        const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
+        for (let id of gemischt) {
+          const res = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
+          const data = await res.json();
+          bildURLs.push(data.images[0].href);
+        }
+      } catch (e) {
+        bildURLs = [
+          'https://digi-api.com/images/digimon/w/Guilmon.png',
+          'https://digi-api.com/images/digimon/w/Terriermon.png',
+          'https://digi-api.com/images/digimon/w/Renamon.png',
+          'https://digi-api.com/images/digimon/w/Impmon.png'
+        ];
+      }
+      break;
+    }
+
+    case 'yugioh': {
+      try {
+        const res = await fetch('https://db.ygoprodeck.com/api/v7/cardinfo.php');
+        const data = await res.json();
+        for (let i = 0; i < 4; i++) {
+          const zufallKarte = data.data[Math.floor(Math.random() * data.data.length)];
+          bildURLs.push(zufallKarte.card_images[0].image_url);
+        }
+      } catch (e) {
+        bildURLs = [
+          'https://images.ygoprodeck.com/images/cards/46986414.jpg',
+          'https://images.ygoprodeck.com/images/cards/74677422.jpg',
+          'https://images.ygoprodeck.com/images/cards/23771716.jpg',
+          'https://images.ygoprodeck.com/images/cards/11901678.jpg'
+        ];
+      }
+      break;
+    }
+
+    case 'katzen': {
+      for (let i = 0; i < 4; i++) {
+        bildURLs.push(`https://cataas.com/cat?t=${r}_${i}`);
+      }
+      break;
+    }
+
+    case 'hunde': {
       try {
         const res = await fetch('https://dog.ceo/api/breeds/image/random/4');
         const data = await res.json();
         bildURLs = data.message;
       } catch (e) {
-        for (let i = 0; i < 4; i++) bildURLs.push(`https://picsum.photos/400/300?random=${r + i}`);
+        for (let i = 0; i < 4; i++) {
+          bildURLs.push(`https://images.dog.ceo/breeds/retriever-golden/n02099601_100.jpg`);
+        }
       }
       break;
-    case 'pokemon-gen1':
+    }
+
+    case 'pokemon-gen1': {
       for (let i = 0; i < 4; i++) {
         const pId = Math.floor(Math.random() * 151) + 1;
         bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
       }
       break;
-    case 'standard':
-    default:
-      for (let i = 0; i < 4; i++) bildURLs.push(`https://picsum.photos/400/300?random=${r + i}`);
+    }
+
+    case 'pokemon-gen2': {
+      for (let i = 0; i < 4; i++) {
+        const pId = Math.floor(Math.random() * 100) + 152;
+        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
+      }
       break;
+    }
+
+    case 'pokemon-gen3': {
+      for (let i = 0; i < 4; i++) {
+        const pId = Math.floor(Math.random() * 135) + 252;
+        bildURLs.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`);
+      }
+      break;
+    }
+
+    case 'standard':
+    default: {
+      for (let i = 0; i < 4; i++) {
+        bildURLs.push(`https://picsum.photos/400/300?random=${r + i}`);
+      }
+      break;
+    }
   }
 
   bildURLs.forEach((url, idx) => {
     const card = document.createElement('div');
     card.className = 'galerie-karte';
-    card.style.cssText = "background: #181818; padding: 10px; border-radius: 8px; border: 1px solid #333; text-align: center;";
     card.innerHTML = `
-      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:200px; object-fit:contain; border-radius:6px; background:#000;">
+      <img src="${url}" alt="KI Bild ${idx + 1}" style="width:100%; height:250px; object-fit:contain; border-radius:8px; background:#121212;">
       <div class="galerie-buttons" style="margin-top: 10px; display: flex; gap: 5px; justify-content: center;">
         <button onclick="oeffnePaintModal(${idx + 1}, '${url}')">🎨 Bearbeiten</button>
         <button onclick="oeffneBeschreibungModal(${idx + 1})">💬 Beschreiben</button>
@@ -394,7 +537,65 @@ async function ladeKiBilder(kategorie) {
 }
 
 // ====================================================
-// 5. FREIES MALEN SYSTEM
+// KI-SPAß: SPEICHERN MIT HINTERGRUND
+// ====================================================
+function speichereKiGemälde(hintergrundUrl) {
+  const nameInput = document.getElementById('ki-paint-name');
+  const name = nameInput ? nameInput.value.trim() : '';
+
+  if (!name) {
+    alert('Bitte gib deinen Namen ein!');
+    return;
+  }
+
+  const canvasEl = document.getElementById('ki-paint-canvas') || document.getElementById('paint-canvas');
+  if (!canvasEl) return;
+
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = canvasEl.width || 800;
+  tempCanvas.height = canvasEl.height || 500;
+  const tempCtx = tempCanvas.getContext('2d');
+
+  const speicherFunktion = (bgData) => {
+    if (bgData) {
+      tempCtx.drawImage(bgData, 0, 0, tempCanvas.width, tempCanvas.height);
+    } else {
+      tempCtx.fillStyle = '#ffffff';
+      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    }
+    tempCtx.drawImage(canvasEl, 0, 0);
+
+    const gemaeldeData = {
+      autor: name,
+      bildData: tempCanvas.toDataURL('image/png'),
+      zeit: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    freieGemaelde.push(gemaeldeData);
+    localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
+
+    if (nameInput) nameInput.value = '';
+    alert('Dein fertig bearbeitetes Bild wurde erfolgreich gespeichert!');
+    rendereFreiUserListe();
+  };
+
+  if (hintergrundUrl) {
+    const bgImg = new Image();
+    bgImg.crossOrigin = "anonymous";
+    bgImg.onload = function() {
+      speicherFunktion(bgImg);
+    };
+    bgImg.onerror = function() {
+      speicherFunktion(null);
+    };
+    bgImg.src = hintergrundUrl;
+  } else {
+    speicherFunktion(null);
+  }
+}
+
+// ====================================================
+// 6. FREIES MALEN SYSTEM (GARANTIERT SICHTBAR)
 // ====================================================
 let aktuellesFreiWerkzeug = 'bleistift';
 let freiCanvas, freiCtx, freiIsDrawing = false;
@@ -403,51 +604,56 @@ function initFreiesCanvas() {
   freiCanvas = document.getElementById('frei-paint-canvas');
   if (!freiCanvas) return;
 
+  // Feste Breite/Höhe erzwingen
   freiCanvas.width = freiCanvas.offsetWidth || 800;
   freiCanvas.height = 450;
+
   freiCtx = freiCanvas.getContext('2d');
   
+  // Dunkler Hintergrund, damit der Malbereich klar abgegrenzt ist
   freiCtx.fillStyle = '#111111';
   freiCtx.fillRect(0, 0, freiCanvas.width, freiCanvas.height);
 
-  const startFn = (e) => {
+  freiCanvas.onmousedown = (e) => {
     freiIsDrawing = true;
-    const pos = holeKoordinaten(e, freiCanvas);
+    const rect = freiCanvas.getBoundingClientRect();
     freiCtx.beginPath();
-    freiCtx.moveTo(pos.x, pos.y);
+    freiCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
   };
-
-  const moveFn = (e) => zeugeFreiMalen(e);
-
-  const stopFn = () => {
+  
+  freiCanvas.onmousemove = zeugeFreiMalen;
+  
+  freiCanvas.onmouseup = () => {
     freiIsDrawing = false;
     if (freiCtx) freiCtx.beginPath();
   };
 
-  freiCanvas.onmousedown = startFn;
-  freiCanvas.onmousemove = moveFn;
-  freiCanvas.onmouseup = stopFn;
-  freiCanvas.onmouseleave = stopFn;
-
-  freiCanvas.ontouchstart = (e) => { e.preventDefault(); startFn(e); };
-  freiCanvas.ontouchmove = (e) => { e.preventDefault(); moveFn(e); };
-  freiCanvas.ontouchend = stopFn;
+  freiCanvas.onmouseleave = () => {
+    freiIsDrawing = false;
+    if (freiCtx) freiCtx.beginPath();
+  };
 
   rendereFreiUserListe();
 }
 
 function setzeFreiWerkzeug(werkzeug, evt) {
   aktuellesFreiWerkzeug = werkzeug;
-  document.querySelectorAll('#tab-freies-malen .btn-tool').forEach(btn => btn.classList.remove('active'));
-  if (evt && evt.target) evt.target.classList.add('active');
+  const toolBtns = document.querySelectorAll('#tab-freies-malen .btn-tool');
+  toolBtns.forEach(btn => btn.classList.remove('active'));
+  if (evt && evt.target) {
+    evt.target.classList.add('active');
+  }
 }
 
 function zeugeFreiMalen(e) {
-  if (!freiIsDrawing || !freiCtx || !freiCanvas) return;
+  if (!freiIsDrawing || !freiCtx) return;
 
-  const pos = holeKoordinaten(e, freiCanvas);
+  const rect = freiCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
   const farbe = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
-  const groesse = parseFloat(document.getElementById('frei-paint-groesse')?.value) || 5;
+  const groesse = document.getElementById('frei-paint-groesse')?.value || 5;
 
   freiCtx.strokeStyle = farbe;
   freiCtx.fillStyle = farbe;
@@ -455,19 +661,19 @@ function zeugeFreiMalen(e) {
 
   if (aktuellesFreiWerkzeug === 'radiergummi') {
     freiCtx.fillStyle = '#111111';
-    freiCtx.fillRect(pos.x - groesse / 2, pos.y - groesse / 2, groesse * 2, groesse * 2);
+    freiCtx.fillRect(x - groesse / 2, y - groesse / 2, groesse * 2, groesse * 2);
     return;
   }
 
   if (aktuellesFreiWerkzeug === 'bleistift' || aktuellesFreiWerkzeug === 'kugelschreiber') {
     freiCtx.lineCap = 'round';
-    freiCtx.lineTo(pos.x, pos.y);
+    freiCtx.lineTo(x, y);
     freiCtx.stroke();
   } else if (aktuellesFreiWerkzeug === 'spray') {
     for (let i = 0; i < 15; i++) {
       const offsetX = (Math.random() - 0.5) * (groesse * 3);
       const offsetY = (Math.random() - 0.5) * (groesse * 3);
-      freiCtx.fillRect(pos.x + offsetX, pos.y + offsetY, 1, 1);
+      freiCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
     }
   }
 }
@@ -511,47 +717,68 @@ function speichereFreiesGemälde() {
   alert('Dein Kunstwerk wurde erfolgreich gespeichert!');
 }
 
+function rendereFreiUserListe() {
+  const liste = document.getElementById('frei-user-liste');
+  if (!liste) return;
+  liste.innerHTML = '';
+
+  freieGemaelde.forEach((werk) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-neon-user';
+    btn.innerText = `🎨 ${werk.autor} (${werk.zeit})`;
+    btn.onclick = () => {
+      const win = window.open('');
+      if (win) {
+        win.document.write(`
+          <body style="background:#111; color:#fff; text-align:center; font-family:sans-serif; padding:20px;">
+            <h3>Kunstwerk von ${werk.autor}</h3>
+            <img src="${werk.bildData}" alt="Werk von ${werk.autor}" style="max-width:90%; border:2px solid #00f3ff; border-radius:8px;"/>
+          </body>
+        `);
+      }
+    };
+    liste.appendChild(btn);
+  });
+}
+
 // ====================================================
-// 6. KI-STUDIO & ANALYSE
+// 6b. KI-STUDIO & ANALYSE (BILD HOCHLADEN & MALEN)
 // ====================================================
 let studioCanvas, studioCtx, studioIsDrawing = false;
 let aktuellesStudioWerkzeug = 'bleistift';
 
 function initStudioCanvas() {
-  studioCanvas = document.getElementById('studio-paint-canvas');
+  studioCanvas = document.getElementById('studio-paint-canvas') || document.getElementById('ki-studio-canvas');
   if (!studioCanvas) return;
 
   studioCanvas.width = studioCanvas.offsetWidth || 800;
   studioCanvas.height = 450;
   studioCtx = studioCanvas.getContext('2d');
 
+  // Dunkler Standardhintergrund
   if (!studioCanvas.dataset.hasImage) {
     studioCtx.fillStyle = '#111111';
     studioCtx.fillRect(0, 0, studioCanvas.width, studioCanvas.height);
   }
 
-  const startFn = (e) => {
+  studioCanvas.onmousedown = (e) => {
     studioIsDrawing = true;
-    const pos = holeKoordinaten(e, studioCanvas);
+    const rect = studioCanvas.getBoundingClientRect();
     studioCtx.beginPath();
-    studioCtx.moveTo(pos.x, pos.y);
+    studioCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
   };
 
-  const moveFn = (e) => zeichneStudioCanvas(e);
+  studioCanvas.onmousemove = zeichneStudioCanvas;
 
-  const stopFn = () => {
+  studioCanvas.onmouseup = () => {
     studioIsDrawing = false;
     if (studioCtx) studioCtx.beginPath();
   };
 
-  studioCanvas.onmousedown = startFn;
-  studioCanvas.onmousemove = moveFn;
-  studioCanvas.onmouseup = stopFn;
-  studioCanvas.onmouseleave = stopFn;
-
-  studioCanvas.ontouchstart = (e) => { e.preventDefault(); startFn(e); };
-  studioCanvas.ontouchmove = (e) => { e.preventDefault(); moveFn(e); };
-  studioCanvas.ontouchend = stopFn;
+  studioCanvas.onmouseleave = () => {
+    studioIsDrawing = false;
+    if (studioCtx) studioCtx.beginPath();
+  };
 }
 
 function ladeStudioBildHoch(event) {
@@ -574,34 +801,65 @@ function ladeStudioBildHoch(event) {
   reader.readAsDataURL(file);
 }
 
+// Auch verknüpft mit deinem alternativen HTML-Funktionsnamen:
+function ladeBildInKiCanvas(event) {
+  ladeStudioBildHoch(event);
+}
+
 function setzeStudioWerkzeug(werkzeug, evt) {
   aktuellesStudioWerkzeug = werkzeug;
-  document.querySelectorAll('#tab-ki-studio .btn-tool').forEach(btn => btn.classList.remove('active'));
-  if (evt && evt.target) evt.target.classList.add('active');
+  const toolBtns = document.querySelectorAll('#tab-ki-studio .btn-tool');
+  toolBtns.forEach(btn => btn.classList.remove('active'));
+  if (evt && evt.target) {
+    evt.target.classList.add('active');
+  }
+}
+
+function setzeKiStudioWerkzeug(werkzeug, evt) {
+  setzeStudioWerkzeug(werkzeug, evt);
 }
 
 function zeichneStudioCanvas(e) {
-  if (!studioIsDrawing || !studioCtx || !studioCanvas) return;
+  if (!studioIsDrawing || !studioCtx) return;
 
-  const pos = holeKoordinaten(e, studioCanvas);
-  const farbe = document.getElementById('studio-paint-farbe')?.value || '#ff007f';
-  const groesse = parseFloat(document.getElementById('studio-paint-groesse')?.value) || 5;
+  const rect = studioCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  const farbeInput = document.getElementById('studio-paint-farbe') || document.getElementById('ki-studio-farbe');
+  const groesseInput = document.getElementById('studio-paint-groesse') || document.getElementById('ki-studio-groesse');
+
+  const farbe = farbeInput?.value || '#ff007f';
+  const groesse = groesseInput?.value || 5;
 
   studioCtx.strokeStyle = farbe;
   studioCtx.fillStyle = farbe;
   studioCtx.lineWidth = groesse;
 
+  if (aktuellesStudioWerkzeug === 'radiergummi') {
+    studioCtx.fillStyle = '#111111';
+    studioCtx.fillRect(x - groesse / 2, y - groesse / 2, groesse * 2, groesse * 2);
+    return;
+  }
+
   if (aktuellesStudioWerkzeug === 'bleistift' || aktuellesStudioWerkzeug === 'kugelschreiber') {
     studioCtx.lineCap = 'round';
-    studioCtx.lineTo(pos.x, pos.y);
+    studioCtx.lineTo(x, y);
     studioCtx.stroke();
   } else if (aktuellesStudioWerkzeug === 'spray') {
     for (let i = 0; i < 15; i++) {
       const offsetX = (Math.random() - 0.5) * (groesse * 3);
       const offsetY = (Math.random() - 0.5) * (groesse * 3);
-      studioCtx.fillRect(pos.x + offsetX, pos.y + offsetY, 1, 1);
+      studioCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
     }
   }
+}
+
+function löscheKiStudioCanvas() {
+  if (!studioCtx || !studioCanvas) return;
+  delete studioCanvas.dataset.hasImage;
+  studioCtx.fillStyle = '#111111';
+  studioCtx.fillRect(0, 0, studioCanvas.width, studioCanvas.height);
 }
 
 function speichereStudioBild() {
@@ -609,7 +867,7 @@ function speichereStudioBild() {
   const name = nameInput ? nameInput.value.trim() : '';
 
   if (name === '') {
-    alert('Bitte gib deinen Namen ein!');
+    alert('Bitte gib deinen Namen ein, um das Bild zu speichern!');
     return;
   }
 
@@ -623,34 +881,15 @@ function speichereStudioBild() {
   localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
 
   if (nameInput) nameInput.value = '';
-  alert('Bild im KI-Studio gespeichert!');
+  alert('Dein KI-Studio Bild wurde sicher gespeichert!');
   rendereFreiUserListe();
 }
 
-function analysiereKiBild(modus) {
-  const modal = document.getElementById('modal-ki-output');
-  const textElem = document.getElementById('ki-output-text');
-  const titelElem = document.getElementById('ki-output-titel');
-
-  if (!modal || !textElem) return;
-
-  if (modus === 'analyse') {
-    titelElem.innerText = "🤖 KI-Analyse";
-    textElem.innerText = "Das Bild zeigt eine dynamische Komposition mit starkem Farbkontrast und kreativem Fluss. Gut strukturiert!";
-  } else if (modus === 'tipp') {
-    titelElem.innerText = "💡 KI-Tipp";
-    textElem.innerText = "Setze gezielt Glanzlichter an den Rändern, um dem Objekt mehr Tiefe und ein 3D-Gefühl zu verleihen.";
-  } else if (modus === 'prompt') {
-    titelElem.innerText = "✍️ KI-Prompt";
-    textElem.innerText = "Prompt: 'Digital painting of a futuristic neon symbol, glowing in cyan and magenta, detailed line art, dark ambient background.'";
-  }
-
-  modal.classList.remove('hidden');
-}
-
-function schliesseKiOutputModal() {
-  document.getElementById('modal-ki-output')?.classList.add('hidden');
-}
+// Initialer Start beim Laden der Seite
+window.addEventListener('DOMContentLoaded', () => {
+  initFreiesCanvas();
+  initStudioCanvas();
+});
 // ====================================================
 // 5. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
 // =======================================
@@ -841,7 +1080,7 @@ Ich erwachte beim Duft von warmem Essen. Bavin 787 lag auf meinem Leib, doch mei
 
 function ladeGeschichtenUebersicht() {
   const container = document.getElementById('geschichten-grid');
-  if (!container) return;
+  if (!container || typeof geschichtenDaten === 'undefined') return;
   container.innerHTML = '';
 
   Object.keys(geschichtenDaten).forEach(key => {
@@ -850,13 +1089,14 @@ function ladeGeschichtenUebersicht() {
 
     const karte = document.createElement('div');
     karte.className = `geschichte-karte ${geschichte.klasse || ''}`;
-    karte.style.cssText = "background: #222; padding: 15px; border-radius: 8px; border: 1px solid #444;";
     karte.innerHTML = `
       <h3>${geschichte.titel}</h3>
       <p>${geschichte.vorschau}</p>
-      <div style="display: flex; justify-content: space-between; margin-top: 15px; align-items: center;">
-        <span>👁️ <strong id="klicks-${key}">${klicks}</strong></span>
-        <button onclick="oeffneGeschichteModal('${key}')">Lesen</button>
+      <div style="display: flex; justify-content: space-around; margin-top: 15px; align-items: center;">
+        <span style="cursor: pointer;" onclick="oeffneGeschichteModal('${key}')">
+          👁️ <strong id="klicks-${key}">${klicks}</strong>
+        </span>
+        <button onclick="oeffneGeschichteModal('${key}')" style="font-size: 0.85rem; padding: 5px 10px;">Lesen</button>
       </div>
     `;
     container.appendChild(karte);
@@ -864,17 +1104,17 @@ function ladeGeschichtenUebersicht() {
 }
 
 function oeffneGeschichteModal(key) {
-  aktuellesStoryKey = key;
+  if (typeof geschichtenDaten === 'undefined' || !geschichtenDaten[key]) return;
+  
   const geschichte = geschichtenDaten[key];
-  if (!geschichte) return;
-
   const modal = document.getElementById('modal-geschichte');
   const titelElem = document.getElementById('geschichte-titel');
-  const textElem = document.getElementById('geschichte-text');
+  const inhaltElem = document.getElementById('geschichte-inhalt');
 
   if (titelElem) titelElem.innerText = geschichte.titel;
-  if (textElem) textElem.innerText = geschichte.inhalt;
+  if (inhaltElem) inhaltElem.innerHTML = geschichte.inhalt;
 
+  // Klick-Zähler erhöhen
   let klicks = Number(localStorage.getItem(`klicks-${key}`)) || 0;
   klicks++;
   localStorage.setItem(`klicks-${key}`, klicks);
@@ -885,30 +1125,10 @@ function oeffneGeschichteModal(key) {
   modal?.classList.remove('hidden');
 }
 
-function schliesseGeschichteModal(e) {
-  if (!e || e.target.id === 'modal-geschichte' || e.target.classList.contains('btn-abbrechen')) {
-    document.getElementById('modal-geschichte')?.classList.add('hidden');
-  }
+function schliesseGeschichteModal() {
+  document.getElementById('modal-geschichte')?.classList.add('hidden');
 }
 
-function wechsleGenre(genre) {
-  document.querySelectorAll('.btn-genre').forEach(b => b.classList.remove('active'));
-  const btn = event?.target;
-  if (btn) btn.classList.add('active');
-
-  const textElem = document.getElementById('geschichte-text');
-  if (!textElem || !aktuellesStoryKey) return;
-
-  const origText = geschichtenDaten[aktuellesStoryKey].inhalt;
-
-  if (genre === 'horror') {
-    textElem.innerText = origText + " ...Doch plötzlich erlosch das Licht und ein kaltes Lachen hallte durch die Finsternis.";
-  } else if (genre === 'krimi') {
-    textElem.innerText = "AKTE #404: " + origText + " Am Tatort hinterließ der Täter eine rätselhafte Botschaft.";
-  } else {
-    textElem.innerText = origText;
-  }
-}
 
 // ====================================================
 // 8. CLIPPER CATCHER GAME LOGIK
@@ -919,6 +1139,7 @@ let gameTimerInterval = null;
 let spawnTimeout = null;
 let verstreichendeSekunden = 0;
 let aktuellesTempo = 2000;
+let itemsGefangen = 0;
 let schwierigkeit = 'leicht';
 let targetScore = 420;
 
@@ -936,160 +1157,299 @@ function starteClipperSpiel(selectedDifficulty) {
     aktuellesTempo = 2000;
   } else if (schwierigkeit === 'normal') {
     targetScore = 840;
-    aktuellesTempo = 1500;
-  } else {
+    aktuellesTempo = 1400;
+  } else if (schwierigkeit === 'schwer') {
     targetScore = 1260;
-    aktuellesTempo = 1000;
+    aktuellesTempo = 900;
   }
 
   score = 0;
   herzen = 3;
   verstreichendeSekunden = 0;
-
-  document.getElementById('clipper-score').innerText = score;
-  document.getElementById('clipper-herzen').innerText = '❤️❤️❤️';
-  document.getElementById('clipper-timer').innerText = '00:00';
+  itemsGefangen = 0;
 
   document.getElementById('clipper-difficulty-select')?.classList.add('hidden');
   document.getElementById('clipper-game-area')?.classList.remove('hidden');
 
-  starteClipperLoop();
-}
+  aktualisiereGameHeader();
 
-function starteClipperLoop() {
-  clearInterval(gameTimerInterval);
-  clearTimeout(spawnTimeout);
-
+  if (gameTimerInterval) clearInterval(gameTimerInterval);
   gameTimerInterval = setInterval(() => {
     verstreichendeSekunden++;
     const min = String(Math.floor(verstreichendeSekunden / 60)).padStart(2, '0');
     const sec = String(verstreichendeSekunden % 60).padStart(2, '0');
-    document.getElementById('clipper-timer').innerText = `${min}:${sec}`;
+    const timerElem = document.getElementById('clipper-timer');
+    if (timerElem) timerElem.innerText = `${min}:${sec}`;
   }, 1000);
 
-  erzeugeClipperItem();
+  spawneItemLoop();
 }
 
-function erzeugeClipperItem() {
-  const spielfeld = document.getElementById('clipper-spielfeld');
-  if (!spielfeld) return;
+function aktualisiereGameHeader() {
+  const scoreElem = document.getElementById('clipper-score');
+  if (scoreElem) scoreElem.innerText = score;
 
-  const altesItem = document.getElementById('active-clipper-item');
-  if (altesItem) altesItem.remove();
+  let herzStr = '';
+  for (let i = 0; i < herzen; i++) herzStr += '❤️';
+  
+  const herzenElem = document.getElementById('clipper-herzen');
+  if (herzenElem) herzenElem.innerText = herzStr;
+}
 
+function spawneEinzelnesItem(container) {
+  const isJoint = Math.random() > 0.3;
   const item = document.createElement('div');
-  item.id = 'active-clipper-item';
-  item.style.cssText = `
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    background: #ff007f;
-    border-radius: 50%;
-    cursor: pointer;
-    left: ${Math.random() * (spielfeld.clientWidth - 50)}px;
-    top: ${Math.random() * (spielfeld.clientHeight - 50)}px;
-  `;
+  item.className = `game-item ${isJoint ? 'joint' : 'zigarette'}`;
+  item.dataset.type = isJoint ? 'joint' : 'zigarette';
 
-  item.onclick = () => {
-    score += 60;
-    document.getElementById('clipper-score').innerText = score;
-    item.remove();
+  if (isJoint) {
+    item.innerHTML = `<img src="tüten.png" alt="Joint" style="width: 80px; height: auto;">`;
+  } else {
+    item.innerHTML = `<span style="font-size: 3.5rem; line-height: 1; display: block;">🚬</span>`;
+  }
 
-    if (score >= targetScore) {
-      beendeClipperSpiel(true);
-    } else {
-      erzeugeClipperItem();
-    }
+  const maxX = Math.max(10, container.clientWidth - 90);
+  const maxY = Math.max(10, container.clientHeight - 90);
+  item.style.left = Math.floor(Math.random() * maxX) + 'px';
+  item.style.top = Math.floor(Math.random() * maxY) + 'px';
+
+  item.onmousedown = (e) => {
+    e.stopPropagation();
+    anzuenden(item);
   };
 
-  spielfeld.appendChild(item);
-
-  spawnTimeout = setTimeout(() => {
-    if (document.getElementById('active-clipper-item')) {
-      herzen--;
-      document.getElementById('clipper-herzen').innerText = '❤️'.repeat(herzen);
-      if (herzen <= 0) {
-        beendeClipperSpiel(false);
-      } else {
-        erzeugeClipperItem();
-      }
-    }
-  }, aktuellesTempo);
+  container.appendChild(item);
 }
 
-function beendeClipperSpiel(gewonnen = false) {
+function spawneItemLoop() {
+  const spielfeld = document.getElementById('clipper-spielfeld');
+  const modal = document.getElementById('modal-clipper-game');
+  
+  if (!spielfeld || (modal && modal.classList.contains('hidden'))) return;
+
+  const alteItems = spielfeld.querySelectorAll('.game-item');
+  alteItems.forEach(el => el.remove());
+
+  if (schwierigkeit === 'schwer') {
+    spawneEinzelnesItem(spielfeld);
+    spawneEinzelnesItem(spielfeld);
+  } else {
+    spawneEinzelnesItem(spielfeld);
+  }
+
+  if (itemsGefangen > 0 && itemsGefangen % 8 === 0) {
+    const minTempo = schwierigkeit === 'schwer' ? 400 : (schwierigkeit === 'normal' ? 600 : 800);
+    aktuellesTempo = Math.max(minTempo, aktuellesTempo - 120);
+  }
+
+  const zufallsDelay = aktuellesTempo + (Math.random() * 300 - 150);
+  spawnTimeout = setTimeout(() => {
+    itemsGefangen++;
+    spawneItemLoop();
+  }, zufallsDelay);
+}
+
+function anzuenden(item) {
+  const type = item.dataset.type;
+  const spielfeld = document.getElementById('clipper-spielfeld');
+  item.remove();
+
+  if (type === 'joint') {
+    score += 10;
+    
+    if (spielfeld) {
+      spielfeld.classList.add('flash-gruen');
+      setTimeout(() => spielfeld.classList.remove('flash-gruen'), 350);
+    }
+
+    if (score >= targetScore) {
+      beendeClipperSpiel(false, true);
+      return;
+    }
+  } else {
+    herzen--;
+    
+    if (spielfeld) {
+      spielfeld.classList.add('flash-rot');
+      setTimeout(() => spielfeld.classList.remove('flash-rot'), 450);
+    }
+
+    if (herzen <= 0) {
+      beendeClipperSpiel(true, false);
+      return;
+    }
+  }
+  aktualisiereGameHeader();
+}
+
+function beendeClipperSpiel(isGameOver = false, gewonnen = false) {
   clearInterval(gameTimerInterval);
   clearTimeout(spawnTimeout);
+  
+  const spielfeld = document.getElementById('clipper-spielfeld');
+  if (spielfeld) {
+    const alteItems = spielfeld.querySelectorAll('.game-item');
+    alteItems.forEach(el => el.remove());
+  }
 
   document.getElementById('modal-clipper-game')?.classList.add('hidden');
 
+  const min = String(Math.floor(verstreichendeSekunden / 60)).padStart(2, '0');
+  const sec = String(verstreichendeSekunden % 60).padStart(2, '0');
+  const zeitFormatted = `${min}:${sec}`;
+
+  const titelElem = document.getElementById('game-over-titel');
+  const endScoreElem = document.getElementById('end-score');
+  const endTimeElem = document.getElementById('end-time');
+
+  if (endScoreElem) endScoreElem.innerText = score;
+  if (endTimeElem) endTimeElem.innerText = zeitFormatted;
+
   if (gewonnen) {
-    document.getElementById('end-score').innerText = score;
-    document.getElementById('end-time').innerText = document.getElementById('clipper-timer').innerText;
-    document.getElementById('modal-game-over')?.classList.remove('hidden');
+    if (titelElem) {
+      titelElem.innerText = "ZIEL ERREICHT! 🎯";
+      titelElem.style.color = "#00ff66";
+    }
+    aktiviere420EasterEgg();
+  } else if (isGameOver) {
+    if (titelElem) {
+      titelElem.innerText = "GAME OVER! ❌";
+      titelElem.style.color = "#ff0055";
+    }
   }
+
+  document.getElementById('modal-game-over')?.classList.remove('hidden');
+}
+
+function aktiviere420EasterEgg() {
+  document.getElementById('easter-egg-nachricht')?.classList.remove('hidden');
+  document.getElementById('joint-links')?.classList.remove('hidden');
+  document.getElementById('joint-rechts')?.classList.remove('hidden');
+
+  setTimeout(() => {
+    document.getElementById('easter-egg-nachricht')?.classList.add('hidden');
+    document.getElementById('joint-links')?.classList.add('hidden');
+    document.getElementById('joint-rechts')?.classList.add('hidden');
+  }, 10000);
+}
+
+
+// ====================================================
+// 9. HIGHSCORE SPEICHERN & FILTER
+// ====================================================
+let aktuellerFilter = 'leicht';
+
+function speichereHighscore() {
+  const nameInput = document.getElementById('player-name');
+  const name = nameInput ? nameInput.value.trim() || 'Anonym' : 'Anonym';
+
+  const min = String(Math.floor(verstreichendeSekunden / 60)).padStart(2, '0');
+  const sec = String(verstreichendeSekunden % 60).padStart(2, '0');
+  const zeitFormatted = `${min}:${sec}`;
+
+  highscores.push({ 
+    name: name, 
+    schwierigkeit: schwierigkeit,
+    score: score,
+    time: zeitFormatted,
+    seconds: verstreichendeSekunden
+  });
+
+  highscores.sort((a, b) => {
+    if (b.score === a.score) {
+      return a.seconds - b.seconds;
+    }
+    return b.score - a.score;
+  });
+
+  localStorage.setItem('clipper_highscores', JSON.stringify(highscores));
+  if (nameInput) nameInput.value = '';
+  
+  document.getElementById('modal-game-over')?.classList.add('hidden');
+  oeffneHighscoreModal(schwierigkeit);
+}
+
+function oeffneHighscoreModal(kategorie) {
+  aktuellerFilter = kategorie || schwierigkeit || 'leicht';
+  zeigeHighscoreKategorie(aktuellerFilter);
+  document.getElementById('modal-highscore')?.classList.remove('hidden');
+}
+
+function zeigeHighscoreKategorie(kategorie) {
+  aktuellerFilter = kategorie;
+  const liste = document.getElementById('highscore-liste');
+  if (!liste) return;
+
+  const gefiltert = highscores
+    .filter(e => (e.schwierigkeit || 'leicht') === kategorie)
+    .slice(0, 10);
+
+  if (gefiltert.length === 0) {
+    liste.innerHTML = `<li style="text-align: center; color: #888; padding: 15px;">Noch keine Einträge für ${kategorie.toUpperCase()}</li>`;
+    return;
+  }
+
+  liste.innerHTML = gefiltert.map((e, index) => `
+    <li style="margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong style="color: #fff;">#${index + 1} ${e.name}</strong>
+      </div>
+      <div style="text-align: right;">
+        <span style="color: #00ff66; font-weight: bold;">${e.score} Pkt</span> | 
+        <span style="color: #ffcc00;">⏱️ ${e.time}</span>
+      </div>
+    </li>
+  `).join('');
 }
 
 function schliesseGameOverModal() {
   document.getElementById('modal-game-over')?.classList.add('hidden');
 }
 
-function speichereHighscore() {
-  const player = document.getElementById('player-name')?.value.trim() || 'Anonym';
-  highscores.push({
-    spieler: player,
-    punkte: score,
-    zeit: document.getElementById('clipper-timer').innerText,
-    schwierigkeit: schwierigkeit
-  });
-
-  localStorage.setItem('clipper_highscores', JSON.stringify(highscores));
-  schliesseGameOverModal();
-  oeffneHighscoreModal(schwierigkeit);
-}
-
-function oeffneHighscoreModal(kategorie = 'leicht') {
-  document.getElementById('modal-highscore')?.classList.remove('hidden');
-  zeigeHighscoreKategorie(kategorie);
-}
-
-function zeigeHighscoreKategorie(kategorie) {
-  const liste = document.getElementById('highscore-liste');
-  if (!liste) return;
-  liste.innerHTML = '';
-
-  const gefiltert = highscores.filter(h => h.schwierigkeit === kategorie);
-
-  gefiltert.forEach(entry => {
-    const li = document.createElement('li');
-    li.style.cssText = "padding: 5px; border-bottom: 1px solid #333; color: #fff;";
-    li.innerText = `👤 ${entry.spieler} - ${entry.punkte} Pkt (${entry.zeit})`;
-    liste.appendChild(li);
-  });
-}
-
 function schliesseHighscoreModal() {
   document.getElementById('modal-highscore')?.classList.add('hidden');
 }
 
-// ====================================================
-// 9. MINISPIEL: TITEL ERRATEN
-// ====================================================
-function starteTitelRatenSpiel() {
-  const titel = prompt("🎨 Welcher Kunst-Titel passt zu einer bunten Mona Lisa?\n1) Die Farbige\n2) Cyberpunk Lisa\n3) Neon Smile");
-  if (titel === "2" || titel?.toLowerCase() === "cyberpunk lisa") {
-    alert("🎉 Richtig geraten!");
-  } else if (titel) {
-    alert("Leider falsch! Die richtige Antwort war 'Cyberpunk Lisa'.");
-  }
-}
 
 // ====================================================
-// 10. INITIALISIERUNG BEIM SEITENLADEN
+// 10. INITIALISIERUNG BEIM LADEN DER SEITE
 // ====================================================
-window.addEventListener('DOMContentLoaded', () => {
-  initFreiesCanvas();
-  initStudioCanvas();
+document.addEventListener('DOMContentLoaded', () => {
+  // Galerie & KI-Bilder initialisieren
+  erstelleGalerie();
+  ladeKiBilder('standard');
   rendereKiUserListe();
-  rendereFreiUserListe();
+
+  // Custom Cursor für das Clipper-Spiel
+  const spielfeld = document.getElementById('clipper-spielfeld');
+  const customCursor = document.getElementById('custom-clipper-cursor');
+  const clipperImg = document.getElementById('clipper-img');
+
+  if (spielfeld && customCursor) {
+    spielfeld.addEventListener('mousemove', (e) => {
+      const rect = spielfeld.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      customCursor.style.left = x + 'px';
+      customCursor.style.top = y + 'px';
+      customCursor.style.opacity = '1';
+    });
+
+    spielfeld.addEventListener('mouseenter', () => {
+      customCursor.style.opacity = '1';
+    });
+
+    spielfeld.addEventListener('mouseleave', () => {
+      customCursor.style.opacity = '0';
+    });
+
+    spielfeld.addEventListener('mousedown', () => {
+      if (clipperImg) clipperImg.src = 'Feuer.png';
+    });
+
+    spielfeld.addEventListener('mouseup', () => {
+      if (clipperImg) clipperImg.src = 'Clipper.png';
+    });
+  }
 });
