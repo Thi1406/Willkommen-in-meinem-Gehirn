@@ -1224,3 +1224,13 @@ header h1 {
   color: #fff;
   box-shadow: 0 0 18px #aa00ff;
 }
+
+/* Klick-Blockade auf den Hauptkarten aufheben */
+.card * {
+  pointer-events: none !important;
+}
+
+.card {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
