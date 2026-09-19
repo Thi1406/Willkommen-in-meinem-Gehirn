@@ -362,7 +362,7 @@ header h1 {
 }
 
 /* =======================================================
-   UNTERSEITEN & GALERIE
+   1. GRUNDGERÜST & UNTERSEITEN
    ======================================================= */
 .unterseite { 
   background-color: #111111; 
@@ -384,10 +384,48 @@ header h1 {
   margin-bottom: 20px; 
 }
 
-.unterseite button:hover { background: #555; }
+.unterseite button:hover { 
+  background: #555; 
+}
 
-.hidden { display: none !important; }
+.hidden { 
+  display: none !important; 
+}
 
+/* =======================================================
+   2. REITER / TAB-NAVIGATION
+   ======================================================= */
+.bilder-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.btn-tab {
+  background: rgba(15, 15, 25, 0.8);
+  border: 1px solid #00f3ff !important;
+  color: #e0e0e0;
+  padding: 10px 22px !important;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 5px rgba(0, 243, 255, 0.2);
+}
+
+.btn-tab:hover, .btn-tab.active {
+  background: #00f3ff !important;
+  color: #0d0d13 !important;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.8);
+}
+
+/* =======================================================
+   3. GALERIE & BILD-KARTEN
+   ======================================================= */
 .galerie-grid {
   display: flex;
   flex-wrap: wrap;
@@ -408,9 +446,13 @@ header h1 {
   transition: transform 0.3s ease;
 }
 
-.bild-karte:hover { transform: translateY(-5px); }
+.bild-karte:hover { 
+  transform: translateY(-5px); 
+}
 
-.bild-container { position: relative; }
+.bild-container { 
+  position: relative; 
+}
 
 .bild-container img {
   width: 100%;
@@ -486,195 +528,7 @@ header h1 {
   color: #000;
 }
 
-/* MODALS / POP-UPS */
-.modal {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-}
-
-.modal-inhalt {
-  background: #181824;
-  border: 2px solid #b026ff;
-  box-shadow: 0 0 20px #b026ff;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 350px;
-  width: 90%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  color: #fff;
-}
-
-.modal-inhalt textarea, .modal-inhalt input {
-  background: #0a0a10;
-  border: 1px solid #444;
-  color: #fff;
-  padding: 10px;
-  border-radius: 6px;
-}
-
-.fehler-text {
-  color: #ff4d4d;
-  font-size: 0.85rem;
-  margin: 0;
-}
-
-.modal-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.btn-abbrechen {
-  background: #444 !important;
-  color: #fff !important;
-}
-
-/* PAINT STUDIO */
-.paint-inhalt {
-  max-width: 500px !important;
-  width: 95% !important;
-}
-
-.paint-tools {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  background: #0a0a10;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-}
-
-.btn-tool {
-  background: transparent;
-  border: 1px solid #555;
-  color: #fff;
-  padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-tool.active {
-  border-color: #00f3ff;
-  color: #00f3ff;
-  box-shadow: 0 0 5px #00f3ff;
-}
-
-.canvas-container {
-  position: relative;
-  width: 100%;
-  max-height: 300px;
-  overflow: hidden;
-  border: 1px solid #00f3ff;
-  border-radius: 8px;
-}
-
-.canvas-container img {
-  width: 100%;
-  display: block;
-}
-
-.canvas-container canvas {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  cursor: crosshair;
-}
-
-/* =======================================================
-   NEU: ERWEITERUNGEN FÜR BILDER-WELT & FREIES MALEN
-   ======================================================= */
-.bilder-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-}
-
-.btn-tab {
-  background: rgba(15, 15, 25, 0.8);
-  border: 1px solid #00f3ff !important;
-  color: #e0e0e0;
-  padding: 10px 22px !important;
-  font-family: 'Cinzel', serif;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 5px rgba(0, 243, 255, 0.2);
-}
-
-.btn-tab:hover, .btn-tab.active {
-  background: #00f3ff !important;
-  color: #0d0d13 !important;
-  font-weight: bold;
-  box-shadow: 0 0 15px rgba(0, 243, 255, 0.8);
-}
-
-.ki-steuerung {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.ki-select {
-  background: #0a0a10;
-  color: #00f3ff;
-  border: 1px solid #00f3ff;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-family: 'Cinzel', serif;
-  cursor: pointer;
-}
-
-.btn-wuerfel {
-  background: #111 !important;
-  border: 1px solid #b026ff !important;
-  color: #b026ff !important;
-  margin-bottom: 0 !important;
-}
-
-.btn-wuerfel:hover {
-  background: #b026ff !important;
-  color: #fff !important;
-  box-shadow: 0 0 10px #b026ff;
-}
-
-.frei-canvas-container {
-  border: 2px solid #00f3ff;
-  border-radius: 8px;
-  background: #0a0a10;
-  width: 100%;
-  max-width: 600px;
-  height: 400px;
-  margin: 15px auto;
-  position: relative;
-}
-
-#frei-paint-canvas {
-  width: 100%;
-  height: 100%;
-  cursor: crosshair;
-}
-
-.user-werke-liste {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 15px;
-  justify-content: center;
-}
-
+/* Filter-Box & Steuerung */
 .filter-box {
   margin-bottom: 20px;
   text-align: center;
@@ -697,11 +551,200 @@ header h1 {
   cursor: pointer;
 }
 
+.ki-steuerung {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.btn-wuerfel {
+  background: #111 !important;
+  border: 1px solid #b026ff !important;
+  color: #b026ff !important;
+  margin-bottom: 0 !important;
+}
+
+.btn-wuerfel:hover {
+  background: #b026ff !important;
+  color: #fff !important;
+  box-shadow: 0 0 10px #b026ff;
+}
+
+/* =======================================================
+   4. MODALS & POP-UPS (NEU & VERBESSERT)
+   ======================================================= */
+.modal, .modal-overlay {
+  position: fixed;
+  top: 0; 
+  left: 0; 
+  width: 100vw; 
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-inhalt, .modal-content {
+  background: #181824;
+  border: 2px solid #b026ff;
+  box-shadow: 0 0 20px rgba(176, 38, 255, 0.5);
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: #fff;
+}
+
+.modal-inhalt textarea, 
+.modal-inhalt input,
+.modal-content textarea,
+.modal-content input[type="text"] {
+  background: #0a0a10;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fehler-text {
+  color: #ff4d4d;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn-abbrechen {
+  background: #444 !important;
+  color: #fff !important;
+}
+
+/* =======================================================
+   5. PAINT STUDIO & CANVAS STYLES
+   ======================================================= */
+.paint-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  background: #0a0a10;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  border: 1px solid #333;
+}
+
+.werkzeug-leiste {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-tool {
+  background: transparent;
+  border: 1px solid #555;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-tool.active, .btn-tool:hover {
+  border-color: #00f3ff;
+  color: #00f3ff;
+  box-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
+}
+
+.canvas-container {
+  position: relative;
+  width: 100%;
+  max-height: 400px;
+  overflow: hidden;
+  border: 1px solid #00f3ff;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  background: #050508;
+}
+
+.canvas-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.canvas-container canvas, canvas {
+  touch-action: none; /* Verhindert ungewolltes Scrollen beim Malen auf Touchscreens */
+  cursor: crosshair;
+}
+
+.canvas-container canvas {
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+}
+
+/* =======================================================
+   6. FREIES MALEN & KI-STUDIO
+   ======================================================= */
+.freies-malen-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.freies-canvas-box canvas {
+  background: #111;
+  border: 2px solid #00f3ff;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+  max-width: 100%;
+  height: auto;
+}
+
+.frei-paint-speichern-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 10px;
+}
+
+.frei-paint-speichern-box input[type="text"] {
+  background: #0a0a10;
+  border: 1px solid #00f3ff;
+  color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+/* User-Werke & Neon Buttons */
 .bearbeitete-werke-bereich {
   margin-top: 35px;
   border-top: 1px solid rgba(0, 243, 255, 0.2);
   padding-top: 20px;
   text-align: center;
+  width: 100%;
 }
 
 .bearbeitete-werke-bereich h4 {
@@ -710,7 +753,7 @@ header h1 {
   margin-bottom: 15px;
 }
 
-.neon-button-grid {
+.neon-button-grid, .user-werke-liste {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -739,32 +782,7 @@ header h1 {
   box-shadow: 0 0 20px #00f3ff;
 }
 
-.freies-malen-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-}
-
-.freies-canvas-box canvas {
-  background: #111;
-  border: 2px solid #00f3ff;
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
-  cursor: crosshair;
-  max-width: 100%;
-  height: auto;
-}
-
-.frei-paint-speichern-box {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  max-width: 400px;
-  margin-top: 10px;
-}
-
+/* Kommentare */
 .kommentare-liste-box {
   max-height: 250px;
   overflow-y: auto;
@@ -787,7 +805,6 @@ header h1 {
   font-size: 0.85rem;
   margin-bottom: 3px;
 }
-
 /* =======================================================
    GESCHICHTEN LAYOUT, KARTEN & MODAL-SCROLLBAR
    ======================================================= */
