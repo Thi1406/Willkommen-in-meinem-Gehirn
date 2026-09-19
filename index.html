@@ -224,52 +224,6 @@
       </div>
     </div>
   </div>
-   <!-- POPUP MODAL: BESCHREIBEN -->
-<div id="modal-beschreibung" class="modal-overlay hidden">
-  <div class="modal-content">
-    <h3>Bild beschreiben</h3>
-    <textarea id="beschreibung-text" placeholder="Deine Beschreibung zum Bild..."></textarea>
-    <input type="text" id="beschreibung-name" placeholder="Dein Name (Pflichtfeld)*">
-    <p id="modal-fehler" class="fehler-text hidden">Bitte gib deinen Namen ein!</p>
-    <div class="modal-buttons">
-      <button onclick="speichereBeschreibung()">Speichern</button>
-      <button onclick="schliesseBeschreibungModal()">Abbrechen</button>
-    </div>
-  </div>
-</div>
-
-<!-- POPUP MODAL: BILD BEARBEITEN (PAINT) -->
-<div id="modal-paint" class="modal-overlay hidden">
-  <div class="modal-content paint-modal-content">
-    <h3>Bild bearbeiten</h3>
-    
-    <div class="paint-tools">
-      <label for="paint-farbe">Farbe:</label>
-      <input type="color" id="paint-farbe" value="#00f3ff">
-      
-      <div class="werkzeug-leiste">
-        <button class="btn-tool active" onclick="setzeWerkzeug('bleistift', event)">✏️ Bleistift</button>
-        <button class="btn-tool" onclick="setzeWerkzeug('kugelschreiber', event)">🖊️ Kugelschreiber</button>
-        <button class="btn-tool" onclick="setzeWerkzeug('spray', event)">💨 Spraydose</button>
-      </div>
-    </div>
-
-    <!-- Canvas über dem Hintergrundbild -->
-    <div class="canvas-container">
-      <img id="paint-hintergrund-bild" src="" alt="Hintergrund">
-      <canvas id="paint-canvas"></canvas>
-    </div>
-
-    <div class="paint-speichern-bereich">
-      <input type="text" id="paint-name" placeholder="Dein Name (Pflichtfeld)*">
-      <p id="paint-fehler" class="fehler-text hidden">Bitte gib deinen Namen ein!</p>
-      <div class="modal-buttons">
-        <button onclick="speicherePaint()">Speichern</button>
-        <button onclick="schliessePaintModal()">Abbrechen</button>
-      </div>
-    </div>
-  </div>
-</div>
 </section>
 
 <!-- UNTERSEITE: GESCHICHTEN -->
@@ -408,6 +362,8 @@
   </div>
 </div>
 
+</body>
+</html>
 <!-- MODAL: GESCHICHTEN-KOMMENTAR -->
 <div id="modal-geschichte-kommentar" class="modal hidden">
   <div class="modal-inhalt">
