@@ -1,51 +1,39 @@
 // ====================================================
-// 1. HELFER-FUNKTIONEN (Sicheres LocalStorage)
+// 1. SEITEN-NAVIGATION (Startseite & Unterseiten)
 // ====================================================
-function ladeLokalDaten(key, standardWert) {
-  try {
-    const daten = localStorage.getItem(key);
-    return daten ? JSON.parse(daten) : standardWert;
-  } catch (e) {
-    console.error(`Fehler beim Laden von ${key} aus LocalStorage:`, e);
-    return standardWert;
-  }
+function initialisiereNavigation() {
+  document.querySelectorAll('[data-bereich]').forEach(karte => {
+    karte.addEventListener('click', () => zeigeBereich(karte.dataset.bereich));
+  });
 }
 
-// Global definierte Datenstrukturen aus LocalStorage (NUR EINMAL DEKLARIERT)
-let kiBearbeiteteBilder = ladeLokalDaten('kiBearbeiteteBilder', []);
-let freieGemaelde = ladeLokalDaten('freieGemaelde', []);
-let highscores = ladeLokalDaten('clipper_highscores', []);
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initialisiereNavigation, { once: true });
+} else {
+  initialisiereNavigation();
+}
 
 
-// ====================================================
-// 2. SEITEN-NAVIGATION & UNTER-REITER
-// ====================================================
 function zeigeBereich(bereichId) {
-  // Header und Haupt-Grid ausblenden
   document.querySelector('header')?.classList.add('hidden');
   document.querySelector('.navigation-grid')?.classList.add('hidden');
   
-  // Alle Unterseiten verbergen
   const alleUnterseiten = document.querySelectorAll('.unterseite');
   alleUnterseiten.forEach(seite => seite.classList.add('hidden'));
   
-  // Gewählte Unterseite anzeigen
   const zielSeite = document.getElementById('unterseite-' + bereichId);
   if (zielSeite) {
     zielSeite.classList.remove('hidden');
   }
 
-  // Spezial-Initialisierungen je nach Seite
   if (bereichId === 'geschichten') {
-    if (typeof ladeGeschichtenUebersicht === 'function') {
-      ladeGeschichtenUebersicht();
-    }
-  } else if (bereichId === 'bilder') {
-    // Malflächen beim Öffnen der Bilderwelt neu berechnen/initialisieren
-    setTimeout(() => {
-      if (typeof initFreiesCanvas === 'function') initFreiesCanvas();
-      if (typeof initStudioCanvas === 'function') initStudioCanvas();
-    }, 100);
+    ladeGeschichtenUebersicht();
+  }
+
+
+  if (bereichId === 'bilder') {
+    ladeKiBilder(aktuelleKiKategorie);
   }
 }
 
@@ -57,39 +45,33 @@ function zeigeStartseite() {
   document.querySelector('.navigation-grid')?.classList.remove('hidden');
 }
 
-// Funktion für die Unter-Reiter in der Bilderwelt (KI-Spaß, Freies Malen, KI-Studio)
-function wechsleBilderTab(tabName, evt) {
-  // Alle Tabs deaktivieren
-  document.querySelectorAll('.bilder-tabs .btn-tab, .tab-button').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('#unterseite-bilder .tab-content, .tab-content').forEach(tab => {
-    if (tab.id.startsWith('tab-')) {
-      tab.classList.add('hidden');
-    }
-  });
 
-  // Aktiven Button hervorheben (currentTarget stellt sicher, dass der Button getroffen wird)
-  if (evt) {
-    const btn = evt.currentTarget || evt.target;
-    btn.classList.add('active');
-  }  
-  
-  // Ziel-Tab einblenden
-  const zielTab = document.getElementById(`tab-${tabName}`);
-  if (zielTab) {
-    zielTab.classList.remove('hidden');
-  }
-
-  // Canvas-Initialisierung je nach Tab
-  if (tabName === 'freies-malen') {
-    setTimeout(() => { if (typeof initFreiesCanvas === 'function') initFreiesCanvas(); }, 50);
-  } else if (tabName === 'ki-studio') {
-    setTimeout(() => { if (typeof initStudioCanvas === 'function') initStudioCanvas(); }, 50);
+function ladeGespeicherteListe(schluessel) {
+  try {
+    const daten = JSON.parse(localStorage.getItem(schluessel) || '[]');
+    return Array.isArray(daten) ? daten : [];
+  } catch (fehler) {
+    console.warn(`Gespeicherte Daten für "${schluessel}" konnten nicht geladen werden.`, fehler);
+    return [];
   }
 }
 
 
+function speichereListe(schluessel, daten) {
+  try {
+    localStorage.setItem(schluessel, JSON.stringify(daten));
+    return true;
+  } catch (fehler) {
+    console.warn(`Daten für "${schluessel}" konnten nicht gespeichert werden.`, fehler);
+    return false;
+  }
+}
+
+
+
+
 // ====================================================
-// 3. BILDER-LINKS & GALERIE
+// 2. BILDER-LINKS & GALERIE
 // ====================================================
 const meineBilder = [
   "https://picsum.photos/300/200?random=1",
@@ -104,15 +86,15 @@ let aktuellesWerkzeug = 'bleistift';
 let canvas, ctx;
 
 function erstelleGalerie() {
-  const galerieGrid = document.getElementById("galerie-grid");
+  const galerieGrid = document.getElementById("meine-werke-grid");
   if (!galerieGrid) return;
   
-  let gesamtHtml = "";
+  galerieGrid.innerHTML = "";
 
   meineBilder.forEach((bildUrl, index) => {
     const id = index + 1;
 
-    gesamtHtml += `
+    const karteHtml = `
       <div class="bild-karte" id="karte-${id}">
         <div class="bild-container">
           <img src="${bildUrl}" alt="Bild ${id}">
@@ -134,14 +116,13 @@ function erstelleGalerie() {
         </div>
       </div>
     `;
-  });
 
-  galerieGrid.innerHTML = gesamtHtml;
+    galerieGrid.innerHTML += karteHtml;
+  });
 }
 
-
 // ====================================================
-// 4. BESCHREIBEN & PAINT MODALS
+// 3. BESCHREIBEN & PAINT MODALS
 // ====================================================
 function oeffneBeschreibungModal(bildId) {
   aktuellesBildId = bildId;
@@ -151,25 +132,21 @@ function oeffneBeschreibungModal(bildId) {
 
 function schliesseBeschreibungModal() {
   document.getElementById("modal-beschreibung")?.classList.add("hidden");
-  const txt = document.getElementById("beschreibung-text");
-  const name = document.getElementById("beschreibung-name");
-  if (txt) txt.value = "";
-  if (name) name.value = "";
+  document.getElementById("beschreibung-text").value = "";
+  document.getElementById("beschreibung-name").value = "";
 }
 
 function speichereBeschreibung() {
-  const text = document.getElementById("beschreibung-text")?.value || "";
-  const name = document.getElementById("beschreibung-name")?.value.trim() || "";
+  const text = document.getElementById("beschreibung-text").value;
+  const name = document.getElementById("beschreibung-name").value.trim();
 
   if (name === "") {
     document.getElementById("modal-fehler")?.classList.remove("hidden");
     return;
   }
 
-  const wolkeText = document.getElementById(`wolke-text-${aktuellesBildId}`);
-  const wolkeAutor = document.getElementById(`wolke-autor-${aktuellesBildId}`);
-  if (wolkeText) wolkeText.innerText = `"${text}"`;
-  if (wolkeAutor) wolkeAutor.innerText = `— ${name}`;
+  document.getElementById(`wolke-text-${aktuellesBildId}`).innerText = `"${text}"`;
+  document.getElementById(`wolke-autor-${aktuellesBildId}`).innerText = `— ${name}`;
 
   const karte = document.getElementById(`karte-${aktuellesBildId}`);
   if (karte) {
@@ -178,7 +155,7 @@ function speichereBeschreibung() {
     
     badge?.classList.remove("hidden");
     if (anzahlSpan) {
-      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0", 10) + 1;
+      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0") + 1;
     }
   }
 
@@ -195,22 +172,18 @@ function initCanvas() {
   if (!canvas) return;
   
   ctx = canvas.getContext('2d');
-  canvas.width = canvas.offsetWidth || 600;
-  canvas.height = canvas.offsetHeight || 400;
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
 
   canvas.onmousedown = startZeichnen;
   canvas.onmousemove = zeichnen;
   canvas.onmouseup = stoppZeichnen;
-  canvas.onmouseleave = stoppZeichnen;
 }
 
-function setzeWerkzeug(werkzeug, evt) {
+function setzeWerkzeug(werkzeug, aktiverButton) {
   aktuellesWerkzeug = werkzeug;
-  document.querySelectorAll('.btn-tool').forEach(btn => btn.classList.remove('active'));
-  if (evt) {
-    const btn = evt.currentTarget || evt.target;
-    btn.classList.add('active');
-  }
+  document.querySelectorAll('#modal-paint .btn-tool').forEach(btn => btn.classList.remove('active'));
+  aktiverButton?.classList.add('active');
 }
 
 function oeffnePaintModal(bildId, bildUrl) {
@@ -236,10 +209,7 @@ function schliessePaintModal() {
 
 function startZeichnen(e) {
   isDrawing = true;
-  if (!ctx) return;
-  const rect = canvas.getBoundingClientRect();
-  ctx.beginPath();
-  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  zeichnen(e);
 }
 
 function stoppZeichnen() {
@@ -258,11 +228,20 @@ function zeichnen(e) {
   ctx.strokeStyle = farbe;
   ctx.fillStyle = farbe;
 
-  if (aktuellesWerkzeug === 'bleistift' || aktuellesWerkzeug === 'kugelschreiber') {
-    ctx.lineWidth = aktuellesWerkzeug === 'bleistift' ? 2 : 4;
+  if (aktuellesWerkzeug === 'bleistift') {
+    ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.lineTo(x, y);
     ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  } else if (aktuellesWerkzeug === 'kugelschreiber') {
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
   } else if (aktuellesWerkzeug === 'spray') {
     for (let i = 0; i < 20; i++) {
       const offsetX = (Math.random() - 0.5) * 15;
@@ -273,40 +252,13 @@ function zeichnen(e) {
 }
 
 function speicherePaint() {
-  const nameInput = document.getElementById('paint-name');
-  const name = nameInput ? nameInput.value.trim() : '';
+  const name = document.getElementById('paint-name').value.trim();
 
   if (name === '') {
     document.getElementById('paint-fehler')?.classList.remove('hidden');
     return;
   }
 
-  // Kombiniere Originalbild und Zeichnung auf ein Hilfs-Canvas
-  const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = canvas.width;
-  tempCanvas.height = canvas.height;
-  const tempCtx = tempCanvas.getContext('2d');
-
-  const img = document.getElementById('paint-hintergrund-bild');
-  if (img && img.complete) {
-    tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
-  }
-  tempCtx.drawImage(canvas, 0, 0);
-
-  const kombiniertesBildDataUrl = tempCanvas.toDataURL('image/png');
-
-  // Bild in LocalStorage speichern
-  kiBearbeiteteBilder.push({
-    id: Date.now(),
-    bildId: aktuellesBildId,
-    autor: name,
-    bildData: kombiniertesBildDataUrl,
-    datum: new Date().toLocaleDateString('de-DE'),
-    zeit: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  });
-  localStorage.setItem('kiBearbeiteteBilder', JSON.stringify(kiBearbeiteteBilder));
-
-  // Counter auf der Karte erhöhen
   const karte = document.getElementById(`karte-${aktuellesBildId}`);
   if (karte) {
     const badge = karte.querySelector('.farbklecks');
@@ -314,64 +266,193 @@ function speicherePaint() {
 
     badge?.classList.remove('hidden');
     if (anzahlSpan) {
-      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0", 10) + 1;
+      anzahlSpan.innerText = parseInt(anzahlSpan.innerText || "0") + 1;
     }
   }
 
-  rendereKiUserListe();
   schliessePaintModal();
 }
 
-function rendereKiUserListe() {
-  const liste = document.getElementById('ki-user-liste');
-  if (!liste) return;
-  liste.innerHTML = '';
+// ====================================================
+// 4. BILDER-WELT FEATURES (REITER, KATEGORIEN & FREIES MALEN)
+// ====================================================
 
-  kiBearbeiteteBilder.forEach((werk) => {
-    const btn = document.createElement('button');
-    btn.className = 'btn-neon-user';
-    btn.innerText = `🎨 ${werk.autor} (${werk.zeit || ''})`;
-    btn.onclick = () => {
-      if (werk.bildData) {
-        const win = window.open('');
-        if (win) {
-          win.document.write(`<h3>Werk von ${werk.autor} (Bild #${werk.bildId || ''})</h3><img src="${werk.bildData}" alt="Werk von ${werk.autor}" style="max-width:100%; border-radius:8px;"/>`);
-        }
-      } else {
-        alert(`Werk von ${werk.autor} für Bild #${werk.bildId || ''}`);
-      }
-    };
-    liste.appendChild(btn);
-  });
+let aktuelleKiKategorie = 'standard';
+let aktuellesFreiWerkzeug = 'bleistift';
+let freiCanvas, freiCtx, freiIsDrawing = false;
+let kiBearbeiteteBilder = ladeGespeicherteListe('kiBearbeiteteBilder');
+let freieGemaelde = ladeGespeicherteListe('freieGemaelde');
+
+// Reiter-Wechsel im Bilderbereich
+function wechsleBilderTab(tabName, aktiverButton) {
+  document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+
+
+  aktiverButton?.classList.add('active');
+  
+  const zielTab = document.getElementById(`tab-${tabName}`);
+  if (zielTab) zielTab.classList.remove('hidden');
+
+  if (tabName === 'freies-malen') {
+    setTimeout(initFreiesCanvas, 50);
+  }
 }
 
-function rendereFreiUserListe() {
+
+function initFreiesCanvas() {
+  freiCanvas = document.getElementById('frei-paint-canvas');
+  if (!freiCanvas || freiCanvas.dataset.initialisiert === 'true') return;
+
+
+  freiCtx = freiCanvas.getContext('2d');
+  freiCanvas.dataset.initialisiert = 'true';
+
+
+  const positionImCanvas = ereignis => {
+    const rect = freiCanvas.getBoundingClientRect();
+    return {
+      x: (ereignis.clientX - rect.left) * (freiCanvas.width / rect.width),
+      y: (ereignis.clientY - rect.top) * (freiCanvas.height / rect.height)
+    };
+  };
+
+
+  const zeichneFrei = ereignis => {
+    if (!freiIsDrawing || !freiCtx) return;
+    const { x, y } = positionImCanvas(ereignis);
+    const farbe = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
+    const groesse = Number(document.getElementById('frei-paint-groesse')?.value) || 5;
+
+
+    freiCtx.globalCompositeOperation = aktuellesFreiWerkzeug === 'radiergummi'
+      ? 'destination-out'
+      : 'source-over';
+    freiCtx.strokeStyle = farbe;
+    freiCtx.fillStyle = farbe;
+    freiCtx.lineCap = 'round';
+    freiCtx.lineWidth = aktuellesFreiWerkzeug === 'kugelschreiber' ? groesse * 1.5 : groesse;
+
+
+    if (aktuellesFreiWerkzeug === 'spray') {
+      for (let i = 0; i < 24; i++) {
+        const winkel = Math.random() * Math.PI * 2;
+        const radius = Math.random() * groesse * 2;
+        freiCtx.fillRect(x + Math.cos(winkel) * radius, y + Math.sin(winkel) * radius, 1.5, 1.5);
+      }
+      return;
+    }
+
+
+    freiCtx.lineTo(x, y);
+    freiCtx.stroke();
+    freiCtx.beginPath();
+    freiCtx.moveTo(x, y);
+  };
+
+
+  freiCanvas.addEventListener('pointerdown', ereignis => {
+    freiIsDrawing = true;
+    freiCanvas.setPointerCapture?.(ereignis.pointerId);
+    const { x, y } = positionImCanvas(ereignis);
+    freiCtx.beginPath();
+    freiCtx.moveTo(x, y);
+    zeichneFrei(ereignis);
+  });
+  freiCanvas.addEventListener('pointermove', zeichneFrei);
+  freiCanvas.addEventListener('pointerup', stoppFreiesZeichnen);
+  freiCanvas.addEventListener('pointercancel', stoppFreiesZeichnen);
+}
+
+
+function stoppFreiesZeichnen() {
+  freiIsDrawing = false;
+  freiCtx?.beginPath();
+}
+
+
+function setzeFreiWerkzeug(werkzeug, ereignis) {
+  aktuellesFreiWerkzeug = werkzeug;
+  document.querySelectorAll('#tab-freies-malen .btn-tool').forEach(button => {
+    button.classList.remove('active');
+  });
+  ereignis?.currentTarget?.classList.add('active');
+}
+
+
+function allesAusfuellenFreiCanvas() {
+  initFreiesCanvas();
+  if (!freiCtx || !freiCanvas) return;
+  freiCtx.save();
+  freiCtx.globalCompositeOperation = 'source-over';
+  freiCtx.fillStyle = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
+  freiCtx.fillRect(0, 0, freiCanvas.width, freiCanvas.height);
+  freiCtx.restore();
+}
+
+
+function löscheFreiCanvas() {
+  initFreiesCanvas();
+  freiCtx?.clearRect(0, 0, freiCanvas.width, freiCanvas.height);
+}
+
+
+function speichereFreiesGemälde() {
+  initFreiesCanvas();
+  const nameFeld = document.getElementById('frei-paint-name');
+  const fehlerFeld = document.getElementById('frei-paint-fehler');
+  const name = nameFeld?.value.trim() || '';
+
+
+  if (!name) {
+    if (fehlerFeld) fehlerFeld.textContent = 'Bitte gib deinen Namen ein!';
+    fehlerFeld?.classList.remove('hidden');
+    return;
+  }
+
+
+  const werk = {
+    id: Date.now(),
+    name,
+    bild: freiCanvas.toDataURL('image/png')
+  };
+  freieGemaelde.unshift(werk);
+  freieGemaelde = freieGemaelde.slice(0, 10);
+
+
+  if (!speichereListe('freieGemaelde', freieGemaelde)) {
+    freieGemaelde.shift();
+    if (fehlerFeld) fehlerFeld.textContent = 'Das Bild ist zu groß für den Browserspeicher.';
+    fehlerFeld?.classList.remove('hidden');
+    return;
+  }
+
+
+  fehlerFeld?.classList.add('hidden');
+  if (nameFeld) nameFeld.value = '';
+  rendereFreieGemaelde();
+}
+
+
+function rendereFreieGemaelde() {
   const liste = document.getElementById('frei-user-liste');
   if (!liste) return;
   liste.innerHTML = '';
 
-  freieGemaelde.forEach((werk) => {
-    const btn = document.createElement('button');
-    btn.className = 'btn-neon-user';
-    btn.innerText = `🖼️ ${werk.autor} (${werk.zeit || ''})`;
-    btn.onclick = () => {
-      if (werk.bildData) {
-        const win = window.open('');
-        if (win) {
-          win.document.write(`<h3>Freies Gemälde von ${werk.autor}</h3><img src="${werk.bildData}" alt="Gemälde von ${werk.autor}" style="max-width:100%; border-radius:8px;"/>`);
-        }
-      }
-    };
-    liste.appendChild(btn);
+
+  freieGemaelde.forEach(werk => {
+    const link = document.createElement('a');
+    link.className = 'btn-neon-user';
+    link.href = werk.bild;
+    link.download = `zeichnung-${werk.name}.png`;
+    link.textContent = werk.name;
+    link.title = 'Zeichnung herunterladen';
+    liste.appendChild(link);
   });
 }
 
 
-// ====================================================
-// 5. BILDER-WELT FEATURES (KI-SPAß)
-// ====================================================
-let aktuelleKiKategorie = 'standard';
-
+// Dropdown & Würfel
 function aendereKiKategorie(kategorie) {
   aktuelleKiKategorie = kategorie;
   ladeKiBilder(kategorie);
@@ -381,72 +462,26 @@ function würfeleKiBilder() {
   ladeKiBilder(aktuelleKiKategorie);
 }
 
+// Sichere, API-basierte Bild-Generator Funktion
 async function ladeKiBilder(kategorie) {
   const grid = document.getElementById('ki-galerie-grid');
   if (!grid) return;
-  grid.innerHTML = ''; 
+  grid.innerHTML = ''; // Galerie leeren
 
   let bildURLs = [];
-  const r = Date.now();
+  const r = Date.now(); // Eindeutiger Zeitstempel für den Würfel
 
   switch (kategorie) {
-    case 'digimon-gen1': {
-      try {
-        const digiIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-        const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
-        for (let id of gemischt) {
-          const res = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
-          const data = await res.json();
-          bildURLs.push(data.images[0].href);
-        }
-      } catch (e) {
-        bildURLs = [
-          'https://digi-api.com/images/digimon/w/Agumon.png',
-          'https://digi-api.com/images/digimon/w/Gabumon.png',
-          'https://digi-api.com/images/digimon/w/Patamon.png',
-          'https://digi-api.com/images/digimon/w/Gatomon.png'
-        ];
-      }
-      break;
-    }
-
-    case 'digimon-gen2': {
-      try {
-        const digiIds = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
-        const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
-        for (let id of gemischt) {
-          const res = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
-          const data = await res.json();
-          bildURLs.push(data.images[0].href);
-        }
-      } catch (e) {
-        bildURLs = [
-          'https://digi-api.com/images/digimon/w/Veemon.png',
-          'https://digi-api.com/images/digimon/w/Hawkmon.png',
-          'https://digi-api.com/images/digimon/w/Armadillomon.png',
-          'https://digi-api.com/images/digimon/w/Wormmon.png'
-        ];
-      }
-      break;
-    }
-
-    case 'digimon-gen3': {
-      try {
-        const digiIds = [26, 27, 28, 29, 30, 31, 32, 33, 34, 35];
-        const gemischt = digiIds.sort(() => 0.5 - Math.random()).slice(0, 4);
-        for (let id of gemischt) {
-          const res = await fetch(`https://digi-api.com/api/v1/digimon/${id}`);
-          const data = await res.json();
-          bildURLs.push(data.images[0].href);
-        }
-      } catch (e) {
-        bildURLs = [
-          'https://digi-api.com/images/digimon/w/Guilmon.png',
-          'https://digi-api.com/images/digimon/w/Terriermon.png',
-          'https://digi-api.com/images/digimon/w/Renamon.png',
-          'https://digi-api.com/images/digimon/w/Impmon.png'
-        ];
-      }
+    case 'superhelden': {
+      const heldenPool = [
+        1, 30, 34, 38, 60, 66, 68, 69, 70, 106, 
+        107, 149, 156, 165, 201, 204, 213, 222, 225, 233, 
+        234, 263, 265, 303, 309, 310, 332, 346, 370, 388, 
+        400, 405, 414, 490, 527, 575, 620, 644, 659, 687
+      ];
+      
+      const gemischt = heldenPool.sort(() => 0.5 - Math.random()).slice(0, 4);
+      bildURLs = gemischt.map(id => `https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/md/${id}.jpg`);
       break;
     }
 
@@ -522,6 +557,7 @@ async function ladeKiBilder(kategorie) {
     }
   }
 
+  // Galerie im DOM befüllen
   bildURLs.forEach((url, idx) => {
     const card = document.createElement('div');
     card.className = 'galerie-karte';
@@ -536,360 +572,6 @@ async function ladeKiBilder(kategorie) {
   });
 }
 
-// ====================================================
-// KI-SPAß: SPEICHERN MIT HINTERGRUND
-// ====================================================
-function speichereKiGemälde(hintergrundUrl) {
-  const nameInput = document.getElementById('ki-paint-name');
-  const name = nameInput ? nameInput.value.trim() : '';
-
-  if (!name) {
-    alert('Bitte gib deinen Namen ein!');
-    return;
-  }
-
-  const canvasEl = document.getElementById('ki-paint-canvas') || document.getElementById('paint-canvas');
-  if (!canvasEl) return;
-
-  const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = canvasEl.width || 800;
-  tempCanvas.height = canvasEl.height || 500;
-  const tempCtx = tempCanvas.getContext('2d');
-
-  const speicherFunktion = (bgData) => {
-    if (bgData) {
-      tempCtx.drawImage(bgData, 0, 0, tempCanvas.width, tempCanvas.height);
-    } else {
-      tempCtx.fillStyle = '#ffffff';
-      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-    }
-    tempCtx.drawImage(canvasEl, 0, 0);
-
-    const gemaeldeData = {
-      autor: name,
-      bildData: tempCanvas.toDataURL('image/png'),
-      zeit: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    freieGemaelde.push(gemaeldeData);
-    localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
-
-    if (nameInput) nameInput.value = '';
-    alert('Dein fertig bearbeitetes Bild wurde erfolgreich gespeichert!');
-    rendereFreiUserListe();
-  };
-
-  if (hintergrundUrl) {
-    const bgImg = new Image();
-    bgImg.crossOrigin = "anonymous";
-    bgImg.onload = function() {
-      speicherFunktion(bgImg);
-    };
-    bgImg.onerror = function() {
-      speicherFunktion(null);
-    };
-    bgImg.src = hintergrundUrl;
-  } else {
-    speicherFunktion(null);
-  }
-}
-
-// ====================================================
-// 6. FREIES MALEN SYSTEM (GARANTIERT SICHTBAR)
-// ====================================================
-let aktuellesFreiWerkzeug = 'bleistift';
-let freiCanvas, freiCtx, freiIsDrawing = false;
-
-function initFreiesCanvas() {
-  freiCanvas = document.getElementById('frei-paint-canvas');
-  if (!freiCanvas) return;
-
-  // Feste Breite/Höhe erzwingen
-  freiCanvas.width = freiCanvas.offsetWidth || 800;
-  freiCanvas.height = 450;
-
-  freiCtx = freiCanvas.getContext('2d');
-  
-  // Dunkler Hintergrund, damit der Malbereich klar abgegrenzt ist
-  freiCtx.fillStyle = '#111111';
-  freiCtx.fillRect(0, 0, freiCanvas.width, freiCanvas.height);
-
-  freiCanvas.onmousedown = (e) => {
-    freiIsDrawing = true;
-    const rect = freiCanvas.getBoundingClientRect();
-    freiCtx.beginPath();
-    freiCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-  };
-  
-  freiCanvas.onmousemove = zeugeFreiMalen;
-  
-  freiCanvas.onmouseup = () => {
-    freiIsDrawing = false;
-    if (freiCtx) freiCtx.beginPath();
-  };
-
-  freiCanvas.onmouseleave = () => {
-    freiIsDrawing = false;
-    if (freiCtx) freiCtx.beginPath();
-  };
-
-  rendereFreiUserListe();
-}
-
-function setzeFreiWerkzeug(werkzeug, evt) {
-  aktuellesFreiWerkzeug = werkzeug;
-  const toolBtns = document.querySelectorAll('#tab-freies-malen .btn-tool');
-  toolBtns.forEach(btn => btn.classList.remove('active'));
-  if (evt && evt.target) {
-    evt.target.classList.add('active');
-  }
-}
-
-function zeugeFreiMalen(e) {
-  if (!freiIsDrawing || !freiCtx) return;
-
-  const rect = freiCanvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  const farbe = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
-  const groesse = document.getElementById('frei-paint-groesse')?.value || 5;
-
-  freiCtx.strokeStyle = farbe;
-  freiCtx.fillStyle = farbe;
-  freiCtx.lineWidth = groesse;
-
-  if (aktuellesFreiWerkzeug === 'radiergummi') {
-    freiCtx.fillStyle = '#111111';
-    freiCtx.fillRect(x - groesse / 2, y - groesse / 2, groesse * 2, groesse * 2);
-    return;
-  }
-
-  if (aktuellesFreiWerkzeug === 'bleistift' || aktuellesFreiWerkzeug === 'kugelschreiber') {
-    freiCtx.lineCap = 'round';
-    freiCtx.lineTo(x, y);
-    freiCtx.stroke();
-  } else if (aktuellesFreiWerkzeug === 'spray') {
-    for (let i = 0; i < 15; i++) {
-      const offsetX = (Math.random() - 0.5) * (groesse * 3);
-      const offsetY = (Math.random() - 0.5) * (groesse * 3);
-      freiCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
-    }
-  }
-}
-
-function allesAusfuellenFreiCanvas() {
-  if (!freiCtx || !freiCanvas) return;
-  const farbe = document.getElementById('frei-paint-farbe')?.value || '#00f3ff';
-  freiCtx.fillStyle = farbe;
-  freiCtx.fillRect(0, 0, freiCanvas.width, freiCanvas.height);
-}
-
-function löscheFreiCanvas() {
-  if (!freiCtx || !freiCanvas) return;
-  freiCtx.fillStyle = '#111111';
-  freiCtx.fillRect(0, 0, freiCanvas.width, freiCanvas.height);
-}
-
-function speichereFreiesGemälde() {
-  const nameInput = document.getElementById('frei-paint-name');
-  const name = nameInput ? nameInput.value.trim() : '';
-
-  if (name === '') {
-    document.getElementById('frei-paint-fehler')?.classList.remove('hidden');
-    return;
-  }
-
-  document.getElementById('frei-paint-fehler')?.classList.add('hidden');
-
-  const gemaeldeData = {
-    autor: name,
-    bildData: freiCanvas.toDataURL(),
-    zeit: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  };
-
-  freieGemaelde.push(gemaeldeData);
-  localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
-
-  nameInput.value = '';
-  löscheFreiCanvas();
-  rendereFreiUserListe();
-  alert('Dein Kunstwerk wurde erfolgreich gespeichert!');
-}
-
-function rendereFreiUserListe() {
-  const liste = document.getElementById('frei-user-liste');
-  if (!liste) return;
-  liste.innerHTML = '';
-
-  freieGemaelde.forEach((werk) => {
-    const btn = document.createElement('button');
-    btn.className = 'btn-neon-user';
-    btn.innerText = `🎨 ${werk.autor} (${werk.zeit})`;
-    btn.onclick = () => {
-      const win = window.open('');
-      if (win) {
-        win.document.write(`
-          <body style="background:#111; color:#fff; text-align:center; font-family:sans-serif; padding:20px;">
-            <h3>Kunstwerk von ${werk.autor}</h3>
-            <img src="${werk.bildData}" alt="Werk von ${werk.autor}" style="max-width:90%; border:2px solid #00f3ff; border-radius:8px;"/>
-          </body>
-        `);
-      }
-    };
-    liste.appendChild(btn);
-  });
-}
-
-// ====================================================
-// 6b. KI-STUDIO & ANALYSE (BILD HOCHLADEN & MALEN)
-// ====================================================
-let studioCanvas, studioCtx, studioIsDrawing = false;
-let aktuellesStudioWerkzeug = 'bleistift';
-
-function initStudioCanvas() {
-  studioCanvas = document.getElementById('studio-paint-canvas') || document.getElementById('ki-studio-canvas');
-  if (!studioCanvas) return;
-
-  studioCanvas.width = studioCanvas.offsetWidth || 800;
-  studioCanvas.height = 450;
-  studioCtx = studioCanvas.getContext('2d');
-
-  // Dunkler Standardhintergrund
-  if (!studioCanvas.dataset.hasImage) {
-    studioCtx.fillStyle = '#111111';
-    studioCtx.fillRect(0, 0, studioCanvas.width, studioCanvas.height);
-  }
-
-  studioCanvas.onmousedown = (e) => {
-    studioIsDrawing = true;
-    const rect = studioCanvas.getBoundingClientRect();
-    studioCtx.beginPath();
-    studioCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-  };
-
-  studioCanvas.onmousemove = zeichneStudioCanvas;
-
-  studioCanvas.onmouseup = () => {
-    studioIsDrawing = false;
-    if (studioCtx) studioCtx.beginPath();
-  };
-
-  studioCanvas.onmouseleave = () => {
-    studioIsDrawing = false;
-    if (studioCtx) studioCtx.beginPath();
-  };
-}
-
-function ladeStudioBildHoch(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = new Image();
-    img.onload = function() {
-      initStudioCanvas();
-      if (studioCtx && studioCanvas) {
-        studioCanvas.dataset.hasImage = "true";
-        studioCtx.clearRect(0, 0, studioCanvas.width, studioCanvas.height);
-        studioCtx.drawImage(img, 0, 0, studioCanvas.width, studioCanvas.height);
-      }
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-// Auch verknüpft mit deinem alternativen HTML-Funktionsnamen:
-function ladeBildInKiCanvas(event) {
-  ladeStudioBildHoch(event);
-}
-
-function setzeStudioWerkzeug(werkzeug, evt) {
-  aktuellesStudioWerkzeug = werkzeug;
-  const toolBtns = document.querySelectorAll('#tab-ki-studio .btn-tool');
-  toolBtns.forEach(btn => btn.classList.remove('active'));
-  if (evt && evt.target) {
-    evt.target.classList.add('active');
-  }
-}
-
-function setzeKiStudioWerkzeug(werkzeug, evt) {
-  setzeStudioWerkzeug(werkzeug, evt);
-}
-
-function zeichneStudioCanvas(e) {
-  if (!studioIsDrawing || !studioCtx) return;
-
-  const rect = studioCanvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  const farbeInput = document.getElementById('studio-paint-farbe') || document.getElementById('ki-studio-farbe');
-  const groesseInput = document.getElementById('studio-paint-groesse') || document.getElementById('ki-studio-groesse');
-
-  const farbe = farbeInput?.value || '#ff007f';
-  const groesse = groesseInput?.value || 5;
-
-  studioCtx.strokeStyle = farbe;
-  studioCtx.fillStyle = farbe;
-  studioCtx.lineWidth = groesse;
-
-  if (aktuellesStudioWerkzeug === 'radiergummi') {
-    studioCtx.fillStyle = '#111111';
-    studioCtx.fillRect(x - groesse / 2, y - groesse / 2, groesse * 2, groesse * 2);
-    return;
-  }
-
-  if (aktuellesStudioWerkzeug === 'bleistift' || aktuellesStudioWerkzeug === 'kugelschreiber') {
-    studioCtx.lineCap = 'round';
-    studioCtx.lineTo(x, y);
-    studioCtx.stroke();
-  } else if (aktuellesStudioWerkzeug === 'spray') {
-    for (let i = 0; i < 15; i++) {
-      const offsetX = (Math.random() - 0.5) * (groesse * 3);
-      const offsetY = (Math.random() - 0.5) * (groesse * 3);
-      studioCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
-    }
-  }
-}
-
-function löscheKiStudioCanvas() {
-  if (!studioCtx || !studioCanvas) return;
-  delete studioCanvas.dataset.hasImage;
-  studioCtx.fillStyle = '#111111';
-  studioCtx.fillRect(0, 0, studioCanvas.width, studioCanvas.height);
-}
-
-function speichereStudioBild() {
-  const nameInput = document.getElementById('studio-paint-name');
-  const name = nameInput ? nameInput.value.trim() : '';
-
-  if (name === '') {
-    alert('Bitte gib deinen Namen ein, um das Bild zu speichern!');
-    return;
-  }
-
-  const gemaeldeData = {
-    autor: name,
-    bildData: studioCanvas.toDataURL(),
-    zeit: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  };
-
-  freieGemaelde.push(gemaeldeData);
-  localStorage.setItem('freieGemaelde', JSON.stringify(freieGemaelde));
-
-  if (nameInput) nameInput.value = '';
-  alert('Dein KI-Studio Bild wurde sicher gespeichert!');
-  rendereFreiUserListe();
-}
-
-// Initialer Start beim Laden der Seite
-window.addEventListener('DOMContentLoaded', () => {
-  initFreiesCanvas();
-  initStudioCanvas();
-});
 // ====================================================
 // 5. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
 // =======================================
@@ -1078,6 +760,104 @@ Ich erwachte beim Duft von warmem Essen. Bavin 787 lag auf meinem Leib, doch mei
   }
 };
 
+
+let aktuelleGeschichteId = null;
+
+
+function oeffneGeschichteModal(geschichteId) {
+  const geschichte = geschichtenDaten[geschichteId];
+  if (!geschichte) return;
+
+
+  aktuelleGeschichteId = geschichteId;
+  const titel = document.getElementById('geschichte-titel');
+  if (titel) titel.textContent = geschichte.titel;
+  wechsleGenre('original');
+
+
+  let klicks = 1;
+  try {
+    klicks = (Number(localStorage.getItem(`klicks-${geschichteId}`)) || 0) + 1;
+    localStorage.setItem(`klicks-${geschichteId}`, String(klicks));
+  } catch (fehler) {
+    console.warn('Der Aufrufzähler konnte nicht gespeichert werden.', fehler);
+  }
+
+
+  const zaehler = document.getElementById(`klicks-${geschichteId}`);
+  if (zaehler) zaehler.textContent = String(klicks);
+  document.getElementById('modal-geschichte')?.classList.remove('hidden');
+}
+
+
+function wechsleGenre(genre) {
+  if (!aktuelleGeschichteId) return;
+  const text = geschichtenDaten[aktuelleGeschichteId]?.genres?.[genre];
+  if (!text) return;
+
+
+  const textFeld = document.getElementById('geschichte-text');
+  if (textFeld) textFeld.textContent = text;
+  document.querySelectorAll('.btn-genre').forEach(button => {
+    button.classList.toggle('active', button.dataset.genre === genre);
+  });
+}
+
+
+function schliesseGeschichteModal(ereignis) {
+  if (ereignis?.currentTarget?.id === 'modal-geschichte' && ereignis.target !== ereignis.currentTarget) {
+    return;
+  }
+  document.getElementById('modal-geschichte')?.classList.add('hidden');
+}
+
+
+function schliesseKommentareModal() {
+  document.getElementById('modal-alle-kommentare')?.classList.add('hidden');
+}
+
+
+function oeffneGeschichteKommentarModal(geschichteId = aktuelleGeschichteId) {
+  if (!geschichteId || !geschichtenDaten[geschichteId]) return;
+  aktuelleGeschichteId = geschichteId;
+  const titel = document.getElementById('kommentar-story-titel');
+  if (titel) titel.textContent = geschichtenDaten[geschichteId].titel;
+  document.getElementById('geschichte-kommentar-fehler')?.classList.add('hidden');
+  document.getElementById('modal-geschichte-kommentar')?.classList.remove('hidden');
+}
+
+
+function speichereGeschichteKommentar() {
+  const nameFeld = document.getElementById('geschichte-kommentar-name');
+  const textFeld = document.getElementById('geschichte-kommentar-text');
+  const fehlerFeld = document.getElementById('geschichte-kommentar-fehler');
+  const name = nameFeld?.value.trim() || '';
+  const kommentar = textFeld?.value.trim() || '';
+
+
+  if (!aktuelleGeschichteId || !name) {
+    fehlerFeld?.classList.remove('hidden');
+    return;
+  }
+
+
+  const schluessel = `geschichte-kommentare-${aktuelleGeschichteId}`;
+  const kommentare = ladeGespeicherteListe(schluessel);
+  kommentare.push({ name, kommentar, erstelltAm: new Date().toISOString() });
+  if (!speichereListe(schluessel, kommentare)) return;
+
+
+  if (nameFeld) nameFeld.value = '';
+  if (textFeld) textFeld.value = '';
+  schliesseGeschichteKommentarModal();
+}
+
+
+function schliesseGeschichteKommentarModal() {
+  document.getElementById('modal-geschichte-kommentar')?.classList.add('hidden');
+}
+
+
 function ladeGeschichtenUebersicht() {
   const container = document.getElementById('geschichten-grid');
   if (!container || typeof geschichtenDaten === 'undefined') return;
@@ -1103,35 +883,8 @@ function ladeGeschichtenUebersicht() {
   });
 }
 
-function oeffneGeschichteModal(key) {
-  if (typeof geschichtenDaten === 'undefined' || !geschichtenDaten[key]) return;
-  
-  const geschichte = geschichtenDaten[key];
-  const modal = document.getElementById('modal-geschichte');
-  const titelElem = document.getElementById('geschichte-titel');
-  const inhaltElem = document.getElementById('geschichte-inhalt');
-
-  if (titelElem) titelElem.innerText = geschichte.titel;
-  if (inhaltElem) inhaltElem.innerHTML = geschichte.inhalt;
-
-  // Klick-Zähler erhöhen
-  let klicks = Number(localStorage.getItem(`klicks-${key}`)) || 0;
-  klicks++;
-  localStorage.setItem(`klicks-${key}`, klicks);
-
-  const klickElem = document.getElementById(`klicks-${key}`);
-  if (klickElem) klickElem.innerText = klicks;
-
-  modal?.classList.remove('hidden');
-}
-
-function schliesseGeschichteModal() {
-  document.getElementById('modal-geschichte')?.classList.add('hidden');
-}
-
-
 // ====================================================
-// 8. CLIPPER CATCHER GAME LOGIK
+// 6. CLIPPER CATCHER GAME LOGIK
 // ====================================================
 let score = 0;
 let herzen = 3;
@@ -1142,7 +895,48 @@ let aktuellesTempo = 2000;
 let itemsGefangen = 0;
 let schwierigkeit = 'leicht';
 let targetScore = 420;
+let highscores = ladeGespeicherteListe('clipper_highscores');
 
+// ----------------------------------------------------
+// FEUERZEUG-STEUERUNG
+// ----------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+  const spielfeld = document.getElementById('clipper-spielfeld');
+  const customCursor = document.getElementById('custom-clipper-cursor');
+  const clipperImg = document.getElementById('clipper-img');
+
+  if (spielfeld && customCursor) {
+    spielfeld.addEventListener('mousemove', (e) => {
+      const rect = spielfeld.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      customCursor.style.left = x + 'px';
+      customCursor.style.top = y + 'px';
+      customCursor.style.opacity = '1';
+    });
+
+    spielfeld.addEventListener('mouseenter', () => {
+      customCursor.style.opacity = '1';
+    });
+
+    spielfeld.addEventListener('mouseleave', () => {
+      customCursor.style.opacity = '0';
+    });
+
+    spielfeld.addEventListener('mousedown', () => {
+      if (clipperImg) clipperImg.src = 'Feuer.png';
+    });
+
+    spielfeld.addEventListener('mouseup', () => {
+      if (clipperImg) clipperImg.src = 'Clipper.png';
+    });
+  }
+});
+
+// ----------------------------------------------------
+// SPIEL-STEUERUNG
+// ----------------------------------------------------
 function oeffneClipperSpiel() {
   document.getElementById('modal-clipper-game')?.classList.remove('hidden');
   document.getElementById('clipper-difficulty-select')?.classList.remove('hidden');
@@ -1223,9 +1017,7 @@ function spawneEinzelnesItem(container) {
 
 function spawneItemLoop() {
   const spielfeld = document.getElementById('clipper-spielfeld');
-  const modal = document.getElementById('modal-clipper-game');
-  
-  if (!spielfeld || (modal && modal.classList.contains('hidden'))) return;
+  if (!spielfeld || document.getElementById('modal-clipper-game').classList.contains('hidden')) return;
 
   const alteItems = spielfeld.querySelectorAll('.game-item');
   alteItems.forEach(el => el.remove());
@@ -1333,10 +1125,9 @@ function aktiviere420EasterEgg() {
   }, 10000);
 }
 
-
-// ====================================================
-// 9. HIGHSCORE SPEICHERN & FILTER
-// ====================================================
+// ----------------------------------------------------
+// HIGHSCORE SPEICHERN & KATEGORIEN-FILTER
+// ----------------------------------------------------
 let aktuellerFilter = 'leicht';
 
 function speichereHighscore() {
@@ -1362,7 +1153,7 @@ function speichereHighscore() {
     return b.score - a.score;
   });
 
-  localStorage.setItem('clipper_highscores', JSON.stringify(highscores));
+  speichereListe('clipper_highscores', highscores);
   if (nameInput) nameInput.value = '';
   
   document.getElementById('modal-game-over')?.classList.add('hidden');
@@ -1411,45 +1202,14 @@ function schliesseHighscoreModal() {
 }
 
 
-// ====================================================
-// 10. INITIALISIERUNG BEIM LADEN DER SEITE
-// ====================================================
-document.addEventListener('DOMContentLoaded', () => {
-  // Galerie & KI-Bilder initialisieren
+function initialisiereInhalte() {
   erstelleGalerie();
-  ladeKiBilder('standard');
-  rendereKiUserListe();
+  rendereFreieGemaelde();
+}
 
-  // Custom Cursor für das Clipper-Spiel
-  const spielfeld = document.getElementById('clipper-spielfeld');
-  const customCursor = document.getElementById('custom-clipper-cursor');
-  const clipperImg = document.getElementById('clipper-img');
 
-  if (spielfeld && customCursor) {
-    spielfeld.addEventListener('mousemove', (e) => {
-      const rect = spielfeld.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      customCursor.style.left = x + 'px';
-      customCursor.style.top = y + 'px';
-      customCursor.style.opacity = '1';
-    });
-
-    spielfeld.addEventListener('mouseenter', () => {
-      customCursor.style.opacity = '1';
-    });
-
-    spielfeld.addEventListener('mouseleave', () => {
-      customCursor.style.opacity = '0';
-    });
-
-    spielfeld.addEventListener('mousedown', () => {
-      if (clipperImg) clipperImg.src = 'Feuer.png';
-    });
-
-    spielfeld.addEventListener('mouseup', () => {
-      if (clipperImg) clipperImg.src = 'Clipper.png';
-    });
-  }
-});
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initialisiereInhalte, { once: true });
+} else {
+  initialisiereInhalte();
+}
