@@ -12,7 +12,7 @@ body, h1, h2, h3, p, button, .geschichte-text-box, .geschichte-karte h3, #geschi
 }
 
 /* =======================================================
-   GRUNDDESIGN
+   GRUNDDESIGN & HAUPTKARTEN-NAVIGATION
    ======================================================= */
 body {
   background-color: #000000;
@@ -44,6 +44,7 @@ header h1 {
   max-width: 1000px;
 }
 
+/* HAUPTKARTEN FIX: Klicks überall auf der Karte zulassen */
 .card {
   background-color: #111111;
   border: 3px solid #333;
@@ -51,9 +52,15 @@ header h1 {
   height: 250px;
   position: relative;
   overflow: hidden;
-  cursor: pointer;
+  cursor: pointer !important;
   transition: transform 0.3s, box-shadow 0.3s;
-  z-index: 1; /* Stellt sicher, dass die Karte Klicks annimmt */
+  z-index: 1;
+  pointer-events: auto !important; /* Stellt sicher, dass die Karte Klicks annimmt */
+}
+
+/* Leitet alle Klicks innerhalb der Karte direkt an die Karte selbst weiter */
+.card * {
+  pointer-events: none !important;
 }
 
 .card:hover { 
@@ -68,7 +75,6 @@ header h1 {
   font-size: 1.8rem;
   font-weight: bold;
   z-index: 10;
-  pointer-events: none; /* Verhindert, dass der Text die Klicks auf die Karte blockiert */
   background-color: rgba(17, 17, 17, 0.8);
   padding: 5px 15px;
   border-radius: 5px;
@@ -361,7 +367,7 @@ header h1 {
 
 /* =======================================================
    1. GRUNDGERÜST & UNTERSEITEN
-   ======================================================= */
+   ====================================================== */
 .unterseite { 
   background-color: #111111; 
   border: 2px solid #555; 
@@ -649,7 +655,6 @@ header h1 {
 /* =======================================================
    5. PAINT STUDIO, TABS & CANVAS STYLES
    ======================================================= */
-/* Studio Navigation Tabs */
 .studio-tabs {
   display: flex;
   justify-content: center;
@@ -675,7 +680,6 @@ header h1 {
   box-shadow: 0 0 12px #00f3ff;
 }
 
-/* Werkzeugleiste */
 .paint-tools {
   display: flex;
   flex-wrap: wrap;
@@ -712,7 +716,6 @@ header h1 {
   box-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
 }
 
-/* Inpainting Canvas Container */
 .canvas-container {
   position: relative;
   width: 100%;
@@ -783,7 +786,6 @@ header h1 {
   font-family: inherit;
 }
 
-/* User-Werke & Neon Buttons */
 .bearbeitete-werke-bereich {
   margin-top: 35px;
   border-top: 1px solid rgba(0, 243, 255, 0.2);
@@ -827,7 +829,6 @@ header h1 {
   box-shadow: 0 0 20px #00f3ff;
 }
 
-/* Kommentare */
 .kommentare-liste-box {
   max-height: 250px;
   overflow-y: auto;
@@ -991,7 +992,7 @@ header h1 {
 }
 
 /* =======================================================
-   CLIPPER GAME STYLES (PRÄZISE MIT FEUERZEUG-CURSOR)
+   CLIPPER GAME STYLES
    ======================================================= */
 .games-grid {
   display: flex;
@@ -1048,7 +1049,6 @@ header h1 {
   cursor: pointer;
 }
 
-/* Spielfeld ohne Standard-Mauszeiger */
 .clipper-spielfeld {
   position: relative;
   width: 100%;
@@ -1062,7 +1062,6 @@ header h1 {
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Custom Clipper-Cursor */
 #custom-clipper-cursor {
   position: absolute;
   width: 35px;
@@ -1083,7 +1082,6 @@ header h1 {
   object-fit: contain;
 }
 
-/* Visuelles Feedback beim Anzünden */
 .clipper-spielfeld.flash-gruen {
   border-color: #00ff00 !important;
   box-shadow: 0 0 35px #00ff00, inset 0 0 20px #00ff00 !important;
@@ -1094,14 +1092,12 @@ header h1 {
   box-shadow: 0 0 35px #ff0000, inset 0 0 20px #ff0000 !important;
 }
 
-/* Ziel-Objekte auf dem Feld */
 .game-item {
   position: absolute;
   user-select: none;
   cursor: none !important;
 }
 
-/* Präzise Hitbox */
 .anzuend-zone {
   position: absolute;
   left: 0;
@@ -1119,7 +1115,6 @@ header h1 {
   pointer-events: none;
 }
 
-/* Leuchteffekte */
 .game-item.joint img {
   filter: drop-shadow(0 0 4px rgba(0, 255, 0, 0.4));
 }
@@ -1159,7 +1154,7 @@ header h1 {
 }
 
 /* =======================================================
-   SCHWIERIGKEITSGRAD BUTTONS & LEUCHTEFFEKTE
+   SCHWIERIGKEITSGRAD BUTTONS
    ======================================================= */
 .btn-diff {
   background: #111;
@@ -1172,7 +1167,6 @@ header h1 {
   min-width: 120px;
 }
 
-/* LEICHT (Grün) */
 .btn-leicht {
   border: 2px solid #00ff66 !important;
   color: #00ff66 !important;
@@ -1184,7 +1178,6 @@ header h1 {
   box-shadow: 0 0 20px #00ff66;
 }
 
-/* NORMAL (Orange) */
 .btn-normal {
   border: 2px solid #ff9900 !important;
   color: #ff9900 !important;
@@ -1196,7 +1189,6 @@ header h1 {
   box-shadow: 0 0 20px #ff9900;
 }
 
-/* SCHWER (Rot) */
 .btn-schwer {
   border: 2px solid #ff0055 !important;
   color: #ff0055 !important;
@@ -1208,7 +1200,6 @@ header h1 {
   box-shadow: 0 0 20px #ff0055;
 }
 
-/* ABBRECHEN (Lila) */
 .btn-abbrechen-purple {
   background: transparent;
   border: 2px solid #aa00ff !important;
@@ -1223,14 +1214,4 @@ header h1 {
   background: #aa00ff;
   color: #fff;
   box-shadow: 0 0 18px #aa00ff;
-}
-
-/* Klick-Blockade auf den Hauptkarten aufheben */
-.card * {
-  pointer-events: none !important;
-}
-
-.card {
-  pointer-events: auto !important;
-  cursor: pointer !important;
 }
