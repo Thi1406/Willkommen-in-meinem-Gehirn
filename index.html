@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -18,8 +20,8 @@
   <p>Wähle einen Bereich aus, um mehr zu sehen:</p>
 </header>
 
-<main class="navigation-grid">
-  <div class="card card-bilder" onclick="zeigeBereich('bilder')">
+<main class="navigation-grid" aria-label="Hauptbereiche">
+  <button type="button" class="card card-bilder" data-bereich="bilder">
     <div class="card-title">Bilder</div>
     
     <div class="runner r1 rot">
@@ -62,17 +64,17 @@
       <div class="leg-l"></div>
       <div class="leg-r"></div>
     </div>
-  </div>
+  </button>
 
-  <div class="card card-geschichten" onclick="zeigeBereich('geschichten')">
+  <button type="button" class="card card-geschichten" data-bereich="geschichten">
     <div class="card-title">Geschichten</div>
     <span class="letter b1">A</span><span class="letter b2">g</span>
     <span class="letter b3">h</span><span class="letter b4">X</span>
     <span class="letter b5">w</span><span class="letter b6">?</span>
     <span class="letter b7">O</span><span class="letter b8">m</span>
-  </div>
+  </button>
 
-  <div class="card card-games" onclick="zeigeBereich('games')">
+  <button type="button" class="card card-games" data-bereich="games">
     <div class="card-title">Games</div>
     <div class="paperplane plane-rot">➔
       <div class="bullet b-rot-1"></div>
@@ -82,20 +84,19 @@
       <div class="bullet b-blau-1"></div>
       <div class="bullet b-blau-2"></div>
     </div>
-  </div>
+  </button>
 </main>
 
-<!-- UNTERSEITE: BILDER (MIT REITER-SUBNAVI) -->
+<!-- UNTERSEITE: BILDER (MIT 3 REITER-SUBNAVI) -->
 <section id="unterseite-bilder" class="unterseite hidden">
   <button onclick="zeigeStartseite()">← Zurück</button>
   <h2>Bilderwelt</h2>
 
   <!-- Sub-Navigation / Reiter -->
   <div class="bilder-tabs">
-    <button class="btn-tab active" onclick="wechsleBilderTab('ki-spass')">KI-Spaß</button>
-    <button class="btn-tab" onclick="wechsleBilderTab('meine-werke')">Meine Werke</button>
-    <button class="btn-tab" onclick="wechsleBilderTab('freies-malen')">Freies Malen</button>
-    <button class="btn-tab" onclick="wechsleBilderTab('ki-studio')">KI-Studio & Analyse</button>
+    <button class="btn-tab active" onclick="wechsleBilderTab('ki-spass', this)">KI-Spaß</button>
+    <button class="btn-tab" onclick="wechsleBilderTab('meine-werke', this)">Meine Werke</button>
+    <button class="btn-tab" onclick="wechsleBilderTab('freies-malen', this)">Freies Malen</button>
   </div>
 
   <!-- REITER 1: KI-SPAß -->
@@ -107,15 +108,13 @@
       <label for="ki-kategorie-select">Kategorie wählen:</label>
       <select id="ki-kategorie-select" onchange="aendereKiKategorie(this.value)">
         <option value="standard">Standard</option>
+        <option value="superhelden">🦸‍♂️ Superhelden & Comics</option>
         <option value="yugioh">🐉 Yu-Gi-Oh! Monster</option>
         <option value="katzen">🐱 Katzen</option>
         <option value="hunde">🐶 Hunde</option>
         <option value="pokemon-gen1">🔴 Pokémon Gen 1</option>
         <option value="pokemon-gen2">🔵 Pokémon Gen 2</option>
         <option value="pokemon-gen3">🟢 Pokémon Gen 3</option>
-        <option value="digimon-gen1">🟠 Digimon Gen 1</option>
-        <option value="digimon-gen2">🟡 Digimon Gen 2</option>
-        <option value="digimon-gen3">🟣 Digimon Gen 3</option>
       </select>
     </div>
 
@@ -126,7 +125,7 @@
     <div class="bearbeitete-werke-bereich">
       <h4>Bearbeitete Werke der Besucher:</h4>
       <div id="ki-user-liste" class="neon-button-grid">
-        <!-- Hier werden die Namensbuttons per JS eingefügt -->
+        <!-- Hier werden die Neon-Cyan Namensbuttons per JS eingefügt -->
       </div>
     </div>
   </div>
@@ -183,47 +182,6 @@
       </div>
     </div>
   </div>
-
-  <!-- REITER 4: KI-STUDIO & ANALYSE -->
-  <div id="tab-ki-studio" class="tab-content hidden">
-    <h3>KI-Studio & Bild-Analyse</h3>
-    <p>Zeichne etwas auf die Leinwand oder lade ein eigenes Bild hoch, um es zu bearbeiten oder analysieren zu lassen!</p>
-
-    <div class="freies-malen-container">
-      <div class="paint-tools">
-        <label for="studio-paint-farbe">Farbe:</label>
-        <input type="color" id="studio-paint-farbe" value="#ff007f">
-        
-        <label for="studio-paint-groesse">Strichstärke:</label>
-        <input type="range" id="studio-paint-groesse" min="1" max="30" value="5">
-
-        <div class="werkzeug-leiste">
-          <button class="btn-tool active" onclick="setzeStudioWerkzeug('bleistift', event)">✏️ Stift</button>
-          <button class="btn-tool" onclick="setzeStudioWerkzeug('kugelschreiber', event)">🖊️ Kugelschreiber</button>
-          <button class="btn-tool" onclick="setzeStudioWerkzeug('spray', event)">💨 Spraydose</button>
-          
-          <label for="ki-image-upload" class="btn-tool" style="cursor: pointer; display: inline-block;">📁 Bild hochladen</label>
-          <input type="file" id="ki-image-upload" accept="image/*" style="display: none;" onchange="ladeStudioBildHoch(event)">
-        </div>
-      </div>
-
-      <div class="canvas-container freies-canvas-box">
-        <canvas id="studio-paint-canvas" width="800" height="500"></canvas>
-      </div>
-
-      <!-- Speichern & KI Aktion Buttons -->
-      <div class="frei-paint-speichern-box" style="margin-top: 15px;">
-        <input type="text" id="studio-paint-name" placeholder="Dein Name (Pflichtfeld)*" required>
-        <button onclick="speichereStudioBild()">Bild Speichern</button>
-      </div>
-
-      <div class="modal-buttons" style="margin-top: 15px; justify-content: center; gap: 15px;">
-        <button onclick="analysiereKiBild('analyse')" class="btn-diff btn-leicht">🤖 KI (Analyse)</button>
-        <button onclick="analysiereKiBild('tipp')" class="btn-diff btn-normal">💡 Tipp</button>
-        <button onclick="analysiereKiBild('prompt')" class="btn-diff btn-schwer">✍️ Prompt</button>
-      </div>
-    </div>
-  </div>
 </section>
 
 <!-- UNTERSEITE: GESCHICHTEN -->
@@ -259,21 +217,6 @@
 
 <!-- ==================== MODALS ==================== -->
 
-<!-- MODAL: KI-STUDIO ERGEBNIS / RÜCKMELDUNG -->
-<div id="modal-ki-output" class="modal hidden">
-  <div class="modal-inhalt" style="border: 2px solid #00f3ff; max-width: 550px; text-align: left;">
-    <h3 id="ki-output-titel" style="color: #00f3ff; margin-bottom: 15px;">KI Analyse</h3>
-    
-    <div id="ki-output-text" style="color: #fff; font-size: 1rem; line-height: 1.6; max-height: 300px; overflow-y: auto; background: #111; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-      <!-- Hier landet die Antwort der KI -->
-    </div>
-
-    <div class="modal-buttons" style="justify-content: flex-end;">
-      <button onclick="schliesseKiOutputModal()" class="btn-abbrechen">✕ Schließen</button>
-    </div>
-  </div>
-</div>
-
 <!-- MODAL / LESEFENSTER FÜR EINE GESCHICHTE -->
 <div id="modal-geschichte" class="modal hidden" onclick="schliesseGeschichteModal(event)">
   <div class="modal-inhalt geschichte-inhalt">
@@ -281,11 +224,11 @@
     
     <!-- Genre-Auswahl Buttons -->
     <div class="genre-buttons">
-      <button class="btn-genre active" onclick="wechsleGenre('original')">Original</button>
-      <button class="btn-genre" onclick="wechsleGenre('horror')">Horror</button>
-      <button class="btn-genre" onclick="wechsleGenre('krimi')">Krimi</button>
-      <button class="btn-genre" onclick="wechsleGenre('kindlich')">Kindlich</button>
-      <button class="btn-genre" onclick="wechsleGenre('erotisch')">Erotisch</button>
+      <button class="btn-genre active" data-genre="original" onclick="wechsleGenre('original')">Original</button>
+      <button class="btn-genre" data-genre="horror" onclick="wechsleGenre('horror')">Horror</button>
+      <button class="btn-genre" data-genre="krimi" onclick="wechsleGenre('krimi')">Krimi</button>
+      <button class="btn-genre" data-genre="kindlich" onclick="wechsleGenre('kindlich')">Kindlich</button>
+      <button class="btn-genre" data-genre="erotisch" onclick="wechsleGenre('erotisch')">Erotisch</button>
     </div>
 
     <!-- Der eigentliche Textbereich -->
@@ -330,19 +273,19 @@
   </div>
 </div>
 
-<!-- MODAL: PAINT (KI-BILD BEARBEITEN UND VORSCHAUEN) -->
+<!-- MODAL: PAINT (KI-BILD BEARBEITEN) -->
 <div id="modal-paint" class="modal hidden">
   <div class="modal-inhalt paint-inhalt">
-    <h3 id="paint-modal-header-title">Bild bearbeiten & bemalen</h3>
+    <h3>Bild bearbeiten & bemalen</h3>
     
-    <div class="paint-tools" id="paint-modal-werkzeugleiste">
+    <div class="paint-tools">
       <label for="paint-farbe">Farbe:</label>
       <input type="color" id="paint-farbe" value="#00f3ff">
       
       <label>Stift:</label>
-      <button class="btn-tool active" onclick="setzeWerkzeug('bleistift')">Bleistift</button>
-      <button class="btn-tool" onclick="setzeWerkzeug('kugelschreiber')">Kugelschreiber</button>
-      <button class="btn-tool" onclick="setzeWerkzeug('spray')">Spraydose</button>
+      <button class="btn-tool active" onclick="setzeWerkzeug('bleistift', this)">Bleistift</button>
+      <button class="btn-tool" onclick="setzeWerkzeug('kugelschreiber', this)">Kugelschreiber</button>
+      <button class="btn-tool" onclick="setzeWerkzeug('spray', this)">Spraydose</button>
     </div>
 
     <div class="canvas-container">
@@ -350,14 +293,12 @@
       <canvas id="paint-canvas"></canvas>
     </div>
 
-    <div id="paint-modal-speicher-bereich">
-      <input type="text" id="paint-name" placeholder="Dein Name (Pflichtfeld)*" required>
-      <p id="paint-fehler" class="fehler-text hidden">Bitte gib deinen Namen ein!</p>
-    </div>
+    <input type="text" id="paint-name" placeholder="Dein Name (Pflichtfeld)*" required>
+    <p id="paint-fehler" class="fehler-text hidden">Bitte gib deinen Namen ein!</p>
 
     <div class="modal-buttons">
-      <button id="paint-modal-btn-speichern" onclick="speicherePaint()">Speichern</button>
-      <button onclick="schliessePaintModal()" class="btn-abbrechen">Schließen</button>
+      <button onclick="speicherePaint()">Speichern</button>
+      <button onclick="schliessePaintModal()" class="btn-abbrechen">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -473,3 +414,4 @@
 
 </body>
 </html>
+
