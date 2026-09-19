@@ -892,24 +892,30 @@ function speichereStudioBild() {
   rendereFreiUserListe();
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  initFreiesCanvas();
-  initStudioCanvas();
-  // ====================================================
+
+// ====================================================
 // 7. KI-ANALYSE FUNKTIONEN (KI-STUDIO)
 // ====================================================
 function analysiereKiBild(modus) {
-  const canvas = document.getElementById('studio-paint-canvas');
-  if (!canvas) return;
+  const canvasEl = document.getElementById('studio-paint-canvas') || document.getElementById('ki-studio-canvas');
+  if (!canvasEl) return;
 
   if (modus === 'analyse') {
-    alert("🤖 KI-Analyse: Das Bild wird verarbeitet... (Hier kann eine KI-Vision-API angebunden werden)");
+    alert("🤖 KI-Analyse: Das Bild wird verarbeitet...");
   } else if (modus === 'tipp') {
     alert("💡 KI-Tipp: Versuche mehr Schattierungen und stärkere Kontraste zu setzen!");
   } else if (modus === 'prompt') {
     alert("✍️ KI-Prompt: 'Ein kreatives digitales Kunstwerk mit leuchtenden Neonfarben auf dunklem Hintergrund.'");
   }
 }
+
+
+// ====================================================
+// 8. INITIALISIERUNG BEIM SEITENLADEN
+// ====================================================
+window.addEventListener('DOMContentLoaded', () => {
+  initFreiesCanvas();
+  initStudioCanvas();
 });
 // ====================================================
 // 5. GESCHICHTEN-DATENBANK & BROWSER-STEUERUNG
